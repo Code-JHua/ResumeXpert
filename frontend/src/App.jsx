@@ -1,12 +1,17 @@
 import React from 'react'
 import LandingPage from './pages/LandingPage.jsx'
 import { Routes, Route } from 'react-router-dom'
+import UserProvider from './context/UserContext.jsx'
+import Dashboard from './pages/Dashboard.jsx'
 
 const App = () => {
   return (
-    <Routes>
-      <Route path="/" element={<LandingPage />} />
-    </Routes>
+    <UserProvider>
+      <Routes>
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/dashboard" element={<Dashboard />} />
+      </Routes>
+    </UserProvider>
   )
 }
 

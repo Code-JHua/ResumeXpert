@@ -22,9 +22,7 @@ connectDB()
 //middleware
 app.use(express.json())
 
-// import userRoutes from './routes/userRoutes.js'
 app.use('/api/auth', userRoutes)
-// import resumeRoutes from './routes/resumeRouter.js'
 app.use('/api/resume', resumeRoutes)
 
 app.use(
