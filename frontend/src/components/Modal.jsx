@@ -5,7 +5,7 @@ import { X } from 'lucide-react';
 
 
 
-const Modal = ({ children, isOpen, onClose, hideHeader, title }) => {
+const Modal = ({ children, isOpen, onClose, hideHeader, title, showActionBtn, actionBtnIcon = null, actionBtnText, onActionclick = () => {} }) => {
   if (!isOpen) {
     return null;
   }
@@ -17,6 +17,12 @@ const Modal = ({ children, isOpen, onClose, hideHeader, title }) => {
             <h3 className={styles.title}>
               {title}
             </h3>
+            {showActionBtn && (
+              <button type="button" className={styles.actionButton} onClick={onActionclick}>
+                {actionBtnIcon}
+                {actionBtnText}
+              </button>
+            )}
           </div>
         )}
 
