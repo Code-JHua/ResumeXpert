@@ -113,17 +113,36 @@ export const getResumeById = async (req, res) => {
 // update resumes
 export const updateResume = async (req, res) => {
   try {
+    console.log('Update request for resume:', req.params.id)
+
     const resume = await Resume.findOne({ _id: req.params.id, userId: req.user._id })
     if (!resume) {
       return res.status(404).json({ message: "Resume not found or not authorized" });
     }
 
-    // merge update resumes
-    Object.assign(resume, req.body)
-    //save updated resume
+    // Update each field individually to avoid issues with nested objects and _id
+    if (req.body.title !== undefined) resume.title = req.body.title
+    if (req.body.thumbnailLink !== undefined) resume.thumbnailLink = req.body.thumbnailLink
+    if (req.body.completion !== undefined) resume.completion = req.body.completion
+
+    if (req.body.profileInfo) resume.profileInfo = { ...resume.profileInfo, ...req.body.profileInfo }
+    if (req.body.contactInfo) resume.contactInfo = { ...resume.contactInfo, ...req.body.contactInfo }
+    if (req.body.template) resume.template = req.body.template
+
+    if (req.body.workExperience) resume.workExperience = req.body.workExperience
+    if (req.body.education) resume.education = req.body.education
+    if (req.body.skills) resume.skills = req.body.skills
+    if (req.body.projects) resume.projects = req.body.projects
+    if (req.body.certifications) resume.certifications = req.body.certifications
+    if (req.body.languages) resume.languages = req.body.languages
+    if (req.body.interests) resume.interests = req.body.interests
+
+    // Save updated resume
     const savedResume = await resume.save()
+    console.log('Resume updated successfully')
     res.json(savedResume)
   } catch (error) {
+    console.error('Update resume error:', error)
     res.status(500).json({ message: "Failed to update resume", error: error.message });
   }
 }

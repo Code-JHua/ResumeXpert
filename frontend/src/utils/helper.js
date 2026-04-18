@@ -105,19 +105,24 @@ export function formatYearMonth(yearMonth) {
 /**
  * Recursively replace any computed 'oklch(...)' in color, backgroundColor,
  * or borderColor—and any inline SVG fill/stroke attributes—so that no OKLCH
- * values remain. This runs on a given rootElement and all its descendants.
+ * values remain. This runs on a CLONE of the rootElement to avoid modifying
+ * the original DOM, and returns the cloned element.
  */
 export const fixTailwindColors = (rootElement) => {
-  if (!rootElement) return
-  const elements = rootElement.querySelectorAll("*")
+  if (!rootElement) return null
+
+  // Clone the element to avoid modifying the original DOM
+  const clone = rootElement.cloneNode(true)
+  const elements = clone.querySelectorAll("*")
+
   elements.forEach((el) => {
     const style = window.getComputedStyle(el)
-      ;["color", "backgroundColor", "borderColor"].forEach((prop) => {
-        const val = style[prop] || ""
-        if (val.includes("oklch")) {
-          el.style[prop] = "#000"
-        }
-      })
+    ;["color", "backgroundColor", "borderColor"].forEach((prop) => {
+      const val = style[prop] || ""
+      if (val.includes("oklch")) {
+        el.style[prop] = "#000"
+      }
+    })
 
     // If this is an SVG element, also override inline fill/stroke attributes
     if (el instanceof SVGElement) {
@@ -131,6 +136,8 @@ export const fixTailwindColors = (rootElement) => {
       }
     }
   })
+
+  return clone
 }
 
 /**

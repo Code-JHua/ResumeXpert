@@ -22,18 +22,25 @@ axiosInstance.interceptors.request.use(
   (error) => Promise.reject(error),
 );
 
-// response inter
+// response interceptor
 axiosInstance.interceptors.response.use(
   (response) => {
     return response;
   },
   (error) => {
-    if (error.response.status === 401) {
-      window.location.href = '/';
-    } else if (error.response.status === 500) {
-      console.error('Server Error')
+    // Check if error.response exists before accessing its properties
+    // This prevents TypeError when error.response is undefined (network errors, timeouts, etc.)
+    if (error.response) {
+      if (error.response.status === 401) {
+        window.location.href = '/';
+      } else if (error.response.status === 500) {
+        console.error('Server Error')
+      }
     } else if (error.code === 'ECONNABORTED') {
       console.error('Request timeout');
+    } else {
+      // Network error or CORS issue - no response from server
+      console.error('Network Error:', error.message);
     }
     return Promise.reject(error);
   },

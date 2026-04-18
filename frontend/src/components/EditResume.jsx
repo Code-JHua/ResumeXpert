@@ -19,7 +19,7 @@ import {
 import axiosInstance from '../utils/axiosInstance'
 import { API_PATHS } from '../utils/apiPaths'
 import html2pdf from 'html2pdf.js'
-import { ArrowLeft, Save, Loader2, AlertCircle } from 'lucide-react'
+import { ArrowLeft, Save, Loader2, AlertCircle, Check } from 'lucide-react'
 import html2canvas from 'html2canvas'
 import { fixTailwindColors, dataURLtoFile } from '../utils/helper'
 import ThemeSelector from './ThemeSelector'
@@ -494,15 +494,54 @@ const EditResume = () => {
         throw new Error("Thumbnail element not found")
       }
 
+      // Clone the thumbnail element and prepare it for html2canvas
       const fixedThumbnail = fixTailwindColors(thumbnailElement)
 
-      const thumbnailCanvas = await html2canvas(fixedThumbnail, {
-        scale: 0.5,
-        backgroundColor: "#FFFFFF",
-        logging: false,
-      })
+      if (!fixedThumbnail) {
+        throw new Error("Failed to process thumbnail element")
+      }
 
-      document.body.removeChild(fixedThumbnail)
+      // Position the clone off-screen and add it to DOM (required by html2canvas)
+      fixedThumbnail.style.position = "absolute"
+      fixedThumbnail.style.top = "-9999px"
+      fixedThumbnail.style.left = "0"
+      fixedThumbnail.style.opacity = "0"
+      const { width, height } = thumbnailElement.getBoundingClientRect()
+      fixedThumbnail.style.width = `${width}px`
+      fixedThumbnail.style.height = `${height}px`
+      document.body.appendChild(fixedThumbnail)
+
+      // Create a style override to ensure consistent colors
+      const override = document.createElement("style")
+      override.id = "__pdf_color_override__"
+      override.textContent = `
+        * {
+          color: #000 !important;
+          background-color: #fff !important;
+          border-color: #000 !important;
+          box-shadow: none !important;
+        }
+      `
+      document.head.appendChild(override)
+
+      let thumbnailCanvas
+      try {
+        thumbnailCanvas = await html2canvas(fixedThumbnail, {
+          scale: 0.5,
+          backgroundColor: "#FFFFFF",
+          logging: false,
+          useCORS: true,
+        })
+      } finally {
+        // Clean up: remove clone and style override
+        if (document.body.contains(fixedThumbnail)) {
+          document.body.removeChild(fixedThumbnail)
+        }
+        const existingOverride = document.getElementById("__pdf_color_override__")
+        if (existingOverride) {
+          document.head.removeChild(existingOverride)
+        }
+      }
 
       const thumbnailDataUrl = thumbnailCanvas.toDataURL("image/png")
       const thumbnailFile = dataURLtoFile(
@@ -515,11 +554,14 @@ const EditResume = () => {
 
       const uploadResponse = await axiosInstance.put(
         API_PATHS.RESUME.UPLOAD_IMAGES(resumeId),
-        formData,
-        {
-          headers: { "Content-Type": "multipart/form-data" },
-        }
+        formData
+        // Remove Content-Type header - browser sets it automatically for FormData
       )
+
+      // Validate response data structure
+      if (!uploadResponse.data || !uploadResponse.data.thumbnailLink) {
+        throw new Error("Invalid server response: missing thumbnail link")
+      }
 
       const { thumbnailLink } = uploadResponse.data
       await updateResumeDetails(thumbnailLink)
@@ -535,9 +577,10 @@ const EditResume = () => {
   }
 
   const updateResumeDetails = async (thumbnailLink) => {
-    try {
-      setIsLoading(true)
+    // Don't set isLoading here - it's already managed by uploadResumeImages
+    // This prevents race conditions and UI state flickering
 
+    try {
       await axiosInstance.put(API_PATHS.RESUME.UPDATE(resumeId), {
         ...resumeData,
         thumbnailLink: thumbnailLink || "",
@@ -545,9 +588,8 @@ const EditResume = () => {
       })
     } catch (err) {
       console.error("Error updating resume:", err)
-      toast.error("Failed to update resume details")
-    } finally {
-      setIsLoading(false)
+      // Re-throw the error so the caller can handle it
+      throw new Error("Failed to update resume details")
     }
   }
 
