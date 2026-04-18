@@ -89,6 +89,38 @@
   opacity: 0;
 }
 
+/* 字母淡入动画 - 用于输入时的新字母 */
+@keyframes letter-in {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-letter-in {
+  animation: letter-in 0.2s ease forwards;
+}
+
+/* 字母淡出动画 - 用于删除时的字母 */
+@keyframes letter-out {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+}
+
+.animate-letter-out {
+  animation: letter-out 0.2s ease forwards;
+}
+
 @keyframes spin {
   0% {
     transform: rotate(0deg);

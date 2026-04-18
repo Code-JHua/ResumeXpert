@@ -75,7 +75,7 @@ export const createResume = async (req, res) => {
 
     // Create a new resume document
     const newResume = await Resume.create({
-      userId: req.user.id,
+      userId: req.user._id,
       title,
       ...defaultResumeData,
       ...req.body,
@@ -89,10 +89,10 @@ export const createResume = async (req, res) => {
 // Get Function
 export const getUserResumes = async (req, res) => {
   try {
-    const resume = await Resume.findOne({ userId: req.user.id }).sort({ updatedAt: -1 })
-    res.json(resume)
+    const resumes = await Resume.find({ userId: req.user._id }).sort({ updatedAt: -1 })
+    res.json(resumes)
   } catch (error) {
-    res.status(500).json({ message: "Failed to get resume", error: error.message });
+    res.status(500).json({ message: "Failed to get resumes", error: error.message });
   }
 }
 
