@@ -1,6 +1,7 @@
 import React from 'react';
 import { ExternalLink, Github } from 'lucide-react';
 import { infoStyles as styles } from '../assets/dummystyle';
+import { useTranslation } from 'react-i18next';
 
 export const Progress = ({ progress, color }) => (
   <div className={styles.progressWrapper}>
@@ -65,24 +66,27 @@ export const SkillSection = ({ skills, accentColor }) => (
   </div>
 );
 
-export const ProjectInfo = ({ title, description, githubLink, liveDemoUrl, isPreview }) => (
-  <div className={styles.projectContainer}>
-    <h3 className={styles.projectTitle(isPreview)}>{title}</h3>
-    <p className={styles.projectDesc}>{description}</p>
-    <div className={styles.projectLinks}>
-      {githubLink && (
-        <a href={githubLink} target="_blank" rel="noopener noreferrer" className={styles.linkRow}>
-          <Github size={16} /><span>GitHub</span>
-        </a>
-      )}
-      {liveDemoUrl && (
-        <a href={liveDemoUrl} target="_blank" rel="noopener noreferrer" className={styles.linkRow}>
-          <ExternalLink size={16} /><span>Live Demo</span>
-        </a>
-      )}
+export const ProjectInfo = ({ title, description, githubLink, liveDemoUrl, isPreview }) => {
+  const { t } = useTranslation();
+  return (
+    <div className={styles.projectContainer}>
+      <h3 className={styles.projectTitle(isPreview)}>{title}</h3>
+      <p className={styles.projectDesc}>{description}</p>
+      <div className={styles.projectLinks}>
+        {githubLink && (
+          <a href={githubLink} target="_blank" rel="noopener noreferrer" className={styles.linkRow}>
+            <Github size={16} /><span>{t('resumeSection.github')}</span>
+          </a>
+        )}
+        {liveDemoUrl && (
+          <a href={liveDemoUrl} target="_blank" rel="noopener noreferrer" className={styles.linkRow}>
+            <ExternalLink size={16} /><span>{t('resumeSection.liveDemo')}</span>
+          </a>
+        )}
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 export const RatingInput = ({ value = 0, total = 5, onChange = () => { }, color = '#10b981', bgColor = '#e5e7eb' }) => {
   const displayValue = Math.round((value / 100) * total);

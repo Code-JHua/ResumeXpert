@@ -1,8 +1,10 @@
 import React from 'react'
 import { shimmerStyle } from '../assets/dummystyle'
 import { Check } from 'react-feather'
+import { useTranslation } from 'react-i18next'
 
 const StepProgress = ({ progress }) => {
+  const { t } = useTranslation()
   return (
     <>
       <style>{shimmerStyle}</style>
@@ -42,12 +44,12 @@ const StepProgress = ({ progress }) => {
       <div className='flex justify-between items-center mt-3'>
         <div className='text-xs font-bold text-white/60'>
           {progress < 25
-            ? 'Getting Started'
+            ? t('stepProgress.gettingStarted')
             : progress < 50
-              ? 'Marking Progress'
+              ? t('stepProgress.markingProgress')
               : progress < 75
-                ? 'Almost There'
-                : 'Nearly Completed'}
+                ? t('stepProgress.almostThere')
+                : t('stepProgress.nearlyCompleted')}
         </div>
         
         <div className=' flex items-center gap-2'>

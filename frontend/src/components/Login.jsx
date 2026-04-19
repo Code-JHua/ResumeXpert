@@ -6,6 +6,7 @@ import { API_PATHS } from '../utils/apiPaths.js';
 import { validateEmail } from '../utils/helper.js';
 import { authStyles as styles } from '../assets/dummystyle';
 import { Input } from '../components/Inputs.jsx';
+import { useTranslation } from 'react-i18next';
 
 const Login = ({ setCurrentPage }) => {
 
@@ -14,16 +15,17 @@ const Login = ({ setCurrentPage }) => {
   const [error, setError] = useState(null);
   const { updateUser } = useContext(UserContext);
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const handleLogin = async (e) => {
     e.preventDefault();
 
     if (!validateEmail(email)) {
-      setError('Please enter valid Email');
+      setError(t('auth.login.errors.invalidEmail'));
       return;
     }
     if (!password) {
-      setError('Please enter your Password');
+      setError(t('auth.login.errors.passwordRequired'));
       return;
     }
     setError('');
@@ -39,16 +41,16 @@ const Login = ({ setCurrentPage }) => {
         navigate('/dashboard');
       }
     } catch (error) {
-      setError(error.response?.data?.message || 'Something went wrong. Please try again.');
+      setError(error.response?.data?.message || t('auth.login.errors.default'));
     }
   }
 
   return (
     <div className={styles.container}>
       <div className={styles.headerWrapper}>
-        <h3 className={styles.title}>Welcome Back</h3>
+        <h3 className={styles.title}>{t('auth.login.title')}</h3>
         <p className={styles.subtitle}>
-          Sign in to continue building amazing resumes
+          {t('auth.login.subtitle')}
         </p>
       </div>
 
@@ -57,26 +59,26 @@ const Login = ({ setCurrentPage }) => {
         <Input
           value={email}
           onChange={({ target }) => setEmail(target.value)}
-          label="Email"
-          placeholder="example@example.com"
+          label={t('auth.login.email')}
+          placeholder={t('auth.login.emailPlaceholder')}
           type="email" />
         <Input
           value={password}
           onChange={({ target }) => setPassword(target.value)}
-          label="Password"
-          placeholder="8 characters or more"
+          label={t('auth.login.password')}
+          placeholder={t('auth.login.passwordPlaceholder')}
           type="password" />
 
         {error && <div className={styles.errorMessage}>{error}</div>}
 
-        <button type="submit" className={styles.submitButton}>Sign In</button>
+        <button type="submit" className={styles.submitButton}>{t('auth.login.submit')}</button>
 
         <p className={styles.switchText}>
-          Don't have an account(' ')
+          {t('auth.login.noAccount')}{' '}
           <button type='button'
             className={styles.switchButton}
             onClick={() => setCurrentPage('signup')}>
-            Sign Up
+            {t('auth.login.signUpLink')}
           </button>
         </p>
       </form>

@@ -14,31 +14,37 @@ import {
   skillsInfoStyles,
   workExperienceStyles
 } from "../assets/dummystyle";
+import { useTranslation } from 'react-i18next';
+
+// Get translation hook outside components
+let t;
+const setT = (tFn) => { t = tFn; };
 
 // AdditionalInfoForm Component
 export const AdditionalInfoForm = ({ languages, interests, updateArrayItem, addArrayItem, removeArrayItem }) => {
+  const { t } = useTranslation();
   return (
     <div className={additionalInfoStyles.container}>
-      <h2 className={additionalInfoStyles.heading}>Additional Information</h2>
+      <h2 className={additionalInfoStyles.heading}>{t('forms.additional.title')}</h2>
 
       {/* Languages Section */}
       <div className="mb-10">
         <h3 className={additionalInfoStyles.sectionHeading}>
           <div className={additionalInfoStyles.dotViolet}></div>
-          Languages
+          {t('forms.additional.languages')}
         </h3>
         <div className="space-y-6">
           {languages?.map((lang, index) => (
             <div key={index} className={additionalInfoStyles.languageItem}>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
                 <Input
-                  label="Language"
-                  placeholder="e.g. English"
+                  label={t('forms.additional.language')}
+                  placeholder={t('forms.additional.languagePlaceholder')}
                   value={lang.name || ""}
                   onChange={({ target }) => updateArrayItem("languages", index, "name", target.value)}
                 />
                 <div>
-                  <label className="block text-sm font-bold text-slate-700 mb-4">Proficiency</label>
+                  <label className="block text-sm font-bold text-slate-700 mb-4">{t('forms.additional.proficiency')}</label>
                   <RatingInput
                     value={lang.progress || 0}
                     total={5}
@@ -65,7 +71,7 @@ export const AdditionalInfoForm = ({ languages, interests, updateArrayItem, addA
             className={`${commonStyles.addButtonBase} ${additionalInfoStyles.addButtonLanguage}`}
             onClick={() => addArrayItem("languages", { name: "", progress: 0 })}
           >
-            <Plus size={16} /> Add Language
+            <Plus size={16} /> {t('forms.additional.addLanguage')}
           </button>
         </div>
       </div>
@@ -74,13 +80,13 @@ export const AdditionalInfoForm = ({ languages, interests, updateArrayItem, addA
       <div className="mb-6">
         <h3 className={additionalInfoStyles.sectionHeading}>
           <div className={additionalInfoStyles.dotOrange}></div>
-          Interests
+          {t('forms.additional.interests')}
         </h3>
         <div className="space-y-4">
           {interests?.map((interest, index) => (
             <div key={index} className={additionalInfoStyles.interestItem}>
               <Input
-                placeholder="e.g. Reading, Photography"
+                placeholder={t('forms.additional.interestPlaceholder')}
                 value={interest || ""}
                 onChange={({ target }) => updateArrayItem("interests", index, null, target.value)}
               />
@@ -101,7 +107,7 @@ export const AdditionalInfoForm = ({ languages, interests, updateArrayItem, addA
             className={`${commonStyles.addButtonBase} ${additionalInfoStyles.addButtonInterest}`}
             onClick={() => addArrayItem("interests", "")}
           >
-            <Plus size={16} /> Add Interest
+            <Plus size={16} /> {t('forms.additional.addInterest')}
           </button>
         </div>
       </div>
@@ -111,30 +117,31 @@ export const AdditionalInfoForm = ({ languages, interests, updateArrayItem, addA
 
 // CertificationInfoForm Component
 export const CertificationInfoForm = ({ certifications, updateArrayItem, addArrayItem, removeArrayItem }) => {
+  const { t } = useTranslation();
   return (
     <div className={certificationInfoStyles.container}>
-      <h2 className={certificationInfoStyles.heading}>Certifications</h2>
+      <h2 className={certificationInfoStyles.heading}>{t('forms.certifications.title')}</h2>
       <div className="space-y-6 mb-6">
         {certifications.map((cert, index) => (
           <div key={index} className={certificationInfoStyles.item}>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <Input
-                label="Certificate Title"
-                placeholder="Full Stack Web Developer"
+                label={t('forms.certifications.certificateTitle')}
+                placeholder={t('forms.certifications.certificateTitlePlaceholder')}
                 value={cert.title || ""}
                 onChange={({ target }) => updateArrayItem(index, "title", target.value)}
               />
 
               <Input
-                label="Issuer"
-                placeholder="Coursera / Google / etc."
+                label={t('forms.certifications.issuer')}
+                placeholder={t('forms.certifications.issuerPlaceholder')}
                 value={cert.issuer || ""}
                 onChange={({ target }) => updateArrayItem(index, "issuer", target.value)}
               />
 
               <Input
-                label="Year"
-                placeholder="2024"
+                label={t('forms.certifications.year')}
+                placeholder={t('forms.certifications.yearPlaceholder')}
                 value={cert.year || ""}
                 onChange={({ target }) => updateArrayItem(index, "year", target.value)}
               />
@@ -164,7 +171,7 @@ export const CertificationInfoForm = ({ certifications, updateArrayItem, addArra
           }
         >
           <Plus size={16} />
-          Add Certification
+          {t('forms.certifications.add')}
         </button>
       </div>
     </div>
@@ -173,53 +180,54 @@ export const CertificationInfoForm = ({ certifications, updateArrayItem, addArra
 
 // ContactInfoForm Component
 export const ContactInfoForm = ({ contactInfo, updateSection }) => {
+  const { t } = useTranslation();
   return (
     <div className={contactInfoStyles.container}>
-      <h2 className={contactInfoStyles.heading}>Contact Information</h2>
+      <h2 className={contactInfoStyles.heading}>{t('forms.contact.title')}</h2>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="md:col-span-2">
           <Input
-            label="Address"
-            placeholder="Short Address"
+            label={t('forms.contact.address')}
+            placeholder={t('forms.contact.addressPlaceholder')}
             value={contactInfo.location || ""}
             onChange={({ target }) => updateSection("location", target.value)}
           />
         </div>
 
         <Input
-          label="Email"
-          placeholder="john@example.com"
+          label={t('forms.contact.email')}
+          placeholder={t('forms.contact.emailPlaceholder')}
           type="email"
           value={contactInfo.email || ""}
           onChange={({ target }) => updateSection("email", target.value)}
         />
 
         <Input
-          label="Phone Number"
-          placeholder="1234567890"
+          label={t('forms.contact.phone')}
+          placeholder={t('forms.contact.phonePlaceholder')}
           value={contactInfo.phone || ""}
           onChange={({ target }) => updateSection("phone", target.value)}
         />
 
         <Input
-          label="LinkedIn"
-          placeholder="https://linkedin.com/in/username"
+          label={t('forms.contact.linkedin')}
+          placeholder={t('forms.contact.linkedinPlaceholder')}
           value={contactInfo.linkedin || ""}
           onChange={({ target }) => updateSection("linkedin", target.value)}
         />
 
         <Input
-          label="GitHub"
-          placeholder="https://github.com/username"
+          label={t('forms.contact.github')}
+          placeholder={t('forms.contact.githubPlaceholder')}
           value={contactInfo.github || ""}
           onChange={({ target }) => updateSection("github", target.value)}
         />
 
         <div className="md:col-span-2">
           <Input
-            label="Portfolio / Website"
-            placeholder="https://yourwebsite.com"
+            label={t('forms.contact.website')}
+            placeholder={t('forms.contact.websitePlaceholder')}
             value={contactInfo.website || ""}
             onChange={({ target }) => updateSection("website", target.value)}
           />
@@ -231,36 +239,37 @@ export const ContactInfoForm = ({ contactInfo, updateSection }) => {
 
 // EducationDetailsForm Component
 export const EducationDetailsForm = ({ educationInfo, updateArrayItem, addArrayItem, removeArrayItem }) => {
+  const { t } = useTranslation();
   return (
     <div className={educationDetailsStyles.container}>
-      <h2 className={educationDetailsStyles.heading}>Education</h2>
+      <h2 className={educationDetailsStyles.heading}>{t('forms.education.title')}</h2>
       <div className="space-y-6 mb-6">
         {educationInfo.map((education, index) => (
           <div key={index} className={educationDetailsStyles.item}>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <Input
-                label="Degree"
-                placeholder="BTech in Computer Science"
+                label={t('forms.education.degree')}
+                placeholder={t('forms.education.degreePlaceholder')}
                 value={education.degree || ""}
                 onChange={({ target }) => updateArrayItem(index, "degree", target.value)}
               />
 
               <Input
-                label="Institution"
-                placeholder="XYZ University"
+                label={t('forms.education.institution')}
+                placeholder={t('forms.education.institutionPlaceholder')}
                 value={education.institution || ""}
                 onChange={({ target }) => updateArrayItem(index, "institution", target.value)}
               />
 
               <Input
-                label="Start Date"
+                label={t('forms.education.startDate')}
                 type="month"
                 value={education.startDate || ""}
                 onChange={({ target }) => updateArrayItem(index, "startDate", target.value)}
               />
 
               <Input
-                label="End Date"
+                label={t('forms.education.endDate')}
                 type="month"
                 value={education.endDate || ""}
                 onChange={({ target }) => updateArrayItem(index, "endDate", target.value)}
@@ -290,7 +299,7 @@ export const EducationDetailsForm = ({ educationInfo, updateArrayItem, addArrayI
             })
           }
         >
-          <Plus size={16} /> Add Education
+          <Plus size={16} /> {t('forms.education.add')}
         </button>
       </div>
     </div>
@@ -299,32 +308,33 @@ export const EducationDetailsForm = ({ educationInfo, updateArrayItem, addArrayI
 
 // ProfileInfoForm Component
 export const ProfileInfoForm = ({ profileData, updateSection }) => {
+  const { t } = useTranslation();
   return (
     <div className={profileInfoStyles.container}>
-      <h2 className={profileInfoStyles.heading}>Personal Information</h2>
+      <h2 className={profileInfoStyles.heading}>{t('forms.profile.title')}</h2>
 
       <div className="space-y-8">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <Input
-            label="Full Name"
-            placeholder="John Doe"
+            label={t('forms.profile.fullName')}
+            placeholder={t('forms.profile.fullNamePlaceholder')}
             value={profileData.fullName || ""}
             onChange={({ target }) => updateSection("fullName", target.value)}
           />
 
           <Input
-            label="Designation"
-            placeholder="Full Stack Developer"
+            label={t('forms.profile.designation')}
+            placeholder={t('forms.profile.designationPlaceholder')}
             value={profileData.designation || ""}
             onChange={({ target }) => updateSection("designation", target.value)}
           />
 
           <div className="md:col-span-2">
-            <label className="block text-sm font-bold text-slate-700 mb-3">Summary</label>
+            <label className="block text-sm font-bold text-slate-700 mb-3">{t('forms.profile.summary')}</label>
             <textarea
               className={profileInfoStyles.textarea}
               rows={4}
-              placeholder="Short introduction about yourself"
+              placeholder={t('forms.profile.summaryPlaceholder')}
               value={profileData.summary || ""}
               onChange={({ target }) => updateSection("summary", target.value)}
             />
@@ -337,26 +347,27 @@ export const ProfileInfoForm = ({ profileData, updateSection }) => {
 
 // ProjectDetailForm Component
 export const ProjectDetailForm = ({ projectInfo, updateArrayItem, addArrayItem, removeArrayItem }) => {
+  const { t } = useTranslation();
   return (
     <div className={projectDetailStyles.container}>
-      <h2 className={projectDetailStyles.heading}>Projects</h2>
+      <h2 className={projectDetailStyles.heading}>{t('forms.projects.title')}</h2>
       <div className="space-y-6 mb-6">
         {projectInfo.map((project, index) => (
           <div key={index} className={projectDetailStyles.item}>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="md:col-span-2">
                 <Input
-                  label="Project Title"
-                  placeholder="Portfolio Website"
+                  label={t('forms.projects.projectTitle')}
+                  placeholder={t('forms.projects.projectTitlePlaceholder')}
                   value={project.title || ""}
                   onChange={({ target }) => updateArrayItem(index, "title", target.value)}
                 />
               </div>
 
               <div className="md:col-span-2">
-                <label className="block text-sm font-bold text-slate-700 mb-3">Description</label>
+                <label className="block text-sm font-bold text-slate-700 mb-3">{t('forms.projects.description')}</label>
                 <textarea
-                  placeholder="Short description about the project"
+                  placeholder={t('forms.projects.descriptionPlaceholder')}
                   className={projectDetailStyles.textarea}
                   rows={3}
                   value={project.description || ""}
@@ -365,15 +376,15 @@ export const ProjectDetailForm = ({ projectInfo, updateArrayItem, addArrayItem, 
               </div>
 
               <Input
-                label="GitHub Link"
-                placeholder="https://github.com/username/project"
+                label={t('forms.projects.githubLink')}
+                placeholder={t('forms.projects.githubLinkPlaceholder')}
                 value={project.github || ""}
                 onChange={({ target }) => updateArrayItem(index, "github", target.value)}
               />
 
               <Input
-                label="Live Demo URL"
-                placeholder="https://yourproject.live"
+                label={t('forms.projects.liveDemoUrl')}
+                placeholder={t('forms.projects.liveDemoUrlPlaceholder')}
                 value={project.liveDemo || ""}
                 onChange={({ target }) => updateArrayItem(index, "liveDemo", target.value)}
               />
@@ -404,7 +415,7 @@ export const ProjectDetailForm = ({ projectInfo, updateArrayItem, addArrayItem, 
           }
         >
           <Plus size={16} />
-          Add Project
+          {t('forms.projects.add')}
         </button>
       </div>
     </div>
@@ -413,23 +424,24 @@ export const ProjectDetailForm = ({ projectInfo, updateArrayItem, addArrayItem, 
 
 // SkillsInfoForm Component
 export const SkillsInfoForm = ({ skillsInfo, updateArrayItem, addArrayItem, removeArrayItem }) => {
+  const { t } = useTranslation();
   return (
     <div className={skillsInfoStyles.container}>
-      <h2 className={skillsInfoStyles.heading}>Skills</h2>
+      <h2 className={skillsInfoStyles.heading}>{t('forms.skills.title')}</h2>
       <div className="space-y-6 mb-6">
         {skillsInfo.map((skill, index) => (
           <div key={index} className={skillsInfoStyles.item}>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <Input
-                label="Skill Name"
-                placeholder="JavaScript"
+                label={t('forms.skills.skillName')}
+                placeholder={t('forms.skills.skillNamePlaceholder')}
                 value={skill.name || ""}
                 onChange={({ target }) => updateArrayItem(index, "name", target.value)}
               />
 
               <div>
                 <label className="block text-sm font-bold text-slate-700 mb-3">
-                  Proficiency ({skill.progress ? Math.round(skill.progress / 20) : 0}/5)
+                  {t('forms.skills.proficiency')} ({skill.progress ? Math.round(skill.progress / 20) : 0}/5)
                 </label>
                 <div className="mt-2">
                   <RatingInput
@@ -465,7 +477,7 @@ export const SkillsInfoForm = ({ skillsInfo, updateArrayItem, addArrayItem, remo
             })
           }
         >
-          <Plus size={16} /> Add Skill
+          <Plus size={16} /> {t('forms.skills.add')}
         </button>
       </div>
     </div>
@@ -474,36 +486,37 @@ export const SkillsInfoForm = ({ skillsInfo, updateArrayItem, addArrayItem, remo
 
 // WorkExperienceForm Component
 export const WorkExperienceForm = ({ workExperience, updateArrayItem, addArrayItem, removeArrayItem }) => {
+  const { t } = useTranslation();
   return (
     <div className={workExperienceStyles.container}>
-      <h2 className={workExperienceStyles.heading}>Work Experience</h2>
+      <h2 className={workExperienceStyles.heading}>{t('forms.workExperience.title')}</h2>
       <div className="space-y-6 mb-6">
         {workExperience.map((experience, index) => (
           <div key={index} className={workExperienceStyles.item}>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <Input
-                label="Company"
-                placeholder="ABC Corp"
+                label={t('forms.workExperience.company')}
+                placeholder={t('forms.workExperience.companyPlaceholder')}
                 value={experience.company || ""}
                 onChange={({ target }) => updateArrayItem(index, "company", target.value)}
               />
 
               <Input
-                label="Role"
-                placeholder="Frontend Developer"
+                label={t('forms.workExperience.role')}
+                placeholder={t('forms.workExperience.rolePlaceholder')}
                 value={experience.role || ""}
                 onChange={({ target }) => updateArrayItem(index, "role", target.value)}
               />
 
               <Input
-                label="Start Date"
+                label={t('forms.workExperience.startDate')}
                 type="month"
                 value={experience.startDate || ""}
                 onChange={({ target }) => updateArrayItem(index, "startDate", target.value)}
               />
 
               <Input
-                label="End Date"
+                label={t('forms.workExperience.endDate')}
                 type="month"
                 value={experience.endDate || ""}
                 onChange={({ target }) => updateArrayItem(index, "endDate", target.value)}
@@ -511,9 +524,9 @@ export const WorkExperienceForm = ({ workExperience, updateArrayItem, addArrayIt
             </div>
 
             <div className="mt-6">
-              <label className="block text-sm font-bold text-slate-700 mb-3">Description</label>
+              <label className="block text-sm font-bold text-slate-700 mb-3">{t('forms.workExperience.description')}</label>
               <textarea
-                placeholder="What did you do in this role?"
+                placeholder={t('forms.workExperience.descriptionPlaceholder')}
                 className={workExperienceStyles.textarea}
                 rows={3}
                 value={experience.description || ""}
@@ -547,7 +560,7 @@ export const WorkExperienceForm = ({ workExperience, updateArrayItem, addArrayIt
           }
         >
           <Plus size={16} />
-          Add Work Experience
+          {t('forms.workExperience.add')}
         </button>
       </div>
     </div>

@@ -25,6 +25,7 @@ import { fixTailwindColors, dataURLtoFile } from '../utils/helper'
 import ThemeSelector from './ThemeSelector'
 import RenderResume from './RenderResume'
 import Modal from './Modal'
+import { useTranslation } from 'react-i18next'
 
 
 
@@ -46,6 +47,7 @@ const useResizeObserver = () => {
 const EditResume = () => {
   const { id: resumeId } = useParams()
   const navigate = useNavigate()
+  const { t } = useTranslation()
   const resumeDownloadRef = useRef(null)
   const thumbnailRef = useRef(null)
 
@@ -215,61 +217,61 @@ const EditResume = () => {
     switch (currentPage) {
       case "profile-info":
         const { fullName, designation, summary } = resumeData.profileInfo
-        if (!fullName.trim()) errors.push("Full Name is required")
-        if (!designation.trim()) errors.push("Designation is required")
-        if (!summary.trim()) errors.push("Summary is required")
+        if (!fullName.trim()) errors.push(t('editResume.validation.fullNameRequired'))
+        if (!designation.trim()) errors.push(t('editResume.validation.designationRequired'))
+        if (!summary.trim()) errors.push(t('editResume.validation.summaryRequired'))
         break
 
       case "contact-info":
         const { email, phone } = resumeData.contactInfo
-        if (!email.trim() || !/^\S+@\S+\.\S+$/.test(email)) errors.push("Valid email is required.")
-        if (!phone.trim() || !/^\d{10}$/.test(phone)) errors.push("Valid 10-digit phone number is required")
+        if (!email.trim() || !/^\S+@\S+\.\S+$/.test(email)) errors.push(t('editResume.validation.validEmailRequired'))
+        if (!phone.trim() || !/^\d{10}$/.test(phone)) errors.push(t('editResume.validation.validPhoneRequired'))
         break
 
       case "work-experience":
         resumeData.workExperience.forEach(({ company, role, startDate, endDate }, index) => {
-          if (!company || !company.trim()) errors.push(`Company is required in experience ${index + 1}`)
-          if (!role || !role.trim()) errors.push(`Role is required in experience ${index + 1}`)
-          if (!startDate || !endDate) errors.push(`Start and End dates are required in experience ${index + 1}`)
+          if (!company || !company.trim()) errors.push(t('editResume.validation.companyRequired', { index: index + 1 }))
+          if (!role || !role.trim()) errors.push(t('editResume.validation.roleRequired', { index: index + 1 }))
+          if (!startDate || !endDate) errors.push(t('editResume.validation.datesRequired', { index: index + 1 }))
         })
         break
 
       case "education-info":
         resumeData.education.forEach(({ degree, institution, startDate, endDate }, index) => {
-          if (!degree.trim()) errors.push(`Degree is required in education ${index + 1}`)
-          if (!institution.trim()) errors.push(`Institution is required in education ${index + 1}`)
-          if (!startDate || !endDate) errors.push(`Start and End dates are required in education ${index + 1}`)
+          if (!degree.trim()) errors.push(t('editResume.validation.degreeRequired', { index: index + 1 }))
+          if (!institution.trim()) errors.push(t('editResume.validation.institutionRequired', { index: index + 1 }))
+          if (!startDate || !endDate) errors.push(t('editResume.validation.eduDatesRequired', { index: index + 1 }))
         })
         break
 
       case "skills":
         resumeData.skills.forEach(({ name, progress }, index) => {
-          if (!name.trim()) errors.push(`Skill name is required in skill ${index + 1}`)
+          if (!name.trim()) errors.push(t('editResume.validation.skillNameRequired', { index: index + 1 }))
           if (progress < 1 || progress > 100)
-            errors.push(`Skill progress must be between 1 and 100 in skill ${index + 1}`)
+            errors.push(t('editResume.validation.skillProgressRange', { index: index + 1 }))
         })
         break
 
       case "projects":
         resumeData.projects.forEach(({ title, description }, index) => {
-          if (!title.trim()) errors.push(`Project Title is required in project ${index + 1}`)
-          if (!description.trim()) errors.push(`Project description is required in project ${index + 1}`)
+          if (!title.trim()) errors.push(t('editResume.validation.projectTitleRequired', { index: index + 1 }))
+          if (!description.trim()) errors.push(t('editResume.validation.projectDescRequired', { index: index + 1 }))
         })
         break
 
       case "certifications":
         resumeData.certifications.forEach(({ title, issuer }, index) => {
-          if (!title.trim()) errors.push(`Certification Title is required in certification ${index + 1}`)
-          if (!issuer.trim()) errors.push(`Issuer is required in certification ${index + 1}`)
+          if (!title.trim()) errors.push(t('editResume.validation.certTitleRequired', { index: index + 1 }))
+          if (!issuer.trim()) errors.push(t('editResume.validation.issuerRequired', { index: index + 1 }))
         })
         break
 
       case "additionalInfo":
         if (resumeData.languages.length === 0 || !resumeData.languages[0].name?.trim()) {
-          errors.push("At least one language is required")
+          errors.push(t('editResume.validation.languageRequired'))
         }
         if (resumeData.interests.length === 0 || !resumeData.interests[0]?.trim()) {
-          errors.push("At least one interest is required")
+          errors.push(t('editResume.validation.interestRequired'))
         }
         break
 
@@ -481,7 +483,7 @@ const EditResume = () => {
       }
     } catch (error) {
       console.error("Error fetching resume:", error)
-      toast.error("Failed to load resume data")
+      toast.error(t('editResume.toast.loadingFailed'))
     }
   }
 
@@ -566,11 +568,11 @@ const EditResume = () => {
       const { thumbnailLink } = uploadResponse.data
       await updateResumeDetails(thumbnailLink)
 
-      toast.success("Resume Updated Successfully")
+      toast.success(t('editResume.toast.updated'))
       navigate("/dashboard")
     } catch (error) {
       console.error("Error Uploading Images:", error)
-      toast.error("Failed to upload images")
+      toast.error(t('editResume.toast.uploadFailed'))
     } finally {
       setIsLoading(false)
     }
@@ -597,11 +599,11 @@ const EditResume = () => {
     try {
       setIsLoading(true)
       await axiosInstance.delete(API_PATHS.RESUME.DELETE(resumeId))
-      toast.success("Resume deleted successfully")
+      toast.success(t('editResume.toast.deleted'))
       navigate("/dashboard")
     } catch (error) {
       console.error("Error deleting resume:", error)
-      toast.error("Failed to delete resume")
+      toast.error(t('editResume.toast.deleteFailed'))
     } finally {
       setIsLoading(false)
     }
@@ -610,13 +612,13 @@ const EditResume = () => {
   const downloadPDF = async () => {
     const element = resumeDownloadRef.current;
     if (!element) {
-      toast.error("Failed to generate PDF. Please try again.");
+      toast.error(t('editResume.toast.pdfErrorDetail'));
       return;
     }
 
     setIsDownloading(true);
     setDownloadSuccess(false);
-    const toastId = toast.loading("Generating PDFâ€¦");
+    const toastId = toast.loading(t('editResume.toast.pdfGenerating'));
 
     const override = document.createElement("style");
     override.id = "__pdf_color_override__";
@@ -654,13 +656,13 @@ const EditResume = () => {
         .from(element)
         .save();
 
-      toast.success("PDF downloaded successfully!", { id: toastId });
+      toast.success(t('editResume.toast.pdfSuccess'), { id: toastId });
       setDownloadSuccess(true);
       setTimeout(() => setDownloadSuccess(false), 3000);
 
     } catch (err) {
       console.error("PDF error:", err);
-      toast.error(`Failed to generate PDF: ${err.message}`, { id: toastId });
+      toast.error(t('editResume.toast.pdfError'), { id: toastId });
 
     } finally {
       document.getElementById("__pdf_color_override__")?.remove();
@@ -693,15 +695,15 @@ const EditResume = () => {
             <div className='flex flex-wrap items-center gap-3'>
               <button onClick={() => setOpenThemeSelector(true)} className={buttonStyles.theme}>
                 <Palette size={16} />
-                <span className='text-sm'>Theme</span>
+                <span className='text-sm'>{t('editResume.buttons.theme')}</span>
               </button>
               <button onClick={handleDeleteResume} className={buttonStyles.delete} disabled={isLoading}>
                 <Trash2 size={16} />
-                <span className='text-sm'>Delete</span>
+                <span className='text-sm'>{t('editResume.buttons.delete')}</span>
               </button>
               <button onClick={() => setOpenPreviewModal(true)} className={buttonStyles.download}>
                 <Download size={16} />
-                <span className='text-sm'>Download</span>
+                <span className='text-sm'>{t('editResume.buttons.download')}</span>
               </button>
             </div>
           </div>
@@ -721,17 +723,17 @@ const EditResume = () => {
                 <div className=' flex flex-wrap items-center justify-end gap-3'>
                   <button className={buttonStyles.back} onClick={goBack} disabled={isLoading}>
                     <ArrowLeft size={16} />
-                    <span className='text-sm'>Back</span>
+                    <span className='text-sm'>{t('editResume.buttons.back')}</span>
                   </button>
 
                   <button className={buttonStyles.save} onClick={uploadResumeImages} disabled={isLoading}>
                     {isLoading ? <Loader2 size={16} className='animate-spin' /> : <Save size={16} />}
-                    {isLoading ? "Saving..." : "Save & Exit"}
+                    {isLoading ? t('editResume.saving') : t('editResume.buttons.save')}
                   </button>
 
                   <button className={buttonStyles.next} onClick={validateAndNext} disabled={isLoading}>
                     {currentPage === "additionalInfo" && <Download size={16} />}
-                    {currentPage === "additionalInfo" ? "Preview & Download" : "Next"}
+                    {currentPage === "additionalInfo" ? t('editResume.buttons.previewAndDownload') : t('editResume.buttons.next')}
                     {currentPage === 'additionalInfo' && <ArrowLeft size={16}  className=' rotate-180'/>}
                   </button>
                 </div>
@@ -743,7 +745,7 @@ const EditResume = () => {
                 <div className='text-center mb-4'>
                   <div className={statusStyles.completionBadge}>
                     <div className={iconStyles.pulseDot}></div>
-                    <span >Preview - {completionPercentage}% Complete</span>
+                    <span >{t('editResume.preview')} - {completionPercentage}% {t('editResume.completion')}</span>
                   </div>
                 </div>
 
@@ -761,7 +763,7 @@ const EditResume = () => {
           </div>
         </div>
 
-        <Modal isOpen={openThemeSelector} onClose={() => setOpenThemeSelector(false)} title='Change Title'>
+        <Modal isOpen={openThemeSelector} onClose={() => setOpenThemeSelector(false)} title={t('editResume.modal.changeTheme')}>
           <div className={containerStyles.modalContent}>
             <ThemeSelector selectedTheme={resumeData?.template?.theme}
               setSelectedTheme={updateTheme} onClose={() => setOpenThemeSelector(false)}
@@ -772,12 +774,12 @@ const EditResume = () => {
         <Modal isOpen={openPreviewModal} onClose={() => setOpenPreviewModal(false)}
           title={resumeData.title}
           showActionBtn
-          actionBtnText={isDownloading ? 'Generating...'
-            : downloadSuccess ? 'Downloaded!' : 'Download PDF'}
+          actionBtnText={isDownloading ? t('editResume.modal.generating')
+            : downloadSuccess ? t('editResume.modal.downloaded') : t('editResume.modal.downloadPDF')}
           actionBtnIcon={
             isLoading ? (
               <Loader2 size={16} className='animate-spin' />
-            ) : 
+            ) :
                 downloadSuccess ? (
                   <Check size={16} className=' text-white'/>
                 ) : (
@@ -790,7 +792,7 @@ const EditResume = () => {
             <div className=' text-center mb-4'>
               <div className={statusStyles.modalBadge}>
                 <div className={iconStyles.pulseDot}></div>
-                <span >Completion: {completionPercentage}% Complete</span>
+                <span >{t('editResume.completion')}: {completionPercentage}% {t('editResume.completion')}</span>
               </div>
             </div>
 

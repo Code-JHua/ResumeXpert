@@ -8,12 +8,15 @@ import { ProfileInfoCard } from '../components/Cards.jsx';
 import Modal from '../components/Modal.jsx';
 import Login from '../components/Login.jsx';
 import SignUp from '../components/SignUp.jsx';
+import LanguageSelector from '../components/LanguageSelector.jsx';
+import { useTranslation } from 'react-i18next';
 
 
 
 const LandingPage = () => {
   const { user } = useContext(UserContext);
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [openAuthModal, setOpenAuthModal] = useState(false);
   const [currentPage, setCurrentPage] = useState('login');
@@ -36,7 +39,7 @@ const LandingPage = () => {
               <LayoutTemplate className={landingPageStyles.logoIconInner} />
             </div>
             <span className={landingPageStyles.logoText}>
-              ResumeXpert
+              {t('common.appName')}
             </span>
           </div>
 
@@ -49,14 +52,15 @@ const LandingPage = () => {
           </button>
 
           {/* desktop navigation */}
-          <div className='hidden md:flex items-center'>
+          <div className='hidden md:flex items-center gap-3'>
+            <LanguageSelector />
             {user ? (
               <ProfileInfoCard />
             ) : (
               <button className={landingPageStyles.desktopAuthButton}
                 onClick={() => setOpenAuthModal(true)}>
                 <div className={landingPageStyles.desktopAuthButtonOverlay}></div>
-                <span className={landingPageStyles.desktopAuthButtonText}>Get Started</span>
+                <span className={landingPageStyles.desktopAuthButtonText}>{t('common.getStarted')}</span>
               </button>
             )
             }
@@ -70,13 +74,13 @@ const LandingPage = () => {
               {user ? (
                 <div className={landingPageStyles.mobileUserInfo}>
                   <div className={landingPageStyles.mobileUserWelcome}>
-                    Welcome Back
+                    {t('landing.mobileMenu.welcomeBack')}
                   </div>
                   <button className={landingPageStyles.mobileDashboardButton} onClick={() => {
                     navigate('/dashboard')
                     setMobileMenuOpen(false)
                   }}>
-                    Go to Dashboard
+                    {t('landing.mobileMenu.goToDashboard')}
                   </button>
                 </div>
               ) : (
@@ -84,7 +88,7 @@ const LandingPage = () => {
                   setOpenAuthModal(true)
                   setMobileMenuOpen(false)
                 }}>
-                  Get Started
+                  {t('common.getStarted')}
                 </button>
               )}
             </div>
@@ -99,40 +103,39 @@ const LandingPage = () => {
             {/* left content */}
             <div className={landingPageStyles.heroLeft}>
               <div className={landingPageStyles.tagline}>
-                Professional Resume Builder
+                {t('landing.tagline')}
               </div>
 
               <h1 className={landingPageStyles.heading}>
-                <span className={landingPageStyles.headingText}>Craft</span>
-                <span className={landingPageStyles.headingGradient}>Professional</span>
-                <span className={landingPageStyles.headingText}>Resumes</span>
+                <span className={landingPageStyles.headingText}>{t('landing.headingCraft')}</span>
+                <span className={landingPageStyles.headingGradient}>{t('landing.headingProfessional')}</span>
+                <span className={landingPageStyles.headingText}>{t('landing.headingResumes')}</span>
               </h1>
 
               <p className={landingPageStyles.description}>
-                Create job-winning resumes with expertly designed templates.
-                ATS-friendly, recruiter-approved, and tailored to your career goals.
+                {t('landing.description')}
               </p>
 
               <div className={landingPageStyles.ctaButtons}>
                 <button className={landingPageStyles.primaryButton} onClick={handleCTA}>
                   <div className={landingPageStyles.primaryButtonOverlay}></div>
                   <span className={landingPageStyles.primaryButtonContent}>
-                    Start Building
+                    {t('landing.startBuilding')}
                     <ArrowRight className={landingPageStyles.primaryButtonIcon} size={18} />
                   </span>
                 </button>
 
                 <button className={landingPageStyles.secondaryButton} onClick={handleCTA}>
-                  View Templates
+                  {t('landing.viewTemplates')}
                 </button>
               </div>
 
               {/* stats grid */}
               <div className={landingPageStyles.statsContainer}>
                 {[
-                  { value: '50K+', label: 'Resumes Created', gradient: 'from-violet-600 to-fuchsia-600' },
-                  { value: '4.9★', label: 'User Rating', gradient: 'from-orange-500 to-red-500' },
-                  { value: '5 Min', label: 'Build Time', gradient: 'from-emerald-500 to-teal-500' }
+                  { value: '50K+', label: t('landing.stats.resumes'), gradient: 'from-violet-600 to-fuchsia-600' },
+                  { value: '4.9★', label: t('landing.stats.rating'), gradient: 'from-orange-500 to-red-500' },
+                  { value: '5 Min', label: t('landing.stats.buildTime'), gradient: 'from-emerald-500 to-teal-500' }
                 ].map((stat, idx) => (
                   <div className={landingPageStyles.statItem} key={idx}>
                     <div className={`${landingPageStyles.statNumber} ${stat.gradient}`}>
@@ -221,10 +224,10 @@ const LandingPage = () => {
           <div className={landingPageStyles.footerContainer}>
             <div className={landingPageStyles.featuresHeader}>
               <h2 className={landingPageStyles.featuresTitle}>
-                Why Choose <span className={landingPageStyles.featuresTitleGradient}>ResumeXpert</span>
+                {t('landing.features.title')} <span className={landingPageStyles.featuresTitleGradient}>{t('common.appName')}</span>
               </h2>
               <p className={landingPageStyles.featureDescription}>
-                Everything you need to create a professional resume that stands out.
+                {t('landing.features.subtitle')}
               </p>
             </div>
 
@@ -232,22 +235,22 @@ const LandingPage = () => {
               {[
                 {
                   icon: <Zap className={landingPageStyles.featureIcon} />,
-                  title: "Lightning Fast",
-                  description: "Create professional resumes in under 5 minutes with our streamlined process",
+                  title: t('landing.features.lightningFast.title'),
+                  description: t('landing.features.lightningFast.description'),
                   gradient: landingPageStyles.featureIconViolet,
                   bg: landingPageStyles.featureCardViolet
                 },
                 {
                   icon: <LayoutTemplate className={landingPageStyles.featureIcon} />,
-                  title: "Pro Templates",
-                  description: "Choose from dozens of recruiter-approved, industry-specific templates",
+                  title: t('landing.features.proTemplates.title'),
+                  description: t('landing.features.proTemplates.description'),
                   gradient: landingPageStyles.featureIconFuchsia,
                   bg: landingPageStyles.featureCardFuchsia
                 },
                 {
                   icon: <Download className={landingPageStyles.featureIcon} />,
-                  title: "Instant Export",
-                  description: "Download high-quality PDFs instantly with perfect formatting",
+                  title: t('landing.features.instantExport.title'),
+                  description: t('landing.features.instantExport.description'),
                   gradient: landingPageStyles.featureIconOrange,
                   bg: landingPageStyles.featureCardOrange
                 }
@@ -278,15 +281,15 @@ const LandingPage = () => {
               <div className={landingPageStyles.ctaCardBg}></div>
               <div className={landingPageStyles.ctaCardContent}>
                 <h2 className={landingPageStyles.ctaTitle}>
-                  Ready to Build Your <span className={landingPageStyles.ctaTitleGradient}>Standout Resume</span>
+                  {t('landing.cta.title')} <span className={landingPageStyles.ctaTitleGradient}>{t('landing.cta.highlight')}</span>
                 </h2>
                 <p className={landingPageStyles.ctaDescription}>
-                  Join thousands of professionals who landed their dream jobs with our platform
+                  {t('landing.cta.subtitle')}
                 </p>
                 <button className={landingPageStyles.ctaButton} onClick={handleCTA}>
                   <div className={landingPageStyles.ctaButtonOverlay}></div>
                   <span className={landingPageStyles.ctaButtonText}>
-                    Start Building Now
+                    {t('landing.cta.button')}
                   </span>
                 </button>
               </div>
@@ -299,7 +302,7 @@ const LandingPage = () => {
       <footer className={landingPageStyles.footer}>
         <div className={landingPageStyles.footerContainer}>
           <p className={landingPageStyles.footerText}>
-            Crafted with <span className={landingPageStyles.footerHeart}>❤️</span> by{' '}
+            {t('landing.footer.craftedBy')} <span className={landingPageStyles.footerHeart}>❤️</span> by{' '}
             <a href='https://hexagondigitalservices.com' target='_blank' className={landingPageStyles.footerLink}>
               Hexagon Digital Services
             </a>

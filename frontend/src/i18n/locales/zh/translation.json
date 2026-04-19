@@ -1,0 +1,348 @@
+{
+  "common": {
+    "appName": "ResumeXpert",
+    "getStarted": "开始使用",
+    "loading": "加载中...",
+    "save": "保存",
+    "saveAndExit": "保存并退出",
+    "cancel": "取消",
+    "delete": "删除",
+    "edit": "编辑",
+    "back": "返回",
+    "next": "下一步",
+    "close": "关闭",
+    "logout": "退出登录",
+    "theme": "主题",
+    "download": "下载",
+    "create": "创建",
+    "add": "添加",
+    "remove": "移除",
+    "confirm": "确认",
+    "or": "或",
+    "email": "邮箱",
+    "password": "密码",
+    "submit": "提交"
+  },
+  "language": {
+    "zh": "中",
+    "en": "EN"
+  },
+  "landing": {
+    "tagline": "专业简历构建器",
+    "heading": "打造专业简历",
+    "headingCraft": "打造",
+    "headingProfessional": "专业",
+    "headingResumes": "简历",
+    "description": "使用专家设计的模板创建获胜简历。ATS友好、招聘方认可，为您的职业目标量身定制。",
+    "startBuilding": "开始制作",
+    "viewTemplates": "查看模板",
+    "stats": {
+      "resumes": "简历创建数",
+      "rating": "用户评分",
+      "buildTime": "制作时间"
+    },
+    "features": {
+      "title": "为什么选择 ResumeXpert",
+      "subtitle": "创建脱颖而出的专业简历所需的一切。",
+      "lightningFast": {
+        "title": "闪电般快速",
+        "description": "通过我们的精简流程，在5分钟内创建专业简历"
+      },
+      "proTemplates": {
+        "title": "专业模板",
+        "description": "从数十种经招聘方认可的特定行业模板中选择"
+      },
+      "instantExport": {
+        "title": "即时导出",
+        "description": "立即下载格式完美的优质PDF"
+      }
+    },
+    "cta": {
+      "title": "准备打造您的脱颖简历",
+      "highlight": "脱颖而出",
+      "subtitle": "加入数千名通过我们平台找到理想工作的专业人士",
+      "button": "立即开始制作"
+    },
+    "footer": {
+      "craftedBy": "由"
+    },
+    "mobileMenu": {
+      "welcomeBack": "欢迎回来",
+      "goToDashboard": "前往仪表板"
+    }
+  },
+  "dashboard": {
+    "title": "我的简历",
+    "subtitleOne": "您有",
+    "subtitleResume": "份简历",
+    "subtitleResumes": "份简历",
+    "subtitleEmpty": "开始制作您的专业简历",
+    "createNow": "立即创建",
+    "createFirst": "创建您的第一份简历",
+    "createNew": "创建新简历",
+    "emptyTitle": "未找到简历",
+    "emptyText": "您还没有创建任何简历。开始制作您的专业简历",
+    "loading": "正在加载您的简历...",
+    "modal": {
+      "title": "创建新简历"
+    },
+    "delete": {
+      "title": "确认删除",
+      "message": "确定要删除这份简历吗？此操作无法撤销。",
+      "button": "删除"
+    },
+    "toast": {
+      "deleted": "简历删除成功",
+      "deleteFailed": "删除简历失败"
+    },
+    "completion": {
+      "gettingStarted": "开始",
+      "almostThere": "快完成了",
+      "readyToGo": "准备好了！"
+    },
+    "new": "新",
+    "completed": "完成",
+    "startBuilding": "开始制作"
+  },
+  "editResume": {
+    "title": "无标题",
+    "defaultTitle": "专业简历",
+    "buttons": {
+      "theme": "主题",
+      "delete": "删除",
+      "download": "下载",
+      "back": "返回",
+      "save": "保存并退出",
+      "next": "下一步",
+      "previewAndDownload": "预览并下载"
+    },
+    "preview": "预览",
+    "completion": "完成",
+    "saving": "保存中...",
+    "modal": {
+      "changeTheme": "更改主题",
+      "applyChanges": "应用更改",
+      "generating": "生成中...",
+      "downloaded": "已下载！",
+      "downloadPDF": "下载PDF",
+      "changeTitle": "修改标题"
+    },
+    "validation": {
+      "fullNameRequired": "姓名为必填项",
+      "designationRequired": "职位为必填项",
+      "summaryRequired": "简介为必填项",
+      "validEmailRequired": "请输入有效的邮箱",
+      "validPhoneRequired": "请输入有效的10位手机号",
+      "companyRequired": "工作经历 {{index}} 的公司名称为必填项",
+      "roleRequired": "工作经历 {{index}} 的职位为必填项",
+      "datesRequired": "工作经历 {{index}} 的开始和结束日期为必填项",
+      "degreeRequired": "教育经历 {{index}} 的学位为必填项",
+      "institutionRequired": "教育经历 {{index}} 的学校为必填项",
+      "eduDatesRequired": "教育经历 {{index}} 的开始和结束日期为必填项",
+      "skillNameRequired": "技能 {{index}} 的名称为必填项",
+      "skillProgressRange": "技能 {{index}} 的熟练度必须在1到100之间",
+      "projectTitleRequired": "项目 {{index}} 的标题为必填项",
+      "projectDescRequired": "项目 {{index}} 的描述为必填项",
+      "certTitleRequired": "证书 {{index}} 的标题为必填项",
+      "issuerRequired": "证书 {{index}} 的颁发机构为必填项",
+      "languageRequired": "至少需要添加一种语言",
+      "interestRequired": "至少需要添加一项兴趣"
+    },
+    "toast": {
+      "loadingFailed": "加载简历数据失败",
+      "updated": "简历更新成功",
+      "uploadFailed": "图片上传失败",
+      "deleted": "简历删除成功",
+      "deleteFailed": "删除简历失败",
+      "pdfGenerating": "正在生成PDF...",
+      "pdfSuccess": "PDF下载成功！",
+      "pdfError": "生成PDF失败",
+      "pdfErrorDetail": "生成PDF失败，请重试。"
+    },
+    "steps": {
+      "gettingStarted": "开始",
+      "markingProgress": "进行中",
+      "almostThere": "快完成了",
+      "nearlyCompleted": "即将完成"
+    }
+  },
+  "forms": {
+    "profile": {
+      "title": "个人信息",
+      "fullName": "姓名",
+      "fullNamePlaceholder": "张三",
+      "designation": "职位",
+      "designationPlaceholder": "全栈开发工程师",
+      "summary": "简介",
+      "summaryPlaceholder": "简短的自我介绍"
+    },
+    "contact": {
+      "title": "联系方式",
+      "address": "地址",
+      "addressPlaceholder": "简短地址",
+      "email": "邮箱",
+      "emailPlaceholder": "zhangsan@example.com",
+      "phone": "手机号",
+      "phonePlaceholder": "1234567890",
+      "linkedin": "领英",
+      "linkedinPlaceholder": "https://linkedin.com/in/username",
+      "github": "GitHub",
+      "githubPlaceholder": "https://github.com/username",
+      "website": "作品集/网站",
+      "websitePlaceholder": "https://yourwebsite.com"
+    },
+    "workExperience": {
+      "title": "工作经历",
+      "company": "公司",
+      "companyPlaceholder": "某某公司",
+      "role": "职位",
+      "rolePlaceholder": "前端开发工程师",
+      "startDate": "开始日期",
+      "endDate": "结束日期",
+      "description": "工作描述",
+      "descriptionPlaceholder": "您在这个职位上做了什么？",
+      "add": "添加工作经历"
+    },
+    "education": {
+      "title": "教育背景",
+      "degree": "学位",
+      "degreePlaceholder": "计算机科学与技术学士",
+      "institution": "学校",
+      "institutionPlaceholder": "某某大学",
+      "startDate": "开始日期",
+      "endDate": "结束日期",
+      "add": "添加教育经历"
+    },
+    "skills": {
+      "title": "技能",
+      "skillName": "技能名称",
+      "skillNamePlaceholder": "JavaScript",
+      "proficiency": "熟练度",
+      "proficiencyFormat": "{{value}}/5",
+      "add": "添加技能"
+    },
+    "projects": {
+      "title": "项目经历",
+      "projectTitle": "项目名称",
+      "projectTitlePlaceholder": "个人作品网站",
+      "description": "项目描述",
+      "descriptionPlaceholder": "关于该项目的简短描述",
+      "githubLink": "GitHub链接",
+      "githubLinkPlaceholder": "https://github.com/username/project",
+      "liveDemoUrl": "在线演示链接",
+      "liveDemoUrlPlaceholder": "https://yourproject.live",
+      "add": "添加项目"
+    },
+    "certifications": {
+      "title": "证书",
+      "certificateTitle": "证书名称",
+      "certificateTitlePlaceholder": "全栈Web开发工程师",
+      "issuer": "颁发机构",
+      "issuerPlaceholder": "Coursera / Google / 等",
+      "year": "年份",
+      "yearPlaceholder": "2024",
+      "add": "添加证书"
+    },
+    "additional": {
+      "title": "附加信息",
+      "languages": "语言能力",
+      "language": "语言",
+      "languagePlaceholder": "例如：英语",
+      "proficiency": "熟练度",
+      "addLanguage": "添加语言",
+      "interests": "兴趣爱好",
+      "interestPlaceholder": "例如：阅读、摄影",
+      "addInterest": "添加兴趣"
+    }
+  },
+  "auth": {
+    "login": {
+      "title": "欢迎回来",
+      "subtitle": "登录以继续制作精美简历",
+      "email": "邮箱",
+      "emailPlaceholder": "example@example.com",
+      "password": "密码",
+      "passwordPlaceholder": "至少8个字符",
+      "submit": "登录",
+      "noAccount": "还没有账户？",
+      "signUpLink": "注册",
+      "errors": {
+        "invalidEmail": "请输入有效的邮箱",
+        "passwordRequired": "请输入您的密码",
+        "default": "出了点问题，请重试。"
+      }
+    },
+    "signup": {
+      "title": "创建账户",
+      "subtitle": "加入数千名专业人士",
+      "fullName": "姓名",
+      "fullNamePlaceholder": "张三",
+      "email": "邮箱",
+      "emailPlaceholder": "example@example.com",
+      "password": "密码",
+      "passwordPlaceholder": "至少8个字符",
+      "submit": "创建账户",
+      "hasAccount": "已有账户？",
+      "signInLink": "登录",
+      "errors": {
+        "nameRequired": "请输入您的姓名",
+        "invalidEmail": "请输入有效的邮箱",
+        "passwordRequired": "请输入您的密码",
+        "default": "出了点问题，请重试。"
+      }
+    }
+  },
+  "card": {
+    "logout": "退出登录",
+    "edit": "编辑",
+    "startBuilding": "开始制作",
+    "createdBy": "创建时间：",
+    "updatedBy": "更新时间：",
+    "gettingStarted": "开始",
+    "almostThere": "快完成了",
+    "readyToGo": "准备好了！",
+    "complete": "完成",
+    "noPreview": "暂无预览",
+    "profile": "个人",
+    "work": "工作",
+    "skills": "技能",
+    "edu": "教育"
+  },
+  "stepProgress": {
+    "gettingStarted": "开始",
+    "markingProgress": "进行中",
+    "almostThere": "快完成了",
+    "nearlyCompleted": "即将完成"
+  },
+  "themeSelector": {
+    "templates": "模板",
+    "applyChanges": "应用更改",
+    "template": "模板"
+  },
+  "createResumeForm": {
+    "title": "创建新简历",
+    "resumeTitle": "简历标题",
+    "resumeTitlePlaceholder": "例如：软件工程师简历",
+    "description": "为您的简历起个标题开始制作。稍后可以自定义所有内容",
+    "createButton": "创建简历",
+    "errors": {
+      "titleRequired": "请输入简历标题"
+    },
+    "failed": "创建简历失败，请稍后重试"
+  },
+  "resumeSection": {
+    "github": "GitHub",
+    "liveDemo": "在线演示"
+  },
+  "modal": {
+    "close": "关闭"
+  },
+  "inputs": {
+    "profile": "头像",
+    "resumeTitle": "简历标题",
+    "resumeTitlePlaceholder": "输入简历标题"
+  },
+  "navbar": {
+    "appName": "ResumeXpert"
+  }
+}

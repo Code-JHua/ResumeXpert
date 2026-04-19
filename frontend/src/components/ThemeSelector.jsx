@@ -3,10 +3,11 @@ import { Check } from 'lucide-react'
 import { DUMMY_RESUME_DATA, resumeTemplates } from '../utils/data'
 import RenderResume from './RenderResume'
 import Tabs from './Tabs'
-
-const TAB_DATA = [{ label: 'Templates' }]
+import { useTranslation } from 'react-i18next'
 
 const ThemeSelector = ({ selectedTheme, setSelectedTheme, resumeData, onClose }) => {
+  const { t } = useTranslation()
+  const TAB_DATA = [{ label: t('themeSelector.templates') }]
   const initialIndex = resumeTemplates.findIndex(t => t.id === selectedTheme)
   const [selectedTemplate, setSelectedTemplate] = useState({
     theme: selectedTheme || resumeTemplates[0]?.id || '',
@@ -25,7 +26,7 @@ const ThemeSelector = ({ selectedTheme, setSelectedTheme, resumeData, onClose })
       <div className='flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8 p-4 sm:p-6 bg-white rounded-2xl border border-violet-100'>
         <Tabs tabs={TAB_DATA} activeTab={tabValue} setActiveTab={setTabValue} />
         <button className='w-full sm:w-auto flex items-center justify-center gap-3 px-6 py-3 bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white font-black rounded-2xl hover:scale-105 transition-all shadow-lg hover:shadow-xl' onClick={handleThemeSelection}>
-          <Check size={18} /> Apply Changes
+          <Check size={18} /> {t('themeSelector.applyChanges')}
         </button>
       </div>
 
@@ -53,7 +54,7 @@ const ThemeSelector = ({ selectedTheme, setSelectedTheme, resumeData, onClose })
                   absolute top-0 left-0 right-0 z-10 px-2 py-1 text-xs font-semibold text-center
                   ${selectedTemplate.index === index ? 'bg-violet-500 text-white' : 'bg-gray-100 text-gray-700'}
                 `}>
-                  {template.name || `Template ${template.id}`}
+                  {template.name || `${t('themeSelector.template')} ${template.id}`}
                 </div>
 
                 {/* 实际预览 - 缩小显示 */}

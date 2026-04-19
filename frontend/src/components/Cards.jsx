@@ -3,36 +3,70 @@ import { UserContext } from '../context/UserContext.jsx'
 import { useNavigate } from 'react-router-dom';
 import { cardStyles } from '../assets/dummystyle';
 import { Award, TrendingUp, Zap, Edit, Trash2, Clock } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 
 //profile info cards
 export const ProfileInfoCard = () => {
   const navigate = useNavigate();
   const { user, clearUser } = useContext(UserContext);
+  const { t } = useTranslation();
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   const handleLogout = () => {
     localStorage.clear()
     clearUser()
     navigate('/')
+    setIsDropdownOpen(false)
   }
 
   return (
     user && (
-      <div className={cardStyles.profileCard}>
-        <div className={cardStyles.profileInitialsContainer}>
-          <span className={cardStyles.profileInitialsText}>
-            {user.name ? user.name.charAt(0).toUpperCase() : ''}
-          </span>
+      <div className="relative">
+        <div
+          className={`${cardStyles.profileCard} cursor-pointer`}
+          onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+        >
+          <div className={cardStyles.profileInitialsContainer}>
+            <span className={cardStyles.profileInitialsText}>
+              {user.name ? user.name.charAt(0).toUpperCase() : ''}
+            </span>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <div className={cardStyles.profileName}>
+              {user.name || ''}
+            </div>
+            <svg className={`w-3.5 h-3.5 text-gray-500 transition-transform duration-200 ml-2 ${isDropdownOpen ? 'rotate-180' : ''}`} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </div>
         </div>
 
-        <div>
-          <div className={cardStyles.profileName}>
-            {user.name || ''}
+        {/* Dropdown */}
+        {isDropdownOpen && (
+          <div className="absolute right-0 mt-2 min-w-[120px] sm:min-w-[140px] w-full bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50">
+            <button
+              className="w-full px-4 py-2.5 text-left text-sm text-gray-700 hover:bg-violet-50 hover:text-violet-600 transition-colors flex items-center justify-center gap-2"
+              onClick={handleLogout}
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                <polyline points="16 17 21 12 16 7"></polyline>
+                <line x1="21" y1="12" x2="9" y2="12"></line>
+              </svg>
+              {t('card.logout')}
+            </button>
           </div>
-          <button className={cardStyles.logoutButton} onClick={handleLogout}>
-            Logout
-          </button>
-        </div>
+        )}
+
+        {/* Click outside to close */}
+        {isDropdownOpen && (
+          <div
+            className="fixed inset-0 z-40"
+            onClick={() => setIsDropdownOpen(false)}
+          />
+        )}
       </div>
     )
   )
@@ -48,6 +82,7 @@ export const ResumeSummaryCard = ({
   completion = 85,
 }) => {
   const [isHovered, setIsHovered] = useState(false);
+  const { t } = useTranslation();
 
   const formattedCreatedDate = createdAt
     ? new Date(createdAt).toLocaleDateString("en-US", {
@@ -119,12 +154,12 @@ export const ResumeSummaryCard = ({
           </div>
           <span className={cardStyles.emptyPreviewText}>{title}</span>
           <span className={cardStyles.emptyPreviewSubtext}>
-            {completion === 0 ? "Start building" : `${completion}% completed`}
+            {completion === 0 ? t('card.startBuilding') : `${completion}% ${t('card.completed')}`}
           </span>
 
           {/* Mini resume sections indicator */}
           <div className="mt-4 flex gap-2">
-            {['Profile', 'Work', 'Skills', 'Edu'].map((section, i) => (
+            {[t('card.profile'), t('card.work'), t('card.skills'), t('card.edu')].map((section, i) => (
               <div
                 key={i}
                 className={`px-2 py-1 text-xs rounded-md ${i < Math.floor(completion / 25)
@@ -171,8 +206,8 @@ export const ResumeSummaryCard = ({
             <h5 className={cardStyles.title}>{title}</h5>
             <div className={cardStyles.dateInfo}>
               <Clock size={12} />
-              <span>Created At: {formattedCreatedDate}</span>
-              <span className="ml-2">Updated At: {formattedUpdatedDate}</span>
+              <span>{t('card.createdBy')} {formattedCreatedDate}</span>
+              <span className="ml-2">{t('card.updatedBy')} {formattedUpdatedDate}</span>
             </div>
           </div>
         </div>
@@ -194,9 +229,9 @@ export const ResumeSummaryCard = ({
         {/* Completion status */}
         <div className="flex justify-between items-center mt-2">
           <span className="text-xs font-medium text-gray-500">
-            {completion < 50 ? "Getting Started" : completion < 80 ? "Almost There" : "Ready to Go!"}
+            {completion < 50 ? t('card.gettingStarted') : completion < 80 ? t('card.almostThere') : t('card.readyToGo')}
           </span>
-          <span className="text-xs font-bold text-gray-700">{completion}% Complete</span>
+          <span className="text-xs font-bold text-gray-700">{completion}% {t('card.complete')}</span>
         </div>
       </div>
     </div>
@@ -233,7 +268,7 @@ export const TemplateCard = ({ thumbnailImg, isSeclected, onSelect }) => {
             <div className='w-12 h-12 bg-gradient-to-br from-violet-500 to-fuchsia-500 rounded-2xl flex items-center justify-center mb-3'>
               <Edit size={20} className="text-white" />
             </div>
-            <span className='text-gray-700 font-bold'>No Preview</span>
+            <span className='text-gray-700 font-bold'>{t('card.noPreview')}</span>
           </div>
       )}
     </div>

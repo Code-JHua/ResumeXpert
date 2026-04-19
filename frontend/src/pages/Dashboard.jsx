@@ -10,9 +10,11 @@ import toast from 'react-hot-toast'
 import moment from 'moment'
 import Modal from '../components/Modal'
 import CreateResumeForm from '../components/CreateResumeForm'
+import { useTranslation } from 'react-i18next'
 
 const Dashboard = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [openCreateModal, setOpenCreateModal] = useState(false);
   const [allResumes, setAllResumes] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -116,15 +118,15 @@ const Dashboard = () => {
 
   const handleDeleteResume = async () => {
     if (!resumeToDelete) return;
-    
+
     try {
       await axiosInstance.delete(API_PATHS.RESUME.DELETE(resumeToDelete))
       setAllResumes(allResumes.filter(resume => resume._id !== resumeToDelete._id))
-      toast.success('Resume deleted successfully')
+      toast.success(t('dashboard.toast.deleted'))
       fetchAllResumes()
     } catch (error) {
       console.error('Error deleting resume:', error);
-      toast.error('Failed to delete resume')
+      toast.error(t('dashboard.toast.deleteFailed'))
       fetchAllResumes()
     }
     finally {
@@ -143,9 +145,11 @@ const Dashboard = () => {
       <div className={styles.container}>
         <div className={styles.headerWrapper}>
           <div>
-            <div className={styles.headerTitle}>My Resume</div> 
+            <div className={styles.headerTitle}>{t('dashboard.title')}</div>
             <p className={styles.headerSubtitle}>
-              {allResumes.length > 0 ? `You have ${allResumes.length} resume${allResumes.length === 1 ? '' : 's'}` : 'Start building your professional resume'}
+              {allResumes.length > 0
+                ? `${t('dashboard.subtitleOne')} ${allResumes.length} ${allResumes.length === 1 ? t('dashboard.subtitleResume') : t('dashboard.subtitleResumes')}`
+                : t('dashboard.subtitleEmpty')}
             </p>
           </div>
 
@@ -153,7 +157,7 @@ const Dashboard = () => {
             <button className={styles.createButton} onClick={() => setOpenCreateModal(true)}>
               <div className={styles.createButtonOverlay}></div>
               <span className={styles.createButtonContent}>
-                Create Now
+                {t('dashboard.createNow')}
                 <LucideFilePlus className='group-hover:translate-x-1 transition-transform' size={18} />
               </span>
             </button>
@@ -177,13 +181,13 @@ const Dashboard = () => {
                 <LucideFilePlus size={32} className=' text-violet-600' />
               </div>
 
-              <h3 className={styles.emptyTitle}>No resumes found</h3>
-              <p className={styles.emptyText}>you haven't created any resumes yet. Start building your professional resume</p>
+              <h3 className={styles.emptyTitle}>{t('dashboard.emptyTitle')}</h3>
+              <p className={styles.emptyText}>{t('dashboard.emptyText')}</p>
 
               <button className={styles.createButton} onClick={() => setOpenCreateModal(true)}>
                 <div className={styles.createButtonOverlay}></div>
                 <span className={styles.createButtonContent}>
-                  Create Your First Resume
+                  {t('dashboard.createFirst')}
                   <LucideFilePlus className='group-hover:translate-x-1 transition-transform' size={28} />
                 </span>
               </button>
@@ -199,8 +203,8 @@ const Dashboard = () => {
                 <div className={styles.newResumeIcon}>
                   <LucideFilePlus size={32} className=' text-white' />
                 </div>
-                <h3 className={styles.newResumeTitle}>Create New Resume</h3>
-                <p className={styles.newResumeText}>Start building your professional resume</p>
+                <h3 className={styles.newResumeTitle}>{t('dashboard.createNew')}</h3>
+                <p className={styles.newResumeText}>{t('dashboard.subtitleEmpty')}</p>
               </div>
 
               {allResumes.map((resume) => (
@@ -222,7 +226,7 @@ const Dashboard = () => {
       <Modal isOpen={openCreateModal} onClose={() => setOpenCreateModal(false)} hideHeader maxWidth='max-w-2xl'>
         <div className='p-6'>
           <div className={styles.modalHeader}>
-            <h3 className={styles.modalTitle}>Create New Resume</h3>
+            <h3 className={styles.modalTitle}>{t('dashboard.modal.title')}</h3>
 
             <button className={styles.modalCloseButton} onClick={() => setOpenCreateModal(false)}>
               X
@@ -236,15 +240,15 @@ const Dashboard = () => {
       </Modal>
 
       {/* delete modal */}
-      <Modal isOpen={showDeleteConfirm} onClose={() => setShowDeleteConfirm(false)} title='Confirm Deletion' showActionBtn actionBtnText='Delete' actionBtnClassName='bg-red-600 hover:bg-red-700 ' onActionclick={handleDeleteResume}>
+      <Modal isOpen={showDeleteConfirm} onClose={() => setShowDeleteConfirm(false)} title={t('dashboard.delete.title')} showActionBtn actionBtnText={t('dashboard.delete.button')} actionBtnClassName='bg-red-600 hover:bg-red-700 ' onActionclick={handleDeleteResume}>
         <div className='p-4'>
           <div className='flex flex-col items-center text-center'>
             <div className={styles.deleteIconWrapper}>
               <LucideTrash2 className='text-orange-600 ' size={24} />
             </div>
 
-            <h3 className={styles.deleteTitle}>Delete Resume?</h3>
-            <p className={styles.deleteText}>Are you sure you want to delete this resume? This action cannot be undone.</p>
+            <h3 className={styles.deleteTitle}>{t('dashboard.delete.title')}</h3>
+            <p className={styles.deleteText}>{t('dashboard.delete.message')}</p>
           </div>
         </div>
       </Modal>

@@ -1,0 +1,348 @@
+{
+  "common": {
+    "appName": "ResumeXpert",
+    "getStarted": "Get Started",
+    "loading": "Loading...",
+    "save": "Save",
+    "saveAndExit": "Save & Exit",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "back": "Back",
+    "next": "Next",
+    "close": "Close",
+    "logout": "Logout",
+    "theme": "Theme",
+    "download": "Download",
+    "create": "Create",
+    "add": "Add",
+    "remove": "Remove",
+    "confirm": "Confirm",
+    "or": "or",
+    "email": "Email",
+    "password": "Password",
+    "submit": "Submit"
+  },
+  "language": {
+    "zh": "中",
+    "en": "EN"
+  },
+  "landing": {
+    "tagline": "Professional Resume Builder",
+    "heading": "Craft Professional Resumes",
+    "headingCraft": "Craft",
+    "headingProfessional": "Professional",
+    "headingResumes": "Resumes",
+    "description": "Create job-winning resumes with expertly designed templates. ATS-friendly, recruiter-approved, and tailored to your career goals.",
+    "startBuilding": "Start Building",
+    "viewTemplates": "View Templates",
+    "stats": {
+      "resumes": "Resumes Created",
+      "rating": "User Rating",
+      "buildTime": "Build Time"
+    },
+    "features": {
+      "title": "Why Choose ResumeXpert",
+      "subtitle": "Everything you need to create a professional resume that stands out.",
+      "lightningFast": {
+        "title": "Lightning Fast",
+        "description": "Create professional resumes in under 5 minutes with our streamlined process"
+      },
+      "proTemplates": {
+        "title": "Pro Templates",
+        "description": "Choose from dozens of recruiter-approved, industry-specific templates"
+      },
+      "instantExport": {
+        "title": "Instant Export",
+        "description": "Download high-quality PDFs instantly with perfect formatting"
+      }
+    },
+    "cta": {
+      "title": "Ready to Build Your Standout Resume",
+      "highlight": "Today",
+      "subtitle": "Join thousands of professionals who landed their dream jobs with our platform",
+      "button": "Start Building Now"
+    },
+    "footer": {
+      "craftedBy": "Crafted with"
+    },
+    "mobileMenu": {
+      "welcomeBack": "Welcome Back",
+      "goToDashboard": "Go to Dashboard"
+    }
+  },
+  "dashboard": {
+    "title": "My Resume",
+    "subtitleOne": "You have",
+    "subtitleResume": "resume",
+    "subtitleResumes": "resumes",
+    "subtitleEmpty": "Start building your professional resume",
+    "createNow": "Create Now",
+    "createFirst": "Create Your First Resume",
+    "createNew": "Create New Resume",
+    "emptyTitle": "No resumes found",
+    "emptyText": "You haven't created any resumes yet. Start building your professional resume",
+    "loading": "Loading your resumes...",
+    "modal": {
+      "title": "Create New Resume"
+    },
+    "delete": {
+      "title": "Confirm Deletion",
+      "message": "Are you sure you want to delete this resume? This action cannot be undone.",
+      "button": "Delete"
+    },
+    "toast": {
+      "deleted": "Resume deleted successfully",
+      "deleteFailed": "Failed to delete resume"
+    },
+    "completion": {
+      "gettingStarted": "Getting Started",
+      "almostThere": "Almost There",
+      "readyToGo": "Ready to Go!"
+    },
+    "new": "New",
+    "completed": "completed",
+    "startBuilding": "Start building"
+  },
+  "editResume": {
+    "title": "Untitled",
+    "defaultTitle": "Professional Resume",
+    "buttons": {
+      "theme": "Theme",
+      "delete": "Delete",
+      "download": "Download",
+      "back": "Back",
+      "save": "Save & Exit",
+      "next": "Next",
+      "previewAndDownload": "Preview & Download"
+    },
+    "preview": "Preview",
+    "completion": "Complete",
+    "saving": "Saving...",
+    "modal": {
+      "changeTheme": "Change Theme",
+      "applyChanges": "Apply Changes",
+      "generating": "Generating...",
+      "downloaded": "Downloaded!",
+      "downloadPDF": "Download PDF",
+      "changeTitle": "Change Title"
+    },
+    "validation": {
+      "fullNameRequired": "Full Name is required",
+      "designationRequired": "Designation is required",
+      "summaryRequired": "Summary is required",
+      "validEmailRequired": "Valid email is required",
+      "validPhoneRequired": "Valid 10-digit phone number is required",
+      "companyRequired": "Company is required in experience {{index}}",
+      "roleRequired": "Role is required in experience {{index}}",
+      "datesRequired": "Start and End dates are required in experience {{index}}",
+      "degreeRequired": "Degree is required in education {{index}}",
+      "institutionRequired": "Institution is required in education {{index}}",
+      "eduDatesRequired": "Start and End dates are required in education {{index}}",
+      "skillNameRequired": "Skill name is required in skill {{index}}",
+      "skillProgressRange": "Skill progress must be between 1 and 100 in skill {{index}}",
+      "projectTitleRequired": "Project Title is required in project {{index}}",
+      "projectDescRequired": "Project description is required in project {{index}}",
+      "certTitleRequired": "Certification Title is required in certification {{index}}",
+      "issuerRequired": "Issuer is required in certification {{index}}",
+      "languageRequired": "At least one language is required",
+      "interestRequired": "At least one interest is required"
+    },
+    "toast": {
+      "loadingFailed": "Failed to load resume data",
+      "updated": "Resume Updated Successfully",
+      "uploadFailed": "Failed to upload images",
+      "deleted": "Resume deleted successfully",
+      "deleteFailed": "Failed to delete resume",
+      "pdfGenerating": "Generating PDF...",
+      "pdfSuccess": "PDF downloaded successfully!",
+      "pdfError": "Failed to generate PDF",
+      "pdfErrorDetail": "Failed to generate PDF. Please try again."
+    },
+    "steps": {
+      "gettingStarted": "Getting Started",
+      "markingProgress": "Marking Progress",
+      "almostThere": "Almost There",
+      "nearlyCompleted": "Nearly Completed"
+    }
+  },
+  "forms": {
+    "profile": {
+      "title": "Personal Information",
+      "fullName": "Full Name",
+      "fullNamePlaceholder": "John Doe",
+      "designation": "Designation",
+      "designationPlaceholder": "Full Stack Developer",
+      "summary": "Summary",
+      "summaryPlaceholder": "Short introduction about yourself"
+    },
+    "contact": {
+      "title": "Contact Information",
+      "address": "Address",
+      "addressPlaceholder": "Short Address",
+      "email": "Email",
+      "emailPlaceholder": "john@example.com",
+      "phone": "Phone Number",
+      "phonePlaceholder": "1234567890",
+      "linkedin": "LinkedIn",
+      "linkedinPlaceholder": "https://linkedin.com/in/username",
+      "github": "GitHub",
+      "githubPlaceholder": "https://github.com/username",
+      "website": "Portfolio / Website",
+      "websitePlaceholder": "https://yourwebsite.com"
+    },
+    "workExperience": {
+      "title": "Work Experience",
+      "company": "Company",
+      "companyPlaceholder": "ABC Corp",
+      "role": "Role",
+      "rolePlaceholder": "Frontend Developer",
+      "startDate": "Start Date",
+      "endDate": "End Date",
+      "description": "Description",
+      "descriptionPlaceholder": "What did you do in this role?",
+      "add": "Add Work Experience"
+    },
+    "education": {
+      "title": "Education",
+      "degree": "Degree",
+      "degreePlaceholder": "BTech in Computer Science",
+      "institution": "Institution",
+      "institutionPlaceholder": "XYZ University",
+      "startDate": "Start Date",
+      "endDate": "End Date",
+      "add": "Add Education"
+    },
+    "skills": {
+      "title": "Skills",
+      "skillName": "Skill Name",
+      "skillNamePlaceholder": "JavaScript",
+      "proficiency": "Proficiency",
+      "proficiencyFormat": "{{value}}/5",
+      "add": "Add Skill"
+    },
+    "projects": {
+      "title": "Projects",
+      "projectTitle": "Project Title",
+      "projectTitlePlaceholder": "Portfolio Website",
+      "description": "Description",
+      "descriptionPlaceholder": "Short description about the project",
+      "githubLink": "GitHub Link",
+      "githubLinkPlaceholder": "https://github.com/username/project",
+      "liveDemoUrl": "Live Demo URL",
+      "liveDemoUrlPlaceholder": "https://yourproject.live",
+      "add": "Add Project"
+    },
+    "certifications": {
+      "title": "Certifications",
+      "certificateTitle": "Certificate Title",
+      "certificateTitlePlaceholder": "Full Stack Web Developer",
+      "issuer": "Issuer",
+      "issuerPlaceholder": "Coursera / Google / etc.",
+      "year": "Year",
+      "yearPlaceholder": "2024",
+      "add": "Add Certification"
+    },
+    "additional": {
+      "title": "Additional Information",
+      "languages": "Languages",
+      "language": "Language",
+      "languagePlaceholder": "e.g. English",
+      "proficiency": "Proficiency",
+      "addLanguage": "Add Language",
+      "interests": "Interests",
+      "interestPlaceholder": "e.g. Reading, Photography",
+      "addInterest": "Add Interest"
+    }
+  },
+  "auth": {
+    "login": {
+      "title": "Welcome Back",
+      "subtitle": "Sign in to continue building amazing resumes",
+      "email": "Email",
+      "emailPlaceholder": "example@example.com",
+      "password": "Password",
+      "passwordPlaceholder": "8 characters or more",
+      "submit": "Sign In",
+      "noAccount": "Don't have an account?",
+      "signUpLink": "Sign Up",
+      "errors": {
+        "invalidEmail": "Please enter valid Email",
+        "passwordRequired": "Please enter your Password",
+        "default": "Something went wrong. Please try again."
+      }
+    },
+    "signup": {
+      "title": "Create Account",
+      "subtitle": "Join thousands of professionals today",
+      "fullName": "Full Name",
+      "fullNamePlaceholder": "John Doe",
+      "email": "Email",
+      "emailPlaceholder": "example@example.com",
+      "password": "Password",
+      "passwordPlaceholder": "8 characters or more",
+      "submit": "Create Account",
+      "hasAccount": "Already have an account?",
+      "signInLink": "Sign In",
+      "errors": {
+        "nameRequired": "Please enter your FullName",
+        "invalidEmail": "Please enter valid Email",
+        "passwordRequired": "Please enter your Password",
+        "default": "Something went wrong. Please try again."
+      }
+    }
+  },
+  "card": {
+    "logout": "Logout",
+    "edit": "Edit",
+    "startBuilding": "Start building",
+    "createdBy": "Created At:",
+    "updatedBy": "Updated At:",
+    "gettingStarted": "Getting Started",
+    "almostThere": "Almost There",
+    "readyToGo": "Ready to Go!",
+    "complete": "Complete",
+    "noPreview": "No Preview",
+    "profile": "Profile",
+    "work": "Work",
+    "skills": "Skills",
+    "edu": "Edu"
+  },
+  "stepProgress": {
+    "gettingStarted": "Getting Started",
+    "markingProgress": "Marking Progress",
+    "almostThere": "Almost There",
+    "nearlyCompleted": "Nearly Completed"
+  },
+  "themeSelector": {
+    "templates": "Templates",
+    "applyChanges": "Apply Changes",
+    "template": "Template"
+  },
+  "createResumeForm": {
+    "title": "Create New Resume",
+    "resumeTitle": "Resume title",
+    "resumeTitlePlaceholder": "e.g., John Doe - software engineer",
+    "description": "Give your resume a title to get started. You can customize everything later",
+    "createButton": "Create Resume",
+    "errors": {
+      "titleRequired": "Please enter a title"
+    },
+    "failed": "Failed to create resume, please try again later"
+  },
+  "resumeSection": {
+    "github": "GitHub",
+    "liveDemo": "Live Demo"
+  },
+  "modal": {
+    "close": "Close"
+  },
+  "inputs": {
+    "profile": "profile",
+    "resumeTitle": "Resume title",
+    "resumeTitlePlaceholder": "e.g. John Doe - software engineer"
+  },
+  "navbar": {
+    "appName": "ResumeXpert"
+  }
+}
