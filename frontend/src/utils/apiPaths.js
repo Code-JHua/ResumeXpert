@@ -1,4 +1,5 @@
-export const BASE_URL = 'http://localhost:4000';
+// 支持环境变量，开发环境用 localhost，生产环境从 Zeabur 获取
+export const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
 
 // routes used for frontend
 export const API_PATHS = {

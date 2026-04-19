@@ -1,7 +1,8 @@
 import mongoose from 'mongoose'
 
 export const connectDB = async () => {
-  await mongoose.connect('mongodb+srv://hjh17607090915_db_user:resume123@cluster0.bkbk8kw.mongodb.net/RESUME')
+  const mongoUri = process.env.MONGODB_URI || process.env.MONGODB_URL || 'mongodb://localhost:27017/resumexpert'
+  await mongoose.connect(mongoUri)
   .then(() => {
     console.log('MongoDB connected')
   })
