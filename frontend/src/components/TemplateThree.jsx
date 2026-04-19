@@ -1,8 +1,10 @@
 import React, { useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { formatYearMonth } from "../utils/helper";
 import { AnimatedText } from "./RenderResume";
 
 const TemplateThree = ({ resumeData = {}, containerWidth }) => {
+  const { t } = useTranslation();
   const {
     profileInfo = {},
     contactInfo = {},
@@ -30,21 +32,21 @@ const TemplateThree = ({ resumeData = {}, containerWidth }) => {
 
   // Group skills by category
   const groupedSkills = {
-    "Automation & Test tools": [],
-    "Product Management": [],
-    Languages: [],
-    "Other Skills": []
+    automationTools: [],
+    productManagement: [],
+    languages: [],
+    otherSkills: []
   };
 
   skills.forEach(skill => {
     if (["Selenium/Webdriver", "TestNG", "Jenkins"].includes(skill.name)) {
-      groupedSkills["Automation & Test tools"].push(skill.name);
+      groupedSkills.automationTools.push(skill.name);
     } else if (["Agile", "Scrum", "JIRA", "Microsoft TFS"].includes(skill.name)) {
-      groupedSkills["Product Management"].push(skill.name);
+      groupedSkills.productManagement.push(skill.name);
     } else if (["Python", "Java", "Javascript", "Databases (MySQL)"].includes(skill.name)) {
-      groupedSkills.Languages.push(skill.name);
+      groupedSkills.languages.push(skill.name);
     } else {
-      groupedSkills["Other Skills"].push(skill.name);
+      groupedSkills.otherSkills.push(skill.name);
     }
   });
 
@@ -100,7 +102,7 @@ const TemplateThree = ({ resumeData = {}, containerWidth }) => {
               </li>
               {contactInfo.linkedin && (
                 <li className="flex items-start ">
-                  <span className="font-semibold min-w-[65px]">LinkedIn:</span>
+                  <span className="font-semibold min-w-[65px]">{t('template.links.linkedin')}:</span>
                   <a href={contactInfo.linkedin}
                     className="text-blue-600 hover:underline truncate pb-1"
                     title={contactInfo.linkedin}>
@@ -110,7 +112,7 @@ const TemplateThree = ({ resumeData = {}, containerWidth }) => {
               )}
               {contactInfo.github && (
                 <li className="flex items-start">
-                  <span className="font-semibold min-w-[65px] ">GitHub:</span>
+                  <span className="font-semibold min-w-[65px] ">{t('template.links.github')}:</span>
                   <a href={contactInfo.github}
                     className="text-blue-600 hover:underline pb-2 truncate"
                     title={contactInfo.github}>
@@ -120,7 +122,7 @@ const TemplateThree = ({ resumeData = {}, containerWidth }) => {
               )}
               {contactInfo.website && (
                 <li className="flex items-start">
-                  <span className="font-semibold min-w-[65px]">Portfolio:</span>
+                  <span className="font-semibold min-w-[65px]">{t('template.links.portfolio')}:</span>
                   <a href={contactInfo.website}
                     className="text-blue-600 hover:underline pb-2 truncate"
                     title={contactInfo.website}>
@@ -133,12 +135,12 @@ const TemplateThree = ({ resumeData = {}, containerWidth }) => {
 
           {/* Skills */}
           <section>
-            <h2 className="text-sm font-bold uppercase text-gray-800 mb-2 tracking-wider">SKILLS</h2>
+            <h2 className="text-sm font-bold uppercase text-gray-800 mb-2 tracking-wider">{t('template.sections.skills')}</h2>
             {Object.entries(groupedSkills).map(([category, skillsList]) => (
               skillsList.length > 0 && (
                 <div key={category} className="mb-2">
-                  {category !== "Other Skills" && (
-                    <h3 className="text-xs font-semibold italic mb-1">{category}:</h3>
+                  {category !== "otherSkills" && (
+                    <h3 className="text-xs font-semibold italic mb-1">{t(`template.skills.${category}`)}:</h3>
                   )}
                   <ul className="text-xs text-gray-700">
                     {skillsList.map((skill, idx) => (
@@ -153,7 +155,7 @@ const TemplateThree = ({ resumeData = {}, containerWidth }) => {
           {/* Education */}
           {education.length > 0 && (
             <section>
-              <h2 className="text-sm font-bold uppercase text-gray-800 mb-3 tracking-wider">EDUCATION</h2>
+              <h2 className="text-sm font-bold uppercase text-gray-800 mb-3 tracking-wider">{t('template.sections.education')}</h2>
               <div className="space-y-3">
                 {education.map((edu, idx) => (
                   <div key={idx} className="text-xs">
@@ -168,7 +170,7 @@ const TemplateThree = ({ resumeData = {}, containerWidth }) => {
           {/* Certifications */}
           {certifications.length > 0 && (
             <section>
-              <h2 className="text-sm font-bold uppercase text-gray-800 mb-2 tracking-wider">CERTIFICATIONS</h2>
+              <h2 className="text-sm font-bold uppercase text-gray-800 mb-2 tracking-wider">{t('template.sections.certifications')}</h2>
               <ul className="text-xs text-gray-700 space-y-1">
                 {certifications.map((cert, idx) => (
                   <li key={idx}><AnimatedText>{cert.title} ({cert.year})</AnimatedText></li>
@@ -180,7 +182,7 @@ const TemplateThree = ({ resumeData = {}, containerWidth }) => {
           {/* Interests */}
           {interests.length > 0 && (
             <section>
-              <h2 className="text-sm font-bold uppercase text-gray-800 mb-2 tracking-wider">INTERESTS</h2>
+              <h2 className="text-sm font-bold uppercase text-gray-800 mb-2 tracking-wider">{t('template.sections.interests')}</h2>
               <ul className="text-xs text-gray-700 space-y-1">
                 {interests.map((interest, idx) => (
                   <li key={idx}>• <AnimatedText>{interest}</AnimatedText></li>
@@ -195,7 +197,7 @@ const TemplateThree = ({ resumeData = {}, containerWidth }) => {
           {/* Work Experience */}
           {workExperience.length > 0 && (
             <section>
-              <h2 className="text-sm font-bold uppercase text-gray-800 mb-3 tracking-wider border-b border-gray-400 pb-1">WORK EXPERIENCE</h2>
+              <h2 className="text-sm font-bold uppercase text-gray-800 mb-3 tracking-wider border-b border-gray-400 pb-1">{t('template.sections.workExperience')}</h2>
               <div className="space-y-5">
                 {workExperience.map((exp, idx) => (
                   <div key={idx} className="text-xs">
@@ -225,7 +227,7 @@ const TemplateThree = ({ resumeData = {}, containerWidth }) => {
           {/* Projects Section */}
           {projects.length > 0 && (
             <section>
-              <h2 className="text-sm font-bold uppercase text-gray-800 mb-3 tracking-wider border-b border-gray-400 pb-1">PROJECTS</h2>
+              <h2 className="text-sm font-bold uppercase text-gray-800 mb-3 tracking-wider border-b border-gray-400 pb-1">{t('template.sections.projects')}</h2>
               <div className="space-y-4">
                 {projects.map((proj, idx) => (
                   <div key={idx} className="text-xs">
@@ -244,13 +246,13 @@ const TemplateThree = ({ resumeData = {}, containerWidth }) => {
                       {proj.github && (
                         <a href={proj.github}
                           className="text-blue-600 hover:underline flex items-center text-xs">
-                          <span>GitHub</span>
+                          <AnimatedText>{t('template.links.github')}</AnimatedText>
                         </a>
                       )}
                       {proj.liveDemo && (
                         <a href={proj.liveDemo}
                           className="text-blue-600 hover:underline flex items-center text-xs">
-                          <span>Live Demo</span>
+                          <AnimatedText>{t('template.links.liveDemo')}</AnimatedText>
                         </a>
                       )}
                       {proj.technologies && (

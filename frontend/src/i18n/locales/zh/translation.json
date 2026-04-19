@@ -344,5 +344,33 @@
   },
   "navbar": {
     "appName": "ResumeXpert"
+  },
+  "template": {
+    "sections": {
+      "professionalSummary": "专业简介",
+      "workExperience": "工作经历",
+      "projects": "项目经历",
+      "skills": "技能",
+      "education": "教育背景",
+      "certifications": "证书",
+      "languages": "语言能力",
+      "interests": "兴趣爱好",
+      "summary": "简介",
+      "experience": "工作经验"
+    },
+    "links": {
+      "linkedin": "领英",
+      "github": "GitHub",
+      "portfolio": "作品集",
+      "link": "链接",
+      "demo": "演示",
+      "liveDemo": "在线演示"
+    },
+    "skills": {
+      "automationTools": "自动化测试工具",
+      "productManagement": "产品管理",
+      "languages": "编程语言",
+      "otherSkills": "其他技能"
+    }
   }
 }

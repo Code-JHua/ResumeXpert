@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { LuMail, LuPhone, LuGithub, LuGlobe } from "react-icons/lu";
 import { RiLinkedinLine } from "react-icons/ri";
+import { useTranslation } from "react-i18next";
 import {
   EducationInfo,
   WorkExperience,
@@ -22,6 +23,7 @@ const Title = ({ text, color }) => (
 );
 
 const TemplateOne = ({ resumeData = {}, colorPalette, containerWidth }) => {
+  const { t } = useTranslation();
   const {
     profileInfo = {},
     contactInfo = {},
@@ -92,7 +94,7 @@ const TemplateOne = ({ resumeData = {}, colorPalette, containerWidth }) => {
             <div className="flex items-center mb-1">
               <RiLinkedinLine className="mr-1" />
               <a href={contactInfo.linkedin} target="_blank" rel="noopener noreferrer" className="hover:underline">
-                LinkedIn
+                <AnimatedText>{t('template.links.linkedin')}</AnimatedText>
               </a>
             </div>
           )}
@@ -100,7 +102,7 @@ const TemplateOne = ({ resumeData = {}, colorPalette, containerWidth }) => {
             <div className="flex items-center mb-1">
               <LuGithub className="mr-1" />
               <a href={contactInfo.github} target="_blank" rel="noopener noreferrer" className="hover:underline">
-                GitHub
+                <AnimatedText>{t('template.links.github')}</AnimatedText>
               </a>
             </div>
           )}
@@ -108,7 +110,7 @@ const TemplateOne = ({ resumeData = {}, colorPalette, containerWidth }) => {
             <div className="flex items-center">
               <LuGlobe className="mr-1" />
               <a href={contactInfo.website} target="_blank" rel="noopener noreferrer" className="hover:underline">
-                Portfolio
+                <AnimatedText>{t('template.links.portfolio')}</AnimatedText>
               </a>
             </div>
           )}
@@ -118,7 +120,7 @@ const TemplateOne = ({ resumeData = {}, colorPalette, containerWidth }) => {
       {/* Professional Summary */}
       {profileInfo.summary && (
         <div className="resume-section mb-3">
-          <Title text="Professional Summary" />
+          <Title text={t('template.sections.professionalSummary')} />
           <p className="text-sm leading-relaxed"><AnimatedText>{profileInfo.summary}</AnimatedText></p>
         </div>
       )}
@@ -128,7 +130,7 @@ const TemplateOne = ({ resumeData = {}, colorPalette, containerWidth }) => {
         <div className="col-span-2 space-y-4">
           {workExperience.length > 0 && (
             <div className="resume-section">
-              <Title text="Work Experience" />
+              <Title text={t('template.sections.workExperience')} />
               <div className="space-y-6">
                 {workExperience.map((exp, i) => (
                   <WorkExperience
@@ -149,7 +151,7 @@ const TemplateOne = ({ resumeData = {}, colorPalette, containerWidth }) => {
 
           {projects.length > 0 && (
             <div className="resume-section">
-              <Title text="Projects" />
+              <Title text={t('template.sections.projects')} />
               <div className="space-y-4">
                 {projects.map((proj, i) => (
                   <ProjectInfo
@@ -171,7 +173,7 @@ const TemplateOne = ({ resumeData = {}, colorPalette, containerWidth }) => {
         <div className="col-span-1 space-y-6">
           {skills.length > 0 && (
             <div className="resume-section">
-              <Title text="Skills" />
+              <Title text={t('template.sections.skills')} />
               <div className="flex flex-wrap gap-2">
                 {skills.map((skill, i) => (
                   <span
@@ -188,7 +190,7 @@ const TemplateOne = ({ resumeData = {}, colorPalette, containerWidth }) => {
 
           {education.length > 0 && (
             <div className="resume-section">
-              <Title text="Education" />
+              <Title text={t('template.sections.education')} />
               <div className="space-y-4 pb-2">
                 {education.map((edu, i) => (
                   <EducationInfo
@@ -208,7 +210,7 @@ const TemplateOne = ({ resumeData = {}, colorPalette, containerWidth }) => {
 
           {certifications.length > 0 && (
             <div className="resume-section">
-              <Title text="Certifications" />
+              <Title text={t('template.sections.certifications')} />
               <div className="space-y-2">
                 {certifications.map((cert, i) => (
                   <CertificationInfo
@@ -226,7 +228,7 @@ const TemplateOne = ({ resumeData = {}, colorPalette, containerWidth }) => {
 
           {languages.length > 0 && (
             <div className="resume-section">
-              <Title text="Languages" />
+              <Title text={t('template.sections.languages')} />
               <div className="flex flex-wrap gap-2">
                 {languages.map((lang, i) => (
                   <span
@@ -243,7 +245,7 @@ const TemplateOne = ({ resumeData = {}, colorPalette, containerWidth }) => {
 
           {interests.length > 0 && interests.some((i) => i) && (
             <div className="resume-section">
-              <Title text="Interests" />
+              <Title text={t('template.sections.interests')} />
               <div className="flex flex-wrap gap-2">
                 {interests.map((int, i) =>
                   int ? (

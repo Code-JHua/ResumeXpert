@@ -1,12 +1,14 @@
 "use client";
 import React, { useEffect, useRef, useState } from "react";
 import { LuExternalLink, LuGithub } from "react-icons/lu";
+import { useTranslation } from "react-i18next";
 import { formatYearMonth } from "../utils/helper";
 import { AnimatedText } from "./RenderResume";
 
 const sectionTitleClass = "text-base font-bold uppercase tracking-wide mb-1 pb-1 border-b border-gray-300";
 
 const TemplateTwo = ({ resumeData = {}, containerWidth }) => {
+  const { t } = useTranslation();
   const {
     profileInfo = {},
     contactInfo = {},
@@ -56,17 +58,17 @@ const TemplateTwo = ({ resumeData = {}, containerWidth }) => {
           )}
           {contactInfo.linkedin && (
             <a href={contactInfo.linkedin} className="hover:underline text-blue-600">
-              LinkedIn
+              <AnimatedText>{t('template.links.linkedin')}</AnimatedText>
             </a>
           )}
           {contactInfo.github && (
             <a href={contactInfo.github} className="hover:underline text-blue-600">
-              GitHub
+              <AnimatedText>{t('template.links.github')}</AnimatedText>
             </a>
           )}
           {contactInfo.website && (
             <a href={contactInfo.website} className="hover:underline text-blue-600">
-              Portfolio
+              <AnimatedText>{t('template.links.portfolio')}</AnimatedText>
             </a>
           )}
         </div>
@@ -77,7 +79,7 @@ const TemplateTwo = ({ resumeData = {}, containerWidth }) => {
       {/* Summary */}
       {profileInfo.summary && (
         <section className="mb-2">
-          <h2 className={sectionTitleClass}>Summary</h2>
+          <h2 className={sectionTitleClass}>{t('template.sections.summary')}</h2>
           <p className="text-[11px] text-gray-800 leading-tight"><AnimatedText>{profileInfo.summary}</AnimatedText></p>
         </section>
       )}
@@ -85,7 +87,7 @@ const TemplateTwo = ({ resumeData = {}, containerWidth }) => {
       {/* Experience */}
       {workExperience.length > 0 && (
         <section className="mb-2">
-          <h2 className={sectionTitleClass}>Experience</h2>
+          <h2 className={sectionTitleClass}>{t('template.sections.experience')}</h2>
           <div className="space-y-2">
             {workExperience.map((exp, idx) => (
               <div key={idx} className="space-y-0.5">
@@ -120,7 +122,7 @@ const TemplateTwo = ({ resumeData = {}, containerWidth }) => {
       {/* Projects */}
       {projects.length > 0 && (
         <section className="mb-2">
-          <h2 className={sectionTitleClass}>Projects</h2>
+          <h2 className={sectionTitleClass}>{t('template.sections.projects')}</h2>
           <div className="space-y-2">
             {projects.map((proj, idx) => (
               <div key={idx} className="space-y-0.5">
@@ -128,7 +130,7 @@ const TemplateTwo = ({ resumeData = {}, containerWidth }) => {
                   <h3 className="font-semibold text-[12px] text-gray-800"><AnimatedText>{proj.title}</AnimatedText></h3>
                   {proj.link && (
                     <a href={proj.link} className="text-blue-600 text-[11px] hover:underline">
-                      <AnimatedText>{proj.linkType || "Link"}</AnimatedText>
+                      <AnimatedText>{proj.linkType || t('template.links.link')}</AnimatedText>
                     </a>
                   )}
                 </div>
@@ -141,12 +143,12 @@ const TemplateTwo = ({ resumeData = {}, containerWidth }) => {
                 <div className="flex gap-1 mt-0.5 pt-2 text-[11px]">
                   {proj.github && (
                     <a href={proj.github} className="flex items-center gap-0.5 hover:underline text-blue-600">
-                      <LuGithub size={10} /> GitHub
+                      <LuGithub size={10} /> <AnimatedText>{t('template.links.github')}</AnimatedText>
                     </a>
                   )}
                   {proj.liveDemo && (
                     <a href={proj.liveDemo} className="flex items-center gap-0.5 hover:underline text-blue-600">
-                      <LuExternalLink size={10} /> Demo
+                      <LuExternalLink size={10} /> <AnimatedText>{t('template.links.demo')}</AnimatedText>
                     </a>
                   )}
                 </div>
@@ -159,7 +161,7 @@ const TemplateTwo = ({ resumeData = {}, containerWidth }) => {
       {/* Education */}
       {education.length > 0 && (
         <section className="mb-2">
-          <h2 className={sectionTitleClass}>Education</h2>
+          <h2 className={sectionTitleClass}>{t('template.sections.education')}</h2>
           <div className="space-y-1">
             {education.map((edu, idx) => (
               <div key={idx} className="space-y-0.25">
@@ -184,7 +186,7 @@ const TemplateTwo = ({ resumeData = {}, containerWidth }) => {
       {/* Skills */}
       {skills.length > 0 && (
         <section className="mb-2">
-          <h2 className={sectionTitleClass}>Skills</h2>
+          <h2 className={sectionTitleClass}>{t('template.sections.skills')}</h2>
           <ul className="text-[11px] text-gray-800 flex flex-wrap gap-1">
             {skills.map((skill, idx) => (
               <li key={idx} className="w-fit"><AnimatedText>{skill.name}</AnimatedText></li>
@@ -196,7 +198,7 @@ const TemplateTwo = ({ resumeData = {}, containerWidth }) => {
       {/* Certifications */}
       {certifications.length > 0 && (
         <section className="mb-2">
-          <h2 className={sectionTitleClass}>Certifications</h2>
+          <h2 className={sectionTitleClass}>{t('template.sections.certifications')}</h2>
           <ul className="list-disc list-inside text-[11px] text-gray-700">
             {certifications.map((cert, idx) => (
               <li key={idx} className="leading-tight">
@@ -213,7 +215,7 @@ const TemplateTwo = ({ resumeData = {}, containerWidth }) => {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
             {languages.length > 0 && (
               <div>
-                <h2 className={sectionTitleClass}>Languages</h2>
+                <h2 className={sectionTitleClass}>{t('template.sections.languages')}</h2>
                 <ul className="flex flex-wrap gap-1 text-[11px] text-gray-700">
                   {languages.map((lang, idx) => (
                     <li key={idx} className="bg-gray-100 px-1.5 py-0.5 rounded-full">
@@ -225,7 +227,7 @@ const TemplateTwo = ({ resumeData = {}, containerWidth }) => {
             )}
             {interests.length > 0 && interests.some(Boolean) && (
               <div>
-                <h2 className={sectionTitleClass}>Interests</h2>
+                <h2 className={sectionTitleClass}>{t('template.sections.interests')}</h2>
                 <ul className="flex flex-wrap gap-1 text-[11px] text-gray-700">
                   {interests.filter(Boolean).map((int, idx) => (
                     <li key={idx} className="bg-gray-100 px-1.5 py-0.5 rounded-full">

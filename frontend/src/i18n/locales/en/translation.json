@@ -344,5 +344,33 @@
   },
   "navbar": {
     "appName": "ResumeXpert"
+  },
+  "template": {
+    "sections": {
+      "professionalSummary": "Professional Summary",
+      "workExperience": "Work Experience",
+      "projects": "Projects",
+      "skills": "Skills",
+      "education": "Education",
+      "certifications": "Certifications",
+      "languages": "Languages",
+      "interests": "Interests",
+      "summary": "Summary",
+      "experience": "Experience"
+    },
+    "links": {
+      "linkedin": "LinkedIn",
+      "github": "GitHub",
+      "portfolio": "Portfolio",
+      "link": "Link",
+      "demo": "Demo",
+      "liveDemo": "Live Demo"
+    },
+    "skills": {
+      "automationTools": "Automation & Test tools",
+      "productManagement": "Product Management",
+      "languages": "Languages",
+      "otherSkills": "Other Skills"
+    }
   }
 }
