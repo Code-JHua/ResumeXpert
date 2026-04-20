@@ -121,17 +121,16 @@ const Dashboard = () => {
 
     try {
       await axiosInstance.delete(API_PATHS.RESUME.DELETE(resumeToDelete))
-      setAllResumes(allResumes.filter(resume => resume._id !== resumeToDelete._id))
+      setAllResumes((prev) => prev.filter((resume) => resume._id !== resumeToDelete))
       toast.success(t('dashboard.toast.deleted'))
-      fetchAllResumes()
     } catch (error) {
       console.error('Error deleting resume:', error);
       toast.error(t('dashboard.toast.deleteFailed'))
-      fetchAllResumes()
     }
     finally {
       setShowDeleteConfirm(false)
       setResumeToDelete(null)
+      fetchAllResumes()
     }
   }
 
@@ -240,7 +239,15 @@ const Dashboard = () => {
       </Modal>
 
       {/* delete modal */}
-      <Modal isOpen={showDeleteConfirm} onClose={() => setShowDeleteConfirm(false)} title={t('dashboard.delete.title')} showActionBtn actionBtnText={t('dashboard.delete.button')} actionBtnClassName='bg-red-600 hover:bg-red-700 ' onActionclick={handleDeleteResume}>
+      <Modal
+        isOpen={showDeleteConfirm}
+        onClose={() => setShowDeleteConfirm(false)}
+        title={t('dashboard.delete.title')}
+        showActionBtn
+        actionBtnText={t('dashboard.delete.button')}
+        actionBtnClassName='bg-red-600 hover:bg-red-700'
+        onActionBtnClick={handleDeleteResume}
+      >
         <div className='p-4'>
           <div className='flex flex-col items-center text-center'>
             <div className={styles.deleteIconWrapper}>

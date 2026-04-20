@@ -5,7 +5,18 @@ import { X } from 'lucide-react';
 
 
 
-const Modal = ({ children, isOpen, onClose, hideHeader, title, showActionBtn, actionBtnIcon = null, actionBtnText, onActionBtnClick = () => {} }) => {
+const Modal = ({
+  children,
+  isOpen,
+  onClose,
+  hideHeader,
+  title,
+  showActionBtn,
+  actionBtnIcon = null,
+  actionBtnText,
+  actionBtnClassName = '',
+  onActionBtnClick = () => {},
+}) => {
   if (!isOpen) {
     return null;
   }
@@ -18,7 +29,7 @@ const Modal = ({ children, isOpen, onClose, hideHeader, title, showActionBtn, ac
               {title}
             </h3>
             {showActionBtn && (
-              <button type="button" className={styles.actionButton} onClick={onActionBtnClick}>
+              <button type="button" className={`${styles.actionButton} ${actionBtnClassName}`.trim()} onClick={onActionBtnClick}>
                 {actionBtnIcon}
                 {actionBtnText}
               </button>
