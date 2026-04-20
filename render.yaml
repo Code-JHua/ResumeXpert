@@ -3,8 +3,8 @@ services:
     name: resumexpert
     runtime: node
     plan: free
-    buildCommand: cd backend && npm install --include=dev && cd ../frontend && npm install --include=dev && npm run build
-    startCommand: cd backend && npm start
+    buildCommand: bash ./scripts/render-build.sh
+    startCommand: bash ./scripts/render-start.sh
     healthCheckPath: /
     envVars:
       - key: NODE_ENV
