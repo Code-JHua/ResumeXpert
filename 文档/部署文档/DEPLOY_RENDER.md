@@ -18,6 +18,7 @@
 
 - `MONGODB_URI`：MongoDB Atlas 连接字符串
 - `JWT_SECRET`：已经在 `render.yaml` 里自动生成，也可以手动改成自己的
+- `NODE_VERSION`：建议填 `20`
 
 ## 可选环境变量
 
