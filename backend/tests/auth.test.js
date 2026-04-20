@@ -128,7 +128,7 @@ describe('Auth API Tests', () => {
           password: 'password123'
         });
 
-      expect(response.status).toBe(500);
+      expect(response.status).toBe(401);
       expect(response.body.message).toContain('Invalid');
     });
 
@@ -140,7 +140,7 @@ describe('Auth API Tests', () => {
           password: 'wrongpassword'
         });
 
-      expect(response.status).toBe(500);
+      expect(response.status).toBe(401);
       expect(response.body.message).toContain('Invalid');
     });
   });
