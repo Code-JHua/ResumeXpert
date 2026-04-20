@@ -560,19 +560,22 @@ const EditResume = () => {
         // Remove Content-Type header - browser sets it automatically for FormData
       )
 
-      // Validate response data structure
-      if (!uploadResponse.data || !uploadResponse.data.thumbnailLink) {
-        throw new Error("Invalid server response: missing thumbnail link")
-      }
-
-      const { thumbnailLink } = uploadResponse.data
+      const thumbnailLink = uploadResponse.data?.thumbnailLink || resumeData.thumbnailLink || ""
       await updateResumeDetails(thumbnailLink)
 
       toast.success(t('editResume.toast.updated'))
       navigate("/dashboard")
     } catch (error) {
       console.error("Error Uploading Images:", error)
-      toast.error(t('editResume.toast.uploadFailed'))
+
+      try {
+        await updateResumeDetails(resumeData.thumbnailLink || "")
+        toast.success(t('editResume.toast.updated'))
+        navigate("/dashboard")
+      } catch (updateError) {
+        console.error("Error saving resume after upload failure:", updateError)
+        toast.error(t('editResume.toast.uploadFailed'))
+      }
     } finally {
       setIsLoading(false)
     }

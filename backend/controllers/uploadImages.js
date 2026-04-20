@@ -18,6 +18,8 @@ export const uploadResumeImage = async (req, res) => {
 
     const newThumbnail = req.files?.thumbnail?.[0]
     const newProfileImage = req.files?.profileImage?.[0] || null
+    const currentThumbnailLink = resume.thumbnailLink || ''
+    const currentProfilePreviewUrl = resume.profileInfo?.profilePreviewUrl || ''
 
     if (newThumbnail) {
       if (resume.thumbnailLink) {
@@ -31,20 +33,23 @@ export const uploadResumeImage = async (req, res) => {
 
     // same for profilepreview image
     if (newProfileImage) {
-      if (resume.profileinfo?.profileImage) {
-        const oldProfile = path.join(uploadsFolder, path.basename(resume.profileinfo.profilePreviewUrl))
+      if (resume.profileInfo?.profilePreviewUrl) {
+        const oldProfile = path.join(uploadsFolder, path.basename(resume.profileInfo.profilePreviewUrl))
         if (fs.existsSync(oldProfile)) {
           fs.unlinkSync(oldProfile)
         }
       }
-      resume.profileinfo.profilePreviewUrl = `${baseUrl}/uploads/${newProfileImage.filename}`
+      resume.profileInfo = {
+        ...resume.profileInfo,
+        profilePreviewUrl: `${baseUrl}/uploads/${newProfileImage.filename}`,
+      }
     }
 
     await resume.save()
     res.status(200).json({
       message: "Image uploaded successfully",
-      thumbnailLink: resume.thumbnailLink,
-      profilePreviewUrl: resume.profileinfo?.profilePreviewUrl,
+      thumbnailLink: resume.thumbnailLink || currentThumbnailLink,
+      profilePreviewUrl: resume.profileInfo?.profilePreviewUrl || currentProfilePreviewUrl,
     })
   } catch (error) {
     console.error("Error uploading image:", error);
