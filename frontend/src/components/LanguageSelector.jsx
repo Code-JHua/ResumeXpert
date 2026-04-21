@@ -2,8 +2,28 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Languages } from 'lucide-react';
 
-const LanguageSelector = ({ className = '' }) => {
+const baseStyles = {
+  background: 'linear-gradient(135deg, #8b5cf6 0%, #d946ef 100%)',
+  color: 'white',
+  display: 'flex',
+  alignItems: 'center',
+  cursor: 'pointer',
+};
+
+const variants = {
+  default: {
+    minWidth: '60px',
+    gap: '6px',
+  },
+  compact: {
+    minWidth: 'auto',
+    gap: '0',
+  },
+};
+
+const LanguageSelector = ({ className = '', variant = 'default' }) => {
   const { i18n, t } = useTranslation();
+  const currentVariant = variants[variant] || variants.default;
 
   const toggleLanguage = () => {
     const newLang = i18n.language === 'zh' ? 'en' : 'zh';
@@ -16,13 +36,8 @@ const LanguageSelector = ({ className = '' }) => {
       onClick={toggleLanguage}
       className={`relative px-4 py-2 rounded-xl font-semibold text-sm transition-all duration-300 ${className}`}
       style={{
-        background: 'linear-gradient(135deg, #8b5cf6 0%, #d946ef 100%)',
-        color: 'white',
-        minWidth: '60px',
-        display: 'flex',
-        alignItems: 'center',
-        gap: '6px',
-        cursor: 'pointer'
+        ...baseStyles,
+        ...currentVariant,
       }}
       onMouseEnter={(e) => {
         e.currentTarget.style.transform = 'translateY(-2px)';
@@ -32,9 +47,10 @@ const LanguageSelector = ({ className = '' }) => {
         e.currentTarget.style.transform = 'translateY(0)';
         e.currentTarget.style.boxShadow = 'none';
       }}
+      aria-label={t('common.language')}
     >
       <Languages size={16} />
-      <span>{t(`language.${i18n.language}`)}</span>
+      {variant !== 'compact' && <span>{t(`language.${i18n.language}`)}</span>}
     </button>
   );
 };

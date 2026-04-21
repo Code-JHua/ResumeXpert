@@ -20,8 +20,8 @@ i18n
   .use(initReactI18next) // 绑定react-i18next
   .init({
     resources,
-    fallbackLng: 'zh', // 默认语言为中文
-    lng: localStorage.getItem('resumexpert-language') || 'zh', // 优先使用localStorage中的语言
+    fallbackLng: 'en', // 默认语言为英文
+    lng: localStorage.getItem('resumexpert-language') || 'en', // 优先使用localStorage中的语言
 
     detection: {
       order: ['localStorage', 'navigator'],

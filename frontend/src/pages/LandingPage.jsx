@@ -44,12 +44,18 @@ const LandingPage = () => {
           </div>
 
           {/* mobile menu btn */}
-          <button className={landingPageStyles.mobileMenuButton} onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
-            {mobileMenuOpen ?
-              <X className={landingPageStyles.mobileMenuIcon} size={24} /> :
-              <Menu className={landingPageStyles.mobileMenuIcon} size={24} />
-            }
-          </button>
+          <div className='flex items-center gap-2 md:hidden'>
+            <LanguageSelector
+              variant='compact'
+              className='!px-3 !py-2 shadow-md shadow-violet-200/60'
+            />
+            <button className={landingPageStyles.mobileMenuButton} onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
+              {mobileMenuOpen ?
+                <X className={landingPageStyles.mobileMenuIcon} size={24} /> :
+                <Menu className={landingPageStyles.mobileMenuIcon} size={24} />
+              }
+            </button>
+          </div>
 
           {/* desktop navigation */}
           <div className='hidden md:flex items-center gap-3'>
@@ -91,6 +97,10 @@ const LandingPage = () => {
                   {t('common.getStarted')}
                 </button>
               )}
+
+              <div className='pt-2 border-t border-violet-100/80'>
+                <LanguageSelector className='w-full justify-center shadow-md shadow-violet-200/50' />
+              </div>
             </div>
           </div>
         )}
