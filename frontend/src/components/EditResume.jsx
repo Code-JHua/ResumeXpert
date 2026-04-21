@@ -674,6 +674,7 @@ const EditResume = () => {
         fileName: `${resumeData.title.replace(/[^a-z0-9]/gi, "_")}.pdf`,
         resumeId,
         templateId: resumeData?.template?.theme || '01',
+        triggerSource: 'editor',
       })
 
       toast.success(t('editResume.toast.pdfSuccess'), { id: toastId })
@@ -738,6 +739,7 @@ const EditResume = () => {
             markdownSyncState={markdownSyncState}
             onOpenVersions={() => setOpenVersionModal(true)}
             onOpenThemeSelector={() => setOpenThemeSelector(true)}
+            onOpenOutputCenter={() => navigate(`/share?resumeId=${resumeId}`)}
             onDeleteResume={handleDeleteResume}
             onOpenPreview={() => setOpenPreviewModal(true)}
             isLoading={isLoading}

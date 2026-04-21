@@ -28,6 +28,10 @@ export const API_PATHS = {
     EXPORT_MARKDOWN: (id) => `/api/resume/${id}/export/markdown`,
     CREATE_EXPORT_LOG: (id) => `/api/resume/${id}/exports/log`,
     GET_EXPORT_LOGS: (id) => `/api/resume/${id}/exports`,
+    CREATE_SHARE: (id) => `/api/resume/${id}/share`,
+    GET_SHARE: (id) => `/api/resume/${id}/share`,
+    UPDATE_SHARE: (id) => `/api/resume/${id}/share`,
+    TOGGLE_SHARE: (id) => `/api/resume/${id}/share/toggle`,
     CREATE_VERSION: (id) => `/api/resume/${id}/versions`,
     GET_VERSIONS: (id) => `/api/resume/${id}/versions`,
     GET_VERSION: (id, versionId) => `/api/resume/${id}/versions/${versionId}`,
@@ -73,6 +77,9 @@ export const API_PATHS = {
   TEMPLATES: {
     GET_ALL: '/api/templates',
     GET_PREVIEW: (id) => `/api/templates/${id}/preview`,
+  },
+  PUBLIC: {
+    GET_SHARE: (slug) => `/api/public/share/${slug}`,
   },
   image: {
     UPLOAD_IMAGE:'/api/auth/upload-image',

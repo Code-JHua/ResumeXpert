@@ -14,6 +14,7 @@ import coverLetterRoutes from './routes/coverLetterRoutes.js'
 import applicationRoutes from './routes/applicationRoutes.js'
 import resumeImportRoutes from './routes/resumeImportRoutes.js'
 import templateRoutes from './routes/templateRoutes.js'
+import publicRoutes from './routes/publicRoutes.js'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -51,6 +52,7 @@ app.use('/api/cover-letters', coverLetterRoutes)
 app.use('/api/applications', applicationRoutes)
 app.use('/api/imports', resumeImportRoutes)
 app.use('/api/templates', templateRoutes)
+app.use('/api/public', publicRoutes)
 
 app.use(
   '/uploads',

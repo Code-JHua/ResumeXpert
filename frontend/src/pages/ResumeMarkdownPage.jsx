@@ -4,6 +4,7 @@ import toast from 'react-hot-toast'
 import DashboardLayout from '../components/DashboardLayout'
 import axiosInstance from '../utils/axiosInstance'
 import { API_PATHS } from '../utils/apiPaths'
+import { exportResumeAsMarkdown } from '../services/resumeExportService'
 
 const defaultDocument = {
   title: '',
@@ -303,15 +304,17 @@ const ResumeMarkdownPage = () => {
 
   const exportMarkdown = async () => {
     try {
-      const response = await axiosInstance.get(API_PATHS.RESUME.EXPORT_MARKDOWN(id))
-      const content = response.data.content || document.content
-      const blob = new Blob([content], { type: 'text/markdown;charset=utf-8' })
-      const url = URL.createObjectURL(blob)
-      const anchor = window.document.createElement('a')
-      anchor.href = url
-      anchor.download = `${(resume?.title || 'resume').replace(/[^a-z0-9]/gi, '_')}.md`
-      anchor.click()
-      URL.revokeObjectURL(url)
+      const response = await exportResumeAsMarkdown({
+        resumeId: id,
+        fileName: `${(resume?.title || 'resume').replace(/[^a-z0-9]/gi, '_')}.md`,
+        triggerSource: 'markdown_page',
+      })
+
+      if (response.status === 'not_ready') {
+        toast.error('Markdown 文档尚未准备好，请先同步或保存 Markdown')
+        return
+      }
+
       toast.success('Markdown 已导出')
     } catch (error) {
       toast.error('导出 Markdown 失败')

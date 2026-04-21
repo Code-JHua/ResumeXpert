@@ -146,6 +146,7 @@ const Dashboard = () => {
         <div className='grid grid-cols-1 md:grid-cols-3 gap-4 mb-8'>
           {[
             { to: '/imports', title: '导入中心', desc: '从 Markdown 或后续 PDF 材料开始创建简历' },
+            { to: '/share', title: '输出 / 分享', desc: '统一导出 PDF、Markdown，并管理公开分享链接' },
             { to: '/jobs', title: '岗位 / ATS', desc: '录入 JD、分析匹配度、生成优化建议' },
             { to: '/cover-letters', title: '求职信', desc: '基于简历和岗位生成求职信' },
             { to: '/applications', title: '投递管理', desc: '管理投递状态、面试节点和日历安排' },

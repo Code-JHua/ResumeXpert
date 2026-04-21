@@ -12,6 +12,7 @@ import ImportsPage from './pages/ImportsPage.jsx'
 import ResumeMarkdownPage from './pages/ResumeMarkdownPage.jsx'
 import ShareManagementPage from './pages/ShareManagementPage.jsx'
 import ImportConfirmPage from './pages/ImportConfirmPage.jsx'
+import PublicSharePage from './pages/PublicSharePage.jsx'
 
 
 
@@ -28,6 +29,7 @@ const App = () => {
         <Route path="/imports/:id/confirm" element={<ImportConfirmPage />} />
         <Route path="/resume/:id/markdown" element={<ResumeMarkdownPage />} />
         <Route path="/share" element={<ShareManagementPage />} />
+        <Route path="/s/:slug" element={<PublicSharePage />} />
         <Route path="/resume/:id" element={<EditResume />} />
       </Routes>
 

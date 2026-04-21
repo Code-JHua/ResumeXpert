@@ -21,8 +21,12 @@ import {
 } from '../controllers/resumeMarkdownController.js'
 import {
   createExportLog,
+  createResumeSharePage,
   exportResumeMarkdown,
   getResumeExportLogs,
+  getResumeSharePage,
+  toggleResumeSharePage,
+  updateResumeSharePage,
 } from '../controllers/exportController.js'
 
 
@@ -40,6 +44,10 @@ resumeRouter.delete('/:id/markdown', protect, deleteResumeMarkdownDocument)
 resumeRouter.get('/:id/export/markdown', protect, exportResumeMarkdown)
 resumeRouter.post('/:id/exports/log', protect, createExportLog)
 resumeRouter.get('/:id/exports', protect, getResumeExportLogs)
+resumeRouter.post('/:id/share', protect, createResumeSharePage)
+resumeRouter.get('/:id/share', protect, getResumeSharePage)
+resumeRouter.put('/:id/share', protect, updateResumeSharePage)
+resumeRouter.post('/:id/share/toggle', protect, toggleResumeSharePage)
 
 resumeRouter.put('/:id', protect, updateResume)
 resumeRouter.put('/:id/upload-image', protect, upload.fields([{ name: "thumbnail" }, { name: "profileImage" }]), uploadResumeImage)

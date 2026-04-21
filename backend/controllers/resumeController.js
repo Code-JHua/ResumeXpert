@@ -1,5 +1,6 @@
 import Resume from '../models/resumeModel.js'
 import ResumeMarkdownDocument from '../models/resumeMarkdownDocumentModel.js'
+import SharedResumePage from '../models/sharedResumePageModel.js'
 import path from 'path'
 import fs from 'fs'
 
@@ -227,6 +228,8 @@ export const deleteResume = async (req, res) => {
     if (!deleted) {
       return res.status(404).json({ message: "Resume not found or not authorized" });
     }
+
+    await SharedResumePage.findOneAndDelete({ resumeId: req.params.id, userId: req.user._id })
     res.json({ message: "Resume deleted successfully" })
   } catch (error) {
     res.status(500).json({ message: "Failed to delete resume", error: error.message });

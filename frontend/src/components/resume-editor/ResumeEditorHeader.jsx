@@ -1,5 +1,5 @@
 import React from 'react'
-import { Palette, Trash2, Download, Save, FileCode2, RefreshCw } from 'lucide-react'
+import { Palette, Trash2, Download, Save, FileCode2, RefreshCw, Share2 } from 'lucide-react'
 import { buttonStyles, containerStyles } from '../../assets/dummystyle'
 import { TitleInput } from '../Inputs'
 
@@ -14,6 +14,7 @@ const ResumeEditorHeader = ({
   onOpenThemeSelector,
   onDeleteResume,
   onOpenPreview,
+  onOpenOutputCenter,
   isLoading,
   t,
 }) => {
@@ -47,6 +48,10 @@ const ResumeEditorHeader = ({
         <button onClick={onOpenThemeSelector} className={buttonStyles.theme}>
           <Palette size={16} />
           <span className='text-sm'>{t('editResume.buttons.theme')}</span>
+        </button>
+        <button onClick={onOpenOutputCenter} className={buttonStyles.theme}>
+          <Share2 size={16} />
+          <span className='text-sm'>输出中心</span>
         </button>
         <button onClick={onDeleteResume} className={buttonStyles.delete} disabled={isLoading}>
           <Trash2 size={16} />

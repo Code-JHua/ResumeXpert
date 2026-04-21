@@ -29,7 +29,8 @@ export const recordExportLog = async (resumeId, payload) => {
   }
 }
 
-export const exportResumeAsPdf = async ({ element, fileName, resumeId, templateId }) => {
+export const exportResumeAsPdf = async ({ element, fileName, resumeId, templateId, triggerSource = 'editor' }) => {
+  const startedAt = Date.now()
   applyPdfOverride()
 
   try {
@@ -62,6 +63,9 @@ export const exportResumeAsPdf = async ({ element, fileName, resumeId, templateI
         format: 'pdf',
         templateId,
         status: 'success',
+        fileName,
+        triggerSource,
+        exportDurationMs: Date.now() - startedAt,
       })
     }
   } catch (error) {
@@ -70,13 +74,73 @@ export const exportResumeAsPdf = async ({ element, fileName, resumeId, templateI
         format: 'pdf',
         templateId,
         status: 'failed',
+        fileName,
+        triggerSource,
+        errorMessage: error.message,
+        exportDurationMs: Date.now() - startedAt,
         metadata: {
           message: error.message,
-        },
+        }
       })
     }
     throw error
   } finally {
     removePdfOverride()
+  }
+}
+
+export const exportResumeAsMarkdown = async ({ resumeId, fileName, triggerSource = 'output_center' }) => {
+  const startedAt = Date.now()
+
+  try {
+    const response = await axiosInstance.get(API_PATHS.RESUME.EXPORT_MARKDOWN(resumeId))
+
+    if (response.data.status === 'not_ready') {
+      await recordExportLog(resumeId, {
+        format: 'markdown',
+        status: 'failed',
+        fileName,
+        triggerSource,
+        errorMessage: response.data.message,
+        exportDurationMs: Date.now() - startedAt,
+        metadata: {
+          status: 'not_ready',
+        },
+      })
+
+      return response.data
+    }
+
+    const content = response.data.content || ''
+    const blob = new Blob([content], { type: 'text/markdown;charset=utf-8' })
+    const url = URL.createObjectURL(blob)
+    const anchor = window.document.createElement('a')
+    anchor.href = url
+    anchor.download = fileName
+    anchor.click()
+    URL.revokeObjectURL(url)
+
+    await recordExportLog(resumeId, {
+      format: 'markdown',
+      status: 'success',
+      fileName,
+      triggerSource,
+      exportDurationMs: Date.now() - startedAt,
+    })
+
+    return response.data
+  } catch (error) {
+    await recordExportLog(resumeId, {
+      format: 'markdown',
+      status: 'failed',
+      fileName,
+      triggerSource,
+      errorMessage: error.message,
+      exportDurationMs: Date.now() - startedAt,
+      metadata: {
+        message: error.message,
+      },
+    })
+    throw error
   }
 }

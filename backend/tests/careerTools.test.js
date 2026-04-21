@@ -10,6 +10,7 @@ import coverLetterRoutes from '../routes/coverLetterRoutes.js'
 import applicationRoutes from '../routes/applicationRoutes.js'
 import resumeImportRoutes from '../routes/resumeImportRoutes.js'
 import templateRoutes from '../routes/templateRoutes.js'
+import publicRoutes from '../routes/publicRoutes.js'
 
 const createTestApp = () => {
   const app = express()
@@ -23,6 +24,7 @@ const createTestApp = () => {
   app.use('/api/applications', applicationRoutes)
   app.use('/api/imports', resumeImportRoutes)
   app.use('/api/templates', templateRoutes)
+  app.use('/api/public', publicRoutes)
 
   return app
 }
@@ -192,6 +194,53 @@ describe('Career Tools API Tests', () => {
 
     expect(getExportLogsResponse.status).toBe(200)
     expect(getExportLogsResponse.body.length).toBe(1)
+    expect(getExportLogsResponse.body[0].metadata.triggerSource).toBe('unknown')
+  })
+
+  it('should create, publish, toggle and expose public share pages', async () => {
+    const createShareResponse = await request(app)
+      .post(`/api/resume/${resumeId}/share`)
+      .set('Authorization', `Bearer ${authToken}`)
+      .send({
+        title: 'Frontend Resume Public Share',
+        triggerSource: 'share_management',
+      })
+
+    expect(createShareResponse.status).toBe(201)
+    expect(createShareResponse.body.isEnabled).toBe(true)
+    expect(createShareResponse.body.slug).toBeDefined()
+
+    const shareDetailResponse = await request(app)
+      .get(`/api/resume/${resumeId}/share`)
+      .set('Authorization', `Bearer ${authToken}`)
+
+    expect(shareDetailResponse.status).toBe(200)
+    expect(shareDetailResponse.body.status).toBe('published')
+
+    const publicShareResponse = await request(app)
+      .get(`/api/public/share/${createShareResponse.body.slug}`)
+      .set('User-Agent', 'career-tools-test')
+
+    expect(publicShareResponse.status).toBe(200)
+    expect(publicShareResponse.body.resume.title).toBe('Frontend Engineer Resume')
+    expect(publicShareResponse.body.viewCount).toBe(1)
+    expect(publicShareResponse.body.uniqueVisitorCount).toBe(1)
+
+    const disableShareResponse = await request(app)
+      .post(`/api/resume/${resumeId}/share/toggle`)
+      .set('Authorization', `Bearer ${authToken}`)
+      .send({
+        isEnabled: false,
+        triggerSource: 'share_management',
+      })
+
+    expect(disableShareResponse.status).toBe(200)
+    expect(disableShareResponse.body.isEnabled).toBe(false)
+
+    const closedPublicShareResponse = await request(app)
+      .get(`/api/public/share/${createShareResponse.body.slug}`)
+
+    expect(closedPublicShareResponse.status).toBe(404)
   })
 
   it('should mark markdown document outdated after structured resume updates', async () => {
