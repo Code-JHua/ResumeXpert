@@ -4,6 +4,7 @@ import Resume3 from '../assets/Resume3.png'
 import TemplateOne from '../components/TemplateOne.jsx'
 import TemplateTwo from '../components/TemplateTwo.jsx'
 import TemplateThree from '../components/TemplateThree.jsx'
+import FlexibleTemplate from '../components/FlexibleTemplate.jsx'
 
 const RENDERER_REGISTRY = [
   {
@@ -23,6 +24,12 @@ const RENDERER_REGISTRY = [
     name: 'Compact ATS',
     renderer: TemplateThree,
     thumbnail: Resume3,
+  },
+  {
+    rendererKey: 'flex',
+    name: 'Flexible Studio',
+    renderer: FlexibleTemplate,
+    thumbnail: Resume1,
   },
 ]
 

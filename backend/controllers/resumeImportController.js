@@ -3,6 +3,7 @@ import Resume from '../models/resumeModel.js'
 import ResumeMarkdownDocument from '../models/resumeMarkdownDocumentModel.js'
 import { parseMarkdownResume } from '../services/markdownImportService.js'
 import { extractPdfText, mapPdfTextToResumeDraft } from '../services/pdfImportService.js'
+import { extractDocxText, mapDocxTextToResumeDraft } from '../services/docxImportService.js'
 
 const mergeDraft = (baseDraft = {}, overrideDraft = {}) => ({
   ...baseDraft,
@@ -149,6 +150,60 @@ export const createPdfImport = async (req, res) => {
     }
   } catch (error) {
     res.status(500).json({ message: 'Failed to import PDF', error: error.message })
+  }
+}
+
+export const createDocxImport = async (req, res) => {
+  try {
+    const base64Content = req.body.base64Content || ''
+    if (!base64Content.trim()) {
+      return res.status(400).json({ message: 'DOCX base64 content is required' })
+    }
+
+    try {
+      const extracted = await extractDocxText(base64Content)
+      const mapped = mapDocxTextToResumeDraft(extracted.rawText)
+
+      const resumeImport = await ResumeImport.create({
+        userId: req.user._id,
+        sourceType: 'word',
+        originalFileName: req.body.originalFileName || 'resume.docx',
+        rawText: extracted.rawText,
+        parsedSections: {
+          source: 'word',
+          messages: extracted.messages,
+        },
+        mappedResumeDraft: mapped.mappedResumeDraft,
+        confidenceSummary: mapped.confidenceSummary,
+        unresolvedFields: mapped.unresolvedFields,
+        status: 'needs_confirmation',
+        manualCorrections: [],
+      })
+
+      return res.status(201).json(resumeImport)
+    } catch (parseError) {
+      const failedImport = await ResumeImport.create({
+        userId: req.user._id,
+        sourceType: 'word',
+        originalFileName: req.body.originalFileName || 'resume.docx',
+        rawText: '',
+        parsedSections: {},
+        mappedResumeDraft: {},
+        confidenceSummary: {},
+        unresolvedFields: [],
+        status: 'failed',
+        failureReason: parseError.message || 'Failed to parse DOCX',
+        manualCorrections: [],
+      })
+
+      return res.status(422).json({
+        message: 'Failed to parse DOCX',
+        failureReason: failedImport.failureReason,
+        importId: failedImport._id,
+      })
+    }
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to import DOCX', error: error.message })
   }
 }
 

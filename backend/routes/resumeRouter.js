@@ -22,6 +22,7 @@ import {
 import {
   createExportLog,
   createResumeSharePage,
+  exportResumeDocx,
   exportResumeMarkdown,
   getResumeExportLogs,
   getResumeSharePage,
@@ -42,6 +43,7 @@ resumeRouter.post('/:id/markdown/preview-apply', protect, previewApplyMarkdownTo
 resumeRouter.post('/:id/markdown/apply-to-resume', protect, applyMarkdownToResume)
 resumeRouter.delete('/:id/markdown', protect, deleteResumeMarkdownDocument)
 resumeRouter.get('/:id/export/markdown', protect, exportResumeMarkdown)
+resumeRouter.get('/:id/export/docx', protect, exportResumeDocx)
 resumeRouter.post('/:id/exports/log', protect, createExportLog)
 resumeRouter.get('/:id/exports', protect, getResumeExportLogs)
 resumeRouter.post('/:id/share', protect, createResumeSharePage)

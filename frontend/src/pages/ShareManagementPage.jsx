@@ -4,7 +4,7 @@ import toast from 'react-hot-toast'
 import DashboardLayout from '../components/DashboardLayout'
 import axiosInstance from '../utils/axiosInstance'
 import { API_PATHS } from '../utils/apiPaths'
-import { exportResumeAsMarkdown, exportResumeAsPdf, getResumeMarkdownExport } from '../services/resumeExportService'
+import { exportResumeAsDocx, exportResumeAsMarkdown, exportResumeAsPdf, getResumeMarkdownExport } from '../services/resumeExportService'
 import RenderResume from '../components/RenderResume'
 
 const formatDateTime = (value) => {
@@ -149,6 +149,25 @@ const ShareManagementPage = () => {
     }
   }
 
+  const handleExportDocx = async () => {
+    if (!resume) return
+
+    try {
+      setActionLoading('docx')
+      await exportResumeAsDocx({
+        resumeId: resume._id,
+        fileName: `${resume.title.replace(/[^a-z0-9]/gi, '_')}.docx`,
+        triggerSource: 'output_center',
+      })
+      toast.success('DOCX 已导出')
+      await refreshCurrentBundle()
+    } catch (error) {
+      toast.error('导出 DOCX 失败')
+    } finally {
+      setActionLoading('')
+    }
+  }
+
   const handleCreateShare = async () => {
     if (!resume) return
 
@@ -244,7 +263,7 @@ const ShareManagementPage = () => {
         <div className='rounded-3xl bg-white p-8 border border-slate-200 shadow-sm'>
           <h1 className='text-3xl font-black text-slate-900'>输出与分享中心</h1>
           <p className='mt-3 text-slate-600'>
-            统一管理 PDF、Markdown 导出，以及公开分享链接和访问统计。
+            统一管理 PDF、Markdown、DOCX 导出，以及公开分享链接和访问统计。
           </p>
         </div>
 
@@ -353,6 +372,13 @@ const ShareManagementPage = () => {
                           className='rounded-2xl border border-slate-200 px-5 py-3 font-semibold text-slate-700 disabled:opacity-60'
                         >
                           {actionLoading === 'markdown' ? '导出中...' : '导出 Markdown'}
+                        </button>
+                        <button
+                          onClick={handleExportDocx}
+                          disabled={actionLoading === 'docx'}
+                          className='rounded-2xl border border-slate-200 px-5 py-3 font-semibold text-slate-700 disabled:opacity-60'
+                        >
+                          {actionLoading === 'docx' ? '导出中...' : '导出 DOCX'}
                         </button>
                         <button
                           onClick={handleCopyMarkdown}

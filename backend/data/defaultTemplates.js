@@ -1,3 +1,5 @@
+import { DEFAULT_TEMPLATE_BLOCKS } from './defaultTemplateBlocks.js'
+
 export const DEFAULT_TEMPLATES = [
   {
     templateId: 'official-classic-professional',
@@ -29,6 +31,11 @@ export const DEFAULT_TEMPLATES = [
         { id: 'amber', label: '琥珀活力', accentColor: '#d97706', headingColor: '#78350f', tagBackground: '#fef3c7' },
       ],
       supportedOptions: ['accentColor', 'headingColor', 'tagBackground', 'fontFamily', 'density'],
+    },
+    blockSchema: {
+      layoutMode: 'fixed',
+      availableLayouts: ['single', 'two-column'],
+      blocks: DEFAULT_TEMPLATE_BLOCKS,
     },
     communityMeta: {
       canPublishToCommunity: false,
@@ -67,6 +74,11 @@ export const DEFAULT_TEMPLATES = [
       ],
       supportedOptions: ['accentColor', 'headingColor', 'tagBackground', 'fontFamily', 'density'],
     },
+    blockSchema: {
+      layoutMode: 'fixed',
+      availableLayouts: ['single', 'two-column'],
+      blocks: DEFAULT_TEMPLATE_BLOCKS,
+    },
     communityMeta: {
       canPublishToCommunity: false,
       reviewStatus: 'official',
@@ -103,6 +115,53 @@ export const DEFAULT_TEMPLATES = [
         { id: 'stone', label: '岩灰', accentColor: '#57534e', headingColor: '#1c1917', tagBackground: '#e7e5e4' },
       ],
       supportedOptions: ['accentColor', 'headingColor', 'tagBackground', 'fontFamily', 'density'],
+    },
+    blockSchema: {
+      layoutMode: 'fixed',
+      availableLayouts: ['single', 'two-column'],
+      blocks: DEFAULT_TEMPLATE_BLOCKS,
+    },
+    communityMeta: {
+      canPublishToCommunity: false,
+      reviewStatus: 'official',
+      reservedFields: ['coverImage', 'license', 'reviewNotes'],
+    },
+  },
+  {
+    templateId: 'official-flex-studio',
+    rendererKey: 'flex',
+    name: 'Flexible Studio',
+    slug: 'flexible-studio',
+    description: 'Block-based custom layout supporting section ordering, visibility, and single/two-column modes.',
+    thumbnail: '/static/templates/flex.png',
+    sourceType: 'official',
+    category: 'custom',
+    status: 'active',
+    authorName: 'ResumeXpert',
+    supportedContentTypes: ['structured', 'markdown', 'imported'],
+    tags: ['official', 'studio', 'blocks', 'layout'],
+    sortOrder: 40,
+    isFeatured: true,
+    allowDuplicate: true,
+    themeSchema: {
+      defaultConfig: {
+        accentColor: '#7c3aed',
+        headingColor: '#111827',
+        tagBackground: '#f3e8ff',
+        fontFamily: '"Segoe UI", "PingFang SC", sans-serif',
+        density: 'comfortable',
+      },
+      presets: [
+        { id: 'iris', label: '鸢尾紫', accentColor: '#7c3aed', headingColor: '#2e1065', tagBackground: '#f3e8ff' },
+        { id: 'coral', label: '珊瑚橙', accentColor: '#ea580c', headingColor: '#7c2d12', tagBackground: '#ffedd5' },
+        { id: 'forest', label: '松林绿', accentColor: '#15803d', headingColor: '#14532d', tagBackground: '#dcfce7' },
+      ],
+      supportedOptions: ['accentColor', 'headingColor', 'tagBackground', 'fontFamily', 'density', 'layoutMode', 'blockConfig'],
+    },
+    blockSchema: {
+      layoutMode: 'two-column',
+      availableLayouts: ['single', 'two-column'],
+      blocks: DEFAULT_TEMPLATE_BLOCKS,
     },
     communityMeta: {
       canPublishToCommunity: false,

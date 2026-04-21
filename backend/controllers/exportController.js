@@ -3,6 +3,7 @@ import Resume from '../models/resumeModel.js'
 import ResumeMarkdownDocument from '../models/resumeMarkdownDocumentModel.js'
 import SharedResumePage from '../models/sharedResumePageModel.js'
 import crypto from 'crypto'
+import { buildResumeDocxBuffer } from '../services/docxExportService.js'
 
 const ensureResumeOwnership = async (resumeId, userId) => {
   return Resume.findOne({ _id: resumeId, userId })
@@ -138,6 +139,36 @@ export const exportResumeMarkdown = async (req, res) => {
     })
   } catch (error) {
     res.status(500).json({ message: 'Failed to export markdown', error: error.message })
+  }
+}
+
+export const exportResumeDocx = async (req, res) => {
+  try {
+    const resume = await ensureResumeOwnership(req.params.id, req.user._id)
+    if (!resume) {
+      return res.status(404).json({ message: 'Resume not found' })
+    }
+
+    const buffer = await buildResumeDocxBuffer(resume)
+    const fileName = `${String(resume.title || 'resume').replace(/[^a-z0-9]/gi, '_')}.docx`
+
+    await ExportLog.create({
+      userId: req.user._id,
+      resumeId: resume._id,
+      format: 'docx',
+      templateId: resume.template?.theme || '',
+      status: 'success',
+      metadata: {
+        triggerSource: req.query.triggerSource || 'output_center',
+        fileName,
+      },
+    })
+
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document')
+    res.setHeader('Content-Disposition', `attachment; filename=\"${fileName}\"`)
+    res.send(buffer)
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to export DOCX', error: error.message })
   }
 }
 

@@ -3,6 +3,7 @@ import { protect } from '../middleware/authMiddleware.js'
 import {
   confirmResumeImport,
   createResumeImport,
+  createDocxImport,
   createMarkdownImport,
   createPdfImport,
   getResumeImports,
@@ -16,6 +17,7 @@ resumeImportRoutes.get('/', protect, getResumeImports)
 resumeImportRoutes.post('/', protect, createResumeImport)
 resumeImportRoutes.post('/markdown', protect, createMarkdownImport)
 resumeImportRoutes.post('/pdf', protect, createPdfImport)
+resumeImportRoutes.post('/docx', protect, createDocxImport)
 resumeImportRoutes.get('/:id', protect, getResumeImportById)
 resumeImportRoutes.put('/:id', protect, updateResumeImport)
 resumeImportRoutes.put('/:id/confirm', protect, confirmResumeImport)

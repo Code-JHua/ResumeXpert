@@ -23,6 +23,48 @@ const ThemeSchemaSchema = new mongoose.Schema({
   },
 }, { _id: false })
 
+const TemplateBlockSchema = new mongoose.Schema({
+  key: {
+    type: String,
+    required: true,
+    trim: true,
+  },
+  title: {
+    type: String,
+    default: '',
+    trim: true,
+  },
+  visible: {
+    type: Boolean,
+    default: true,
+  },
+  column: {
+    type: String,
+    enum: ['main', 'sidebar', 'full'],
+    default: 'main',
+  },
+  order: {
+    type: Number,
+    default: 0,
+  },
+}, { _id: false })
+
+const BlockSchemaSchema = new mongoose.Schema({
+  layoutMode: {
+    type: String,
+    enum: ['fixed', 'single', 'two-column'],
+    default: 'fixed',
+  },
+  availableLayouts: {
+    type: [String],
+    default: ['single', 'two-column'],
+  },
+  blocks: {
+    type: [TemplateBlockSchema],
+    default: [],
+  },
+}, { _id: false })
+
 const CommunityMetaSchema = new mongoose.Schema({
   canPublishToCommunity: {
     type: Boolean,
@@ -46,6 +88,22 @@ const CommunityMetaSchema = new mongoose.Schema({
     default: '',
   },
   reviewNotes: {
+    type: String,
+    default: '',
+  },
+  submitterNote: {
+    type: String,
+    default: '',
+  },
+  submittedAt: {
+    type: Date,
+    default: null,
+  },
+  reviewedAt: {
+    type: Date,
+    default: null,
+  },
+  reviewerName: {
     type: String,
     default: '',
   },
@@ -147,6 +205,10 @@ const TemplateSchema = new mongoose.Schema({
   },
   themeSchema: {
     type: ThemeSchemaSchema,
+    default: () => ({}),
+  },
+  blockSchema: {
+    type: BlockSchemaSchema,
     default: () => ({}),
   },
   communityMeta: {

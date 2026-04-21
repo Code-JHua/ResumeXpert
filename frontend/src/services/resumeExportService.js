@@ -34,6 +34,25 @@ export const getResumeMarkdownExport = async (resumeId) => {
   return response.data
 }
 
+export const exportResumeAsDocx = async ({ resumeId, fileName, triggerSource = 'output_center' }) => {
+  const response = await axiosInstance.get(API_PATHS.RESUME.EXPORT_DOCX(resumeId), {
+    responseType: 'blob',
+    params: {
+      triggerSource,
+    },
+  })
+
+  const blob = new Blob([response.data], {
+    type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  })
+  const url = URL.createObjectURL(blob)
+  const anchor = window.document.createElement('a')
+  anchor.href = url
+  anchor.download = fileName
+  anchor.click()
+  URL.revokeObjectURL(url)
+}
+
 export const exportResumeAsPdf = async ({ element, fileName, resumeId, templateId, triggerSource = 'editor' }) => {
   const startedAt = Date.now()
   applyPdfOverride()

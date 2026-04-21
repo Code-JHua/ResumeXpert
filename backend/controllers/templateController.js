@@ -1,6 +1,7 @@
 import Template from '../models/templateModel.js'
 import Resume from '../models/resumeModel.js'
 import { DEFAULT_TEMPLATES } from '../data/defaultTemplates.js'
+import { DEFAULT_TEMPLATE_BLOCKS } from '../data/defaultTemplateBlocks.js'
 
 const normalizeSlug = (value = '') =>
   value
@@ -49,7 +50,8 @@ export const getTemplates = async (req, res) => {
 
     const query = {
       $or: [
-        { sourceType: { $in: ['official', 'community'] } },
+        { sourceType: 'official' },
+        { sourceType: 'community', 'communityMeta.reviewStatus': 'approved' },
         { ownerId: req.user?._id || null },
       ],
     }
@@ -73,6 +75,10 @@ export const getTemplates = async (req, res) => {
 
     if (req.query.status) {
       query.status = req.query.status
+    }
+
+    if (req.query.reviewStatus) {
+      query['communityMeta.reviewStatus'] = req.query.reviewStatus
     }
 
     const templates = await Template.find(query).sort({ sortOrder: 1, createdAt: -1 })
@@ -180,6 +186,8 @@ export const applyTemplateToResume = async (req, res) => {
     const nextSettings = {
       ...(template.themeSchema?.defaultConfig || {}),
       ...(req.body.themeSettings || {}),
+      layoutMode: req.body.layoutMode || template.blockSchema?.layoutMode || 'fixed',
+      blockConfig: req.body.blockConfig || template.blockSchema?.blocks || DEFAULT_TEMPLATE_BLOCKS,
     }
 
     resume.template = {
@@ -237,6 +245,11 @@ export const createTemplate = async (req, res) => {
         presets: [],
         supportedOptions: ['accentColor', 'headingColor', 'tagBackground', 'fontFamily', 'density'],
       },
+      blockSchema: req.body.blockSchema || {
+        layoutMode: 'two-column',
+        availableLayouts: ['single', 'two-column'],
+        blocks: DEFAULT_TEMPLATE_BLOCKS,
+      },
       communityMeta: req.body.communityMeta || {
         canPublishToCommunity: true,
         reviewStatus: 'reserved',
@@ -266,7 +279,7 @@ export const updateTemplate = async (req, res) => {
     const fields = [
       'name', 'description', 'thumbnail', 'category', 'status',
       'authorName', 'supportedContentTypes', 'tags', 'sortOrder',
-      'isFeatured', 'allowDuplicate', 'themeSchema', 'communityMeta',
+      'isFeatured', 'allowDuplicate', 'themeSchema', 'blockSchema', 'communityMeta',
     ]
 
     fields.forEach((field) => {
@@ -287,5 +300,76 @@ export const updateTemplate = async (req, res) => {
     res.json(toTemplateResponse(template, req.user._id))
   } catch (error) {
     res.status(500).json({ message: 'Failed to update template', error: error.message })
+  }
+}
+
+export const submitTemplateToCommunity = async (req, res) => {
+  try {
+    const template = await Template.findOne({ templateId: req.params.id, ownerId: req.user._id })
+    if (!template) {
+      return res.status(404).json({ message: 'Template not found' })
+    }
+
+    template.sourceType = 'community'
+    template.communityMeta = {
+      ...template.communityMeta?.toObject?.(),
+      canPublishToCommunity: true,
+      reviewStatus: 'pending',
+      submitterNote: req.body.submitterNote || '',
+      submittedAt: new Date(),
+      reviewedAt: null,
+      reviewerName: '',
+      reviewNotes: '',
+    }
+
+    await template.save()
+    res.json(toTemplateResponse(template, req.user._id))
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to submit template to community', error: error.message })
+  }
+}
+
+export const getTemplateReviewQueue = async (req, res) => {
+  try {
+    await seedDefaultTemplates()
+    const query = { sourceType: 'community' }
+
+    if (req.query.reviewStatus) {
+      query['communityMeta.reviewStatus'] = req.query.reviewStatus
+    } else {
+      query['communityMeta.reviewStatus'] = { $in: ['pending', 'rejected', 'approved'] }
+    }
+
+    const templates = await Template.find(query).sort({ 'communityMeta.submittedAt': -1, updatedAt: -1 })
+    res.json(templates.map((template) => toTemplateResponse(template, req.user?._id)))
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to load review queue', error: error.message })
+  }
+}
+
+export const reviewTemplateSubmission = async (req, res) => {
+  try {
+    const template = await Template.findOne({ templateId: req.params.id, sourceType: 'community' })
+    if (!template) {
+      return res.status(404).json({ message: 'Template not found' })
+    }
+
+    const decision = req.body.decision
+    if (!['approved', 'rejected'].includes(decision)) {
+      return res.status(400).json({ message: 'decision must be approved or rejected' })
+    }
+
+    template.communityMeta = {
+      ...template.communityMeta?.toObject?.(),
+      reviewStatus: decision,
+      reviewNotes: req.body.reviewNotes || '',
+      reviewerName: req.user.name || 'Reviewer',
+      reviewedAt: new Date(),
+    }
+
+    await template.save()
+    res.json(toTemplateResponse(template, req.user._id))
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to review template submission', error: error.message })
   }
 }

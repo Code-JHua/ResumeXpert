@@ -111,7 +111,7 @@ const RenderResume = ({
         '--resume-font-family': theme.fontFamily,
       }}
     >
-      <Renderer resumeData={resumeData} containerWidth={containerWidth} theme={theme} />
+      <Renderer resumeData={resumeData} containerWidth={containerWidth} theme={theme} templateMeta={template} />
     </div>
   )
 }
