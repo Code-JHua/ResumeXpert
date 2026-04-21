@@ -59,6 +59,23 @@ const defaultDraft = () => ({
   freeBlocks: [],
 })
 
+const summarizeConfidence = (fieldScores = {}) => {
+  const summary = { high: 0, medium: 0, low: 0, fields: fieldScores }
+
+  Object.values(fieldScores).forEach((score) => {
+    if (typeof score !== 'number') return
+    if (score >= 0.85) {
+      summary.high += 1
+    } else if (score >= 0.5) {
+      summary.medium += 1
+    } else {
+      summary.low += 1
+    }
+  })
+
+  return summary
+}
+
 const pushFreeBlock = (draft, title, lines, source = 'markdown') => {
   const content = lines.join('\n').trim()
   if (!content) return
@@ -187,11 +204,10 @@ export const parseMarkdownResume = (rawText = '') => {
   if (!draft.profileInfo.designation) unresolvedFields.push('profileInfo.designation')
   if (!draft.contactInfo.email) unresolvedFields.push('contactInfo.email')
 
-  const confidenceSummary = {
+  const fieldScores = {
     fullName: draft.profileInfo.fullName ? 0.95 : 0.1,
     designation: draft.profileInfo.designation ? 0.8 : 0.2,
     email: draft.contactInfo.email ? 0.95 : 0.2,
-    sectionsDetected: headings,
   }
 
   return {
@@ -200,7 +216,10 @@ export const parseMarkdownResume = (rawText = '') => {
       lineCount: lines.length,
     },
     mappedResumeDraft: draft,
-    confidenceSummary,
+    confidenceSummary: {
+      ...summarizeConfidence(fieldScores),
+      sectionsDetected: headings,
+    },
     unresolvedFields,
   }
 }

@@ -6,6 +6,27 @@ import { API_PATHS } from '../utils/apiPaths'
 import toast from 'react-hot-toast'
 import { formatDateTime } from '../utils/career'
 
+const getImportAction = (item) => {
+  if (item.status === 'confirmed' && item.confirmedResumeId) {
+    return {
+      label: '打开简历',
+      onClickPath: `/resume/${item.confirmedResumeId}`,
+    }
+  }
+
+  if (item.status === 'failed') {
+    return {
+      label: '查看失败详情',
+      onClickPath: `/imports/${item._id}/confirm`,
+    }
+  }
+
+  return {
+    label: '继续确认',
+    onClickPath: `/imports/${item._id}/confirm`,
+  }
+}
+
 const ImportsPage = () => {
   const navigate = useNavigate()
   const [mode, setMode] = useState('markdown')
@@ -184,13 +205,26 @@ const ImportsPage = () => {
               {imports.length === 0 && <div className='text-sm text-slate-500'>还没有导入记录。</div>}
               {imports.map((item) => (
                 <div key={item._id} className='rounded-2xl border border-slate-200 bg-slate-50 p-4'>
-                  <div className='font-semibold text-slate-800'>{item.originalFileName || '未命名导入'}</div>
-                  <div className='mt-1 text-sm text-slate-500'>{item.sourceType} · {item.status}</div>
+                  <div className='flex items-start justify-between gap-3'>
+                    <div>
+                      <div className='font-semibold text-slate-800'>{item.originalFileName || '未命名导入'}</div>
+                      <div className='mt-1 text-sm text-slate-500'>{item.sourceType} · {item.status}</div>
+                    </div>
+                    <span className={`rounded-full px-3 py-1 text-xs font-semibold ${
+                      item.status === 'confirmed'
+                        ? 'bg-emerald-50 text-emerald-700'
+                        : item.status === 'failed'
+                          ? 'bg-rose-50 text-rose-700'
+                          : 'bg-violet-50 text-violet-700'
+                    }`}>
+                      {item.status}
+                    </span>
+                  </div>
                   <div className='mt-1 text-xs text-slate-400'>{formatDateTime(item.createdAt)}</div>
                   {item.failureReason && <div className='mt-2 text-sm text-rose-600'>{item.failureReason}</div>}
                   <div className='mt-3 flex gap-2'>
-                    <button onClick={() => navigate(`/imports/${item._id}/confirm`)} className='text-sm text-violet-700 font-semibold'>
-                      查看
+                    <button onClick={() => navigate(getImportAction(item).onClickPath)} className='text-sm text-violet-700 font-semibold'>
+                      {getImportAction(item).label}
                     </button>
                   </div>
                 </div>

@@ -1,11 +1,12 @@
 import React from 'react'
-import { Palette, Trash2, Download, Save } from 'lucide-react'
+import { Palette, Trash2, Download, Save, FileCode2 } from 'lucide-react'
 import { buttonStyles, containerStyles } from '../../assets/dummystyle'
 import { TitleInput } from '../Inputs'
 
 const ResumeEditorHeader = ({
   title,
   setTitle,
+  onOpenMarkdown,
   onOpenVersions,
   onOpenThemeSelector,
   onDeleteResume,
@@ -17,6 +18,10 @@ const ResumeEditorHeader = ({
     <div className={containerStyles.header}>
       <TitleInput title={title} setTitle={setTitle} />
       <div className='flex flex-wrap items-center gap-3'>
+        <button onClick={onOpenMarkdown} className={buttonStyles.theme}>
+          <FileCode2 size={16} />
+          <span className='text-sm'>Markdown</span>
+        </button>
         <button onClick={onOpenVersions} className={buttonStyles.theme}>
           <Save size={16} />
           <span className='text-sm'>版本</span>

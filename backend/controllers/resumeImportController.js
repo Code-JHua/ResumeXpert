@@ -4,12 +4,29 @@ import ResumeMarkdownDocument from '../models/resumeMarkdownDocumentModel.js'
 import { parseMarkdownResume } from '../services/markdownImportService.js'
 import { extractPdfText, mapPdfTextToResumeDraft } from '../services/pdfImportService.js'
 
-const buildResumePayload = (resumeImport, overrides = {}) => {
-  const draft = {
-    ...(resumeImport.mappedResumeDraft || {}),
-    ...(overrides.mappedResumeDraft || {}),
-  }
+const mergeDraft = (baseDraft = {}, overrideDraft = {}) => ({
+  ...baseDraft,
+  ...overrideDraft,
+  profileInfo: {
+    ...(baseDraft.profileInfo || {}),
+    ...(overrideDraft.profileInfo || {}),
+  },
+  contactInfo: {
+    ...(baseDraft.contactInfo || {}),
+    ...(overrideDraft.contactInfo || {}),
+  },
+  workExperience: overrideDraft.workExperience || baseDraft.workExperience || [],
+  education: overrideDraft.education || baseDraft.education || [],
+  skills: overrideDraft.skills || baseDraft.skills || [],
+  projects: overrideDraft.projects || baseDraft.projects || [],
+  certifications: overrideDraft.certifications || baseDraft.certifications || [],
+  languages: overrideDraft.languages || baseDraft.languages || [],
+  interests: overrideDraft.interests || baseDraft.interests || [],
+  freeBlocks: overrideDraft.freeBlocks || baseDraft.freeBlocks || [],
+})
 
+const buildResumePayload = (resumeImport, overrides = {}) => {
+  const draft = mergeDraft(resumeImport.mappedResumeDraft || {}, overrides.mappedResumeDraft || {})
   const freeBlocks = draft.freeBlocks || []
 
   return {

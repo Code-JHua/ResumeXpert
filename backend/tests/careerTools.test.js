@@ -289,6 +289,66 @@ describe('Career Tools API Tests', () => {
     expect(resumeResponse.body.sourceImportId).toBe(createImportResponse.body._id)
   })
 
+  it('should preserve original nested fields when confirm overrides only part of the draft', async () => {
+    const createImportResponse = await request(app)
+      .post('/api/imports/markdown')
+      .set('Authorization', `Bearer ${authToken}`)
+      .send({
+        originalFileName: 'partial.md',
+        rawText: [
+          '# Alex Import',
+          'Product Engineer',
+          '',
+          'alex@example.com',
+        ].join('\n'),
+      })
+
+    expect(createImportResponse.status).toBe(201)
+
+    const confirmResponse = await request(app)
+      .put(`/api/imports/${createImportResponse.body._id}/confirm`)
+      .set('Authorization', `Bearer ${authToken}`)
+      .send({
+        mappedResumeDraft: {
+          profileInfo: {
+            designation: 'Senior Product Engineer',
+          },
+        },
+        manualCorrections: [{ field: 'profileInfo.designation', value: 'Senior Product Engineer' }],
+      })
+
+    expect(confirmResponse.status).toBe(200)
+
+    const resumeResponse = await request(app)
+      .get(`/api/resume/${confirmResponse.body.resumeId}`)
+      .set('Authorization', `Bearer ${authToken}`)
+
+    expect(resumeResponse.status).toBe(200)
+    expect(resumeResponse.body.profileInfo.fullName).toBe('Alex Import')
+    expect(resumeResponse.body.profileInfo.designation).toBe('Senior Product Engineer')
+  })
+
+  it('should reject invalid pdf imports with a failed import record', async () => {
+    const pdfImportResponse = await request(app)
+      .post('/api/imports/pdf')
+      .set('Authorization', `Bearer ${authToken}`)
+      .send({
+        originalFileName: 'broken.pdf',
+        base64Content: 'not-a-real-pdf',
+      })
+
+    expect(pdfImportResponse.status).toBe(422)
+    expect(pdfImportResponse.body.importId).toBeDefined()
+
+    const failedImportResponse = await request(app)
+      .get(`/api/imports/${pdfImportResponse.body.importId}`)
+      .set('Authorization', `Bearer ${authToken}`)
+
+    expect(failedImportResponse.status).toBe(200)
+    expect(failedImportResponse.body.status).toBe('failed')
+    expect(failedImportResponse.body.failureReason).toBeTruthy()
+  })
+
   it('should generate cover letters and manage applications', async () => {
     const jobResponse = await request(app)
       .post('/api/job-descriptions')

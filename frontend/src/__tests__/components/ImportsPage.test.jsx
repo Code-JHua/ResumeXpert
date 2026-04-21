@@ -68,4 +68,37 @@ describe('ImportsPage', () => {
     await waitFor(() => expect(postMock).toHaveBeenCalled())
     expect(navigateMock).toHaveBeenCalledWith('/imports/import-123/confirm')
   })
+
+  it('shows status-aware actions for import history', async () => {
+    getMock.mockResolvedValue({
+      data: [
+        {
+          _id: 'import-confirmed',
+          originalFileName: 'confirmed.md',
+          sourceType: 'markdown',
+          status: 'confirmed',
+          confirmedResumeId: 'resume-888',
+          createdAt: '2026-04-21T10:00:00.000Z',
+        },
+        {
+          _id: 'import-failed',
+          originalFileName: 'broken.pdf',
+          sourceType: 'pdf',
+          status: 'failed',
+          failureReason: '无法解析 PDF 文本',
+          createdAt: '2026-04-21T10:00:00.000Z',
+        },
+      ],
+    })
+
+    renderPage()
+    const user = userEvent.setup()
+
+    expect(await screen.findByText('打开简历')).toBeInTheDocument()
+    expect(screen.getByText('查看失败详情')).toBeInTheDocument()
+    expect(screen.getByText('无法解析 PDF 文本')).toBeInTheDocument()
+
+    await user.click(screen.getByText('打开简历'))
+    expect(navigateMock).toHaveBeenCalledWith('/resume/resume-888')
+  })
 })

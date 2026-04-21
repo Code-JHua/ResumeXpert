@@ -671,6 +671,7 @@ const EditResume = () => {
           <ResumeEditorHeader
             title={resumeData.title}
             setTitle={(value) => setResumeData(prev => ({ ...prev, title: value }))}
+            onOpenMarkdown={() => navigate(`/resume/${resumeId}/markdown`)}
             onOpenVersions={() => setOpenVersionModal(true)}
             onOpenThemeSelector={() => setOpenThemeSelector(true)}
             onDeleteResume={handleDeleteResume}

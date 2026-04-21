@@ -41,6 +41,23 @@ const defaultDraft = () => ({
   freeBlocks: [],
 })
 
+const summarizeConfidence = (fieldScores = {}) => {
+  const summary = { high: 0, medium: 0, low: 0, fields: fieldScores }
+
+  Object.values(fieldScores).forEach((score) => {
+    if (typeof score !== 'number') return
+    if (score >= 0.85) {
+      summary.high += 1
+    } else if (score >= 0.5) {
+      summary.medium += 1
+    } else {
+      summary.low += 1
+    }
+  })
+
+  return summary
+}
+
 const sectionNames = [
   'summary',
   'professional summary',
@@ -75,6 +92,7 @@ export const extractPdfText = async (base64Content) => {
 export const mapPdfTextToResumeDraft = (rawText = '') => {
   const draft = defaultDraft()
   const lines = rawText.split(/\r?\n/).map((line) => line.trim()).filter(Boolean)
+  const normalizedLines = lines.map((line) => line.toLowerCase())
 
   if (lines[0]) {
     draft.profileInfo.fullName = lines[0]
@@ -107,6 +125,33 @@ export const mapPdfTextToResumeDraft = (rawText = '') => {
     }
   }
 
+  const educationIndex = normalizedLines.findIndex((line) => line === 'education')
+  if (educationIndex >= 0) {
+    draft.education = lines
+      .slice(educationIndex + 1, educationIndex + 4)
+      .filter((line) => !sectionNames.includes(line.toLowerCase()))
+      .map((line) => ({
+        degree: line.replace(/^[-*]\s*/, ''),
+        institution: '',
+        startDate: '',
+        endDate: '',
+      }))
+  }
+
+  const experienceIndex = normalizedLines.findIndex((line) => line === 'experience' || line === 'work experience')
+  if (experienceIndex >= 0) {
+    draft.workExperience = lines
+      .slice(experienceIndex + 1, experienceIndex + 5)
+      .filter((line) => !sectionNames.includes(line.toLowerCase()))
+      .map((line) => ({
+        role: line.replace(/^[-*]\s*/, ''),
+        company: '',
+        startDate: '',
+        endDate: '',
+        description: '',
+      }))
+  }
+
   draft.freeBlocks.push({
     type: 'pdf_text',
     title: 'Extracted PDF Content',
@@ -119,13 +164,18 @@ export const mapPdfTextToResumeDraft = (rawText = '') => {
   if (!draft.profileInfo.designation) unresolvedFields.push('profileInfo.designation')
   if (!draft.contactInfo.email) unresolvedFields.push('contactInfo.email')
 
+  const fieldScores = {
+    fullName: draft.profileInfo.fullName ? 0.75 : 0.1,
+    designation: draft.profileInfo.designation ? 0.55 : 0.2,
+    email: draft.contactInfo.email ? 0.95 : 0.2,
+    skills: draft.skills.length > 0 ? 0.7 : 0.25,
+    workExperience: draft.workExperience.length > 0 ? 0.6 : 0.25,
+    education: draft.education.length > 0 ? 0.6 : 0.25,
+  }
+
   return {
     mappedResumeDraft: draft,
-    confidenceSummary: {
-      fullName: draft.profileInfo.fullName ? 0.75 : 0.1,
-      designation: draft.profileInfo.designation ? 0.55 : 0.2,
-      email: draft.contactInfo.email ? 0.95 : 0.2,
-    },
+    confidenceSummary: summarizeConfidence(fieldScores),
     unresolvedFields,
   }
 }
