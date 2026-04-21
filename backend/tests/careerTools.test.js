@@ -1,0 +1,363 @@
+import request from 'supertest'
+import express from 'express'
+import cors from 'cors'
+import 'dotenv/config'
+import userRoutes from '../routes/userRoutes.js'
+import resumeRoutes from '../routes/resumeRouter.js'
+import jobDescriptionRoutes from '../routes/jobDescriptionRoutes.js'
+import atsRoutes from '../routes/atsRoutes.js'
+import coverLetterRoutes from '../routes/coverLetterRoutes.js'
+import applicationRoutes from '../routes/applicationRoutes.js'
+import resumeImportRoutes from '../routes/resumeImportRoutes.js'
+import templateRoutes from '../routes/templateRoutes.js'
+
+const createTestApp = () => {
+  const app = express()
+  app.use(cors())
+  app.use(express.json())
+  app.use('/api/auth', userRoutes)
+  app.use('/api/resume', resumeRoutes)
+  app.use('/api/job-descriptions', jobDescriptionRoutes)
+  app.use('/api/ats', atsRoutes)
+  app.use('/api/cover-letters', coverLetterRoutes)
+  app.use('/api/applications', applicationRoutes)
+  app.use('/api/imports', resumeImportRoutes)
+  app.use('/api/templates', templateRoutes)
+
+  return app
+}
+
+describe('Career Tools API Tests', () => {
+  let app
+  let authToken
+  let resumeId
+  let jobDescriptionId
+  let versionId
+  let coverLetterId
+  let applicationId
+
+  beforeAll(async () => {
+    app = createTestApp()
+  })
+
+  beforeEach(async () => {
+    const registerResponse = await request(app)
+      .post('/api/auth/register')
+      .send({
+        name: 'Career Tool User',
+        email: `career${Date.now()}@example.com`,
+        password: 'password123',
+      })
+
+    authToken = registerResponse.body.token
+
+    const resumeResponse = await request(app)
+      .post('/api/resume')
+      .set('Authorization', `Bearer ${authToken}`)
+      .send({
+        title: 'Frontend Engineer Resume',
+        profileInfo: {
+          fullName: 'Career User',
+          designation: 'Frontend Engineer',
+          summary: 'React developer with strong Node.js collaboration experience',
+        },
+        skills: [{ name: 'React', progress: 80 }, { name: 'Node.js', progress: 70 }],
+        projects: [{ title: 'ATS Tool', description: 'Built a React and Node.js project', github: '', liveDemo: '' }],
+      })
+
+    resumeId = resumeResponse.body._id
+  })
+
+  it('should manage job descriptions and run ATS analysis', async () => {
+    const createResponse = await request(app)
+      .post('/api/job-descriptions')
+      .set('Authorization', `Bearer ${authToken}`)
+      .send({
+        title: 'Frontend Engineer',
+        company: 'Example Inc',
+        sourceText: 'Looking for a React engineer with Node.js, testing and communication skills.',
+      })
+
+    expect(createResponse.status).toBe(201)
+    expect(createResponse.body.keywords.length).toBeGreaterThan(0)
+    jobDescriptionId = createResponse.body._id
+
+    const analysisResponse = await request(app)
+      .post('/api/ats/analyze')
+      .set('Authorization', `Bearer ${authToken}`)
+      .send({
+        resumeId,
+        jobDescriptionId,
+      })
+
+    expect(analysisResponse.status).toBe(200)
+    expect(analysisResponse.body).toHaveProperty('overallScore')
+    expect(Array.isArray(analysisResponse.body.recommendations)).toBe(true)
+  })
+
+  it('should create, list, restore and delete resume versions', async () => {
+    const versionResponse = await request(app)
+      .post(`/api/resume/${resumeId}/versions`)
+      .set('Authorization', `Bearer ${authToken}`)
+      .send({
+        versionName: '投递版 V1',
+        note: '初始投递版本',
+      })
+
+    expect(versionResponse.status).toBe(201)
+    versionId = versionResponse.body._id
+
+    const versionsResponse = await request(app)
+      .get(`/api/resume/${resumeId}/versions`)
+      .set('Authorization', `Bearer ${authToken}`)
+
+    expect(versionsResponse.status).toBe(200)
+    expect(versionsResponse.body.length).toBe(1)
+
+    await request(app)
+      .put(`/api/resume/${resumeId}`)
+      .set('Authorization', `Bearer ${authToken}`)
+      .send({
+        title: 'Changed Title',
+      })
+
+    const restoreResponse = await request(app)
+      .post(`/api/resume/${resumeId}/versions/${versionId}/restore`)
+      .set('Authorization', `Bearer ${authToken}`)
+
+    expect(restoreResponse.status).toBe(200)
+    expect(restoreResponse.body.title).toBe('Frontend Engineer Resume')
+
+    const deleteResponse = await request(app)
+      .delete(`/api/resume/${resumeId}/versions/${versionId}`)
+      .set('Authorization', `Bearer ${authToken}`)
+
+    expect(deleteResponse.status).toBe(200)
+  })
+
+  it('should manage markdown documents, export logs, and placeholder markdown export', async () => {
+    const createMarkdownResponse = await request(app)
+      .post(`/api/resume/${resumeId}/markdown`)
+      .set('Authorization', `Bearer ${authToken}`)
+      .send({
+        title: 'Frontend Engineer Markdown',
+        content: '# Frontend Engineer Resume',
+        parsedStructuredSnapshot: {
+          title: 'Frontend Engineer Resume',
+        },
+        syncStatus: 'synced',
+      })
+
+    expect(createMarkdownResponse.status).toBe(201)
+
+    const getMarkdownResponse = await request(app)
+      .get(`/api/resume/${resumeId}/markdown`)
+      .set('Authorization', `Bearer ${authToken}`)
+
+    expect(getMarkdownResponse.status).toBe(200)
+    expect(getMarkdownResponse.body.content).toContain('Frontend Engineer Resume')
+
+    const updateMarkdownResponse = await request(app)
+      .put(`/api/resume/${resumeId}/markdown`)
+      .set('Authorization', `Bearer ${authToken}`)
+      .send({
+        content: '# Updated Frontend Engineer Resume',
+        syncStatus: 'outdated',
+      })
+
+    expect(updateMarkdownResponse.status).toBe(200)
+    expect(updateMarkdownResponse.body.syncStatus).toBe('outdated')
+
+    const exportMarkdownResponse = await request(app)
+      .get(`/api/resume/${resumeId}/export/markdown`)
+      .set('Authorization', `Bearer ${authToken}`)
+
+    expect(exportMarkdownResponse.status).toBe(200)
+    expect(exportMarkdownResponse.body.status).toBe('ready')
+
+    const exportLogResponse = await request(app)
+      .post(`/api/resume/${resumeId}/exports/log`)
+      .set('Authorization', `Bearer ${authToken}`)
+      .send({
+        format: 'pdf',
+        templateId: '01',
+        status: 'success',
+      })
+
+    expect(exportLogResponse.status).toBe(201)
+
+    const getExportLogsResponse = await request(app)
+      .get(`/api/resume/${resumeId}/exports`)
+      .set('Authorization', `Bearer ${authToken}`)
+
+    expect(getExportLogsResponse.status).toBe(200)
+    expect(getExportLogsResponse.body.length).toBe(1)
+  })
+
+  it('should manage imports and expose template metadata', async () => {
+    const createImportResponse = await request(app)
+      .post('/api/imports')
+      .set('Authorization', `Bearer ${authToken}`)
+      .send({
+        sourceType: 'markdown',
+        originalFileName: 'resume.md',
+        rawText: '# Resume',
+        status: 'needs_confirmation',
+      })
+
+    expect(createImportResponse.status).toBe(201)
+
+    const importId = createImportResponse.body._id
+
+    const updateImportResponse = await request(app)
+      .put(`/api/imports/${importId}`)
+      .set('Authorization', `Bearer ${authToken}`)
+      .send({
+        status: 'confirmed',
+        manualCorrections: [{ field: 'profileInfo.fullName', value: 'Career User' }],
+      })
+
+    expect(updateImportResponse.status).toBe(200)
+    expect(updateImportResponse.body.status).toBe('confirmed')
+
+    const getImportResponse = await request(app)
+      .get(`/api/imports/${importId}`)
+      .set('Authorization', `Bearer ${authToken}`)
+
+    expect(getImportResponse.status).toBe(200)
+    expect(getImportResponse.body.manualCorrections.length).toBe(1)
+
+    const templatesResponse = await request(app).get('/api/templates')
+    expect(templatesResponse.status).toBe(200)
+    expect(templatesResponse.body.length).toBeGreaterThan(0)
+
+    const templatePreviewResponse = await request(app).get('/api/templates/01/preview')
+    expect(templatePreviewResponse.status).toBe(200)
+    expect(templatePreviewResponse.body.id).toBe('01')
+  })
+
+  it('should import markdown and confirm it into a resume', async () => {
+    const createImportResponse = await request(app)
+      .post('/api/imports/markdown')
+      .set('Authorization', `Bearer ${authToken}`)
+      .send({
+        originalFileName: 'candidate.md',
+        rawText: [
+          '# Jane Import',
+          'Frontend Engineer',
+          '',
+          '## Summary',
+          'React developer with product thinking.',
+          '',
+          '## Skills',
+          '- React',
+          '- Node.js',
+          '',
+          'jane@example.com',
+        ].join('\n'),
+      })
+
+    expect(createImportResponse.status).toBe(201)
+    expect(createImportResponse.body.status).toBe('needs_confirmation')
+    expect(createImportResponse.body.mappedResumeDraft.profileInfo.fullName).toBe('Jane Import')
+
+    const confirmResponse = await request(app)
+      .put(`/api/imports/${createImportResponse.body._id}/confirm`)
+      .set('Authorization', `Bearer ${authToken}`)
+      .send({
+        mappedResumeDraft: {
+          ...createImportResponse.body.mappedResumeDraft,
+          profileInfo: {
+            ...createImportResponse.body.mappedResumeDraft.profileInfo,
+            designation: 'Senior Frontend Engineer',
+          },
+        },
+        manualCorrections: [{ field: 'profileInfo.designation', value: 'Senior Frontend Engineer' }],
+      })
+
+    expect(confirmResponse.status).toBe(200)
+    expect(confirmResponse.body.status).toBe('confirmed')
+    expect(confirmResponse.body.resumeId).toBeDefined()
+    expect(confirmResponse.body.markdownDocumentId).toBeDefined()
+
+    const resumeResponse = await request(app)
+      .get(`/api/resume/${confirmResponse.body.resumeId}`)
+      .set('Authorization', `Bearer ${authToken}`)
+
+    expect(resumeResponse.status).toBe(200)
+    expect(resumeResponse.body.contentSource).toBe('markdown')
+    expect(resumeResponse.body.sourceImportId).toBe(createImportResponse.body._id)
+  })
+
+  it('should generate cover letters and manage applications', async () => {
+    const jobResponse = await request(app)
+      .post('/api/job-descriptions')
+      .set('Authorization', `Bearer ${authToken}`)
+      .send({
+        title: 'Full Stack Engineer',
+        company: 'Hiring Co',
+        sourceText: 'Need React, Node.js and team communication experience for product development.',
+      })
+    jobDescriptionId = jobResponse.body._id
+
+    const versionResponse = await request(app)
+      .post(`/api/resume/${resumeId}/versions`)
+      .set('Authorization', `Bearer ${authToken}`)
+      .send({ versionName: '全栈投递版' })
+    versionId = versionResponse.body._id
+
+    const coverLetterResponse = await request(app)
+      .post('/api/cover-letters/generate')
+      .set('Authorization', `Bearer ${authToken}`)
+      .send({
+        resumeId,
+        jobDescriptionId,
+        title: 'Hiring Co 求职信',
+      })
+
+    expect(coverLetterResponse.status).toBe(201)
+    expect(coverLetterResponse.body.content).toContain('尊敬的招聘团队')
+    coverLetterId = coverLetterResponse.body._id
+
+    const applicationResponse = await request(app)
+      .post('/api/applications')
+      .set('Authorization', `Bearer ${authToken}`)
+      .send({
+        company: 'Hiring Co',
+        position: 'Full Stack Engineer',
+        resumeId,
+        resumeVersionId: versionId,
+        jobDescriptionId,
+        coverLetterId,
+        status: 'applied',
+        appliedAt: '2026-04-21T10:00:00.000Z',
+        nextActionAt: '2026-04-25T10:00:00.000Z',
+        notes: '等待一面通知',
+      })
+
+    expect(applicationResponse.status).toBe(201)
+    applicationId = applicationResponse.body._id
+
+    const timelineResponse = await request(app)
+      .post(`/api/applications/${applicationId}/timeline`)
+      .set('Authorization', `Bearer ${authToken}`)
+      .send({
+        type: 'first_interview',
+        title: '一面',
+        time: '2026-04-26T09:00:00.000Z',
+        description: '技术面试',
+        status: 'first_interview',
+      })
+
+    expect(timelineResponse.status).toBe(200)
+    expect(timelineResponse.body.timeline.length).toBe(1)
+
+    const statsResponse = await request(app)
+      .get('/api/applications/stats/summary')
+      .set('Authorization', `Bearer ${authToken}`)
+
+    expect(statsResponse.status).toBe(200)
+    expect(statsResponse.body.total).toBe(1)
+    expect(statsResponse.body.calendarItems.length).toBeGreaterThan(0)
+  })
+})
