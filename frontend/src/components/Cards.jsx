@@ -80,6 +80,7 @@ export const ResumeSummaryCard = ({
   onSelect,
   onDelete,
   completion = 85,
+  contentSource = 'structured',
 }) => {
   const [isHovered, setIsHovered] = useState(false);
   const { t } = useTranslation();
@@ -204,6 +205,11 @@ export const ResumeSummaryCard = ({
         <div className="flex items-start justify-between mb-4">
           <div className="flex-1">
             <h5 className={cardStyles.title}>{title}</h5>
+            {contentSource !== 'structured' && (
+              <div className='inline-flex mt-2 rounded-full bg-violet-50 px-3 py-1 text-xs font-semibold text-violet-700'>
+                {contentSource === 'markdown' ? 'Markdown 导入' : '导入创建'}
+              </div>
+            )}
             <div className={cardStyles.dateInfo}>
               <Clock size={12} />
               <span>{t('card.createdBy')} {formattedCreatedDate}</span>

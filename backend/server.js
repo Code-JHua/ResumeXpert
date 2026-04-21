@@ -8,6 +8,12 @@ import fs from 'fs'
 import path from 'path'
 import { fileURLToPath } from 'url'
 import resumeRoutes from './routes/resumeRouter.js'
+import jobDescriptionRoutes from './routes/jobDescriptionRoutes.js'
+import atsRoutes from './routes/atsRoutes.js'
+import coverLetterRoutes from './routes/coverLetterRoutes.js'
+import applicationRoutes from './routes/applicationRoutes.js'
+import resumeImportRoutes from './routes/resumeImportRoutes.js'
+import templateRoutes from './routes/templateRoutes.js'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -39,6 +45,12 @@ app.use(express.json())
 
 app.use('/api/auth', userRoutes)
 app.use('/api/resume', resumeRoutes)
+app.use('/api/job-descriptions', jobDescriptionRoutes)
+app.use('/api/ats', atsRoutes)
+app.use('/api/cover-letters', coverLetterRoutes)
+app.use('/api/applications', applicationRoutes)
+app.use('/api/imports', resumeImportRoutes)
+app.use('/api/templates', templateRoutes)
 
 app.use(
   '/uploads',

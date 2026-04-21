@@ -11,6 +11,7 @@ import moment from 'moment'
 import Modal from '../components/Modal'
 import CreateResumeForm from '../components/CreateResumeForm'
 import { useTranslation } from 'react-i18next'
+import { Link } from 'react-router-dom'
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -142,6 +143,20 @@ const Dashboard = () => {
   return (
     <DashboardLayout>
       <div className={styles.container}>
+        <div className='grid grid-cols-1 md:grid-cols-3 gap-4 mb-8'>
+          {[
+            { to: '/imports', title: '导入中心', desc: '从 Markdown 或后续 PDF 材料开始创建简历' },
+            { to: '/jobs', title: '岗位 / ATS', desc: '录入 JD、分析匹配度、生成优化建议' },
+            { to: '/cover-letters', title: '求职信', desc: '基于简历和岗位生成求职信' },
+            { to: '/applications', title: '投递管理', desc: '管理投递状态、面试节点和日历安排' },
+          ].map((item) => (
+            <Link key={item.to} to={item.to} className='rounded-3xl bg-white border border-slate-200 shadow-sm p-5 hover:border-violet-300 transition-colors'>
+              <div className='text-lg font-bold text-slate-800'>{item.title}</div>
+              <p className='mt-2 text-sm text-slate-600'>{item.desc}</p>
+            </Link>
+          ))}
+        </div>
+
         <div className={styles.headerWrapper}>
           <div>
             <div className={styles.headerTitle}>{t('dashboard.title')}</div>
@@ -212,6 +227,7 @@ const Dashboard = () => {
                   onSelect={() => navigate(`/resume/${resume._id}`)}
                   onDelete={() => handleDeleteClick(resume._id)}
                   completion={resume.completion || 0}
+                  contentSource={resume.contentSource}
                   isPremium={resume.isPremium}
                   isNew={moment().diff(moment(resume.createdAt), 'day') < 7}
                 />

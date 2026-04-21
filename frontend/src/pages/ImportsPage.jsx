@@ -1,0 +1,206 @@
+import React, { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import DashboardLayout from '../components/DashboardLayout'
+import axiosInstance from '../utils/axiosInstance'
+import { API_PATHS } from '../utils/apiPaths'
+import toast from 'react-hot-toast'
+import { formatDateTime } from '../utils/career'
+
+const ImportsPage = () => {
+  const navigate = useNavigate()
+  const [mode, setMode] = useState('markdown')
+  const [markdownText, setMarkdownText] = useState('')
+  const [selectedMarkdownFileName, setSelectedMarkdownFileName] = useState('')
+  const [selectedPdfFileName, setSelectedPdfFileName] = useState('')
+  const [pdfBase64Content, setPdfBase64Content] = useState('')
+  const [imports, setImports] = useState([])
+  const [submitting, setSubmitting] = useState(false)
+
+  const fetchImports = async () => {
+    try {
+      const response = await axiosInstance.get(API_PATHS.IMPORTS.GET_ALL)
+      setImports(response.data)
+    } catch (error) {
+      toast.error('加载导入记录失败')
+    }
+  }
+
+  useEffect(() => {
+    fetchImports()
+  }, [])
+
+  const handleMarkdownFileChange = async (event) => {
+    const file = event.target.files?.[0]
+    if (!file) return
+
+    const text = await file.text()
+    setMarkdownText(text)
+    setSelectedMarkdownFileName(file.name)
+  }
+
+  const handlePdfFileChange = async (event) => {
+    const file = event.target.files?.[0]
+    if (!file) return
+
+    const arrayBuffer = await file.arrayBuffer()
+    const bytes = new Uint8Array(arrayBuffer)
+    let binary = ''
+    bytes.forEach((byte) => {
+      binary += String.fromCharCode(byte)
+    })
+
+    setPdfBase64Content(btoa(binary))
+    setSelectedPdfFileName(file.name)
+  }
+
+  const handleMarkdownImport = async () => {
+    if (!markdownText.trim()) {
+      toast.error('请先粘贴或选择 Markdown 内容')
+      return
+    }
+
+    try {
+      setSubmitting(true)
+      const response = await axiosInstance.post(API_PATHS.IMPORTS.CREATE_MARKDOWN, {
+        rawText: markdownText,
+        originalFileName: selectedMarkdownFileName || 'pasted-resume.md',
+      })
+
+      toast.success('Markdown 已解析，请确认导入结果')
+      fetchImports()
+      navigate(`/imports/${response.data._id}/confirm`)
+    } catch (error) {
+      toast.error('Markdown 导入失败')
+    } finally {
+      setSubmitting(false)
+    }
+  }
+
+  const handlePdfImport = async () => {
+    if (!pdfBase64Content) {
+      toast.error('请先选择 PDF 文件')
+      return
+    }
+
+    try {
+      setSubmitting(true)
+      const response = await axiosInstance.post(API_PATHS.IMPORTS.CREATE_PDF, {
+        base64Content: pdfBase64Content,
+        originalFileName: selectedPdfFileName || 'resume.pdf',
+      })
+
+      toast.success('PDF 已解析，请确认导入结果')
+      fetchImports()
+      navigate(`/imports/${response.data._id}/confirm`)
+    } catch (error) {
+      const failureReason = error.response?.data?.failureReason
+      toast.error(failureReason || 'PDF 导入失败')
+      fetchImports()
+    } finally {
+      setSubmitting(false)
+    }
+  }
+
+  return (
+    <DashboardLayout activeMenu='imports'>
+      <div className='space-y-8 px-4'>
+        <div className='rounded-3xl bg-white p-8 border border-slate-200 shadow-sm'>
+          <h1 className='text-3xl font-black text-slate-900'>导入中心</h1>
+          <p className='mt-3 text-slate-600'>Phase B 第一批先打通 Markdown 导入闭环：导入、确认、生成 Resume。PDF 导入入口保留，后续继续接入。</p>
+        </div>
+
+        <div className='grid grid-cols-1 xl:grid-cols-3 gap-6'>
+          <div className='xl:col-span-2 rounded-3xl bg-white p-6 border border-slate-200 shadow-sm space-y-5'>
+            <div className='flex gap-3'>
+              <button
+                onClick={() => setMode('markdown')}
+                className={`rounded-2xl px-5 py-3 font-semibold ${mode === 'markdown' ? 'bg-violet-600 text-white' : 'bg-slate-100 text-slate-700'}`}
+              >
+                Markdown 导入
+              </button>
+              <button
+                onClick={() => setMode('pdf')}
+                className={`rounded-2xl px-5 py-3 font-semibold ${mode === 'pdf' ? 'bg-violet-600 text-white' : 'bg-slate-100 text-slate-700'}`}
+              >
+                PDF 导入
+              </button>
+            </div>
+
+            {mode === 'markdown' && (
+              <div className='space-y-4'>
+                <div className='rounded-2xl bg-slate-50 border border-slate-200 p-4'>
+                  <div className='font-semibold text-slate-800 mb-2'>方式一：上传 Markdown 文件</div>
+                  <input type='file' accept='.md,text/markdown' onChange={handleMarkdownFileChange} className='block w-full text-sm text-slate-600' />
+                  {selectedMarkdownFileName && <div className='mt-2 text-sm text-slate-500'>已选择：{selectedMarkdownFileName}</div>}
+                </div>
+
+                <div>
+                  <div className='font-semibold text-slate-800 mb-2'>方式二：直接粘贴 Markdown 内容</div>
+                  <textarea
+                    value={markdownText}
+                    onChange={(e) => setMarkdownText(e.target.value)}
+                    placeholder='# 张三&#10;前端工程师&#10;&#10;## Summary&#10;...'
+                    rows={18}
+                    className='w-full rounded-2xl border border-slate-200 px-4 py-3 font-mono text-sm'
+                  />
+                </div>
+
+                <button
+                  onClick={handleMarkdownImport}
+                  disabled={submitting}
+                  className='rounded-2xl bg-violet-600 px-6 py-3 text-white font-semibold disabled:opacity-60'
+                >
+                  {submitting ? '解析中...' : '开始导入 Markdown'}
+                </button>
+              </div>
+            )}
+
+            {mode === 'pdf' && (
+              <div className='space-y-4'>
+                <div className='rounded-2xl bg-slate-50 border border-slate-200 p-4'>
+                  <div className='font-semibold text-slate-800 mb-2'>上传文本型 PDF</div>
+                  <input type='file' accept='application/pdf,.pdf' onChange={handlePdfFileChange} className='block w-full text-sm text-slate-600' />
+                  {selectedPdfFileName && <div className='mt-2 text-sm text-slate-500'>已选择：{selectedPdfFileName}</div>}
+                </div>
+
+                <div className='rounded-2xl bg-amber-50 border border-amber-200 p-4 text-sm text-amber-900'>
+                  当前仅支持文本型 PDF。扫描件 / 图片型 PDF 会在后续 OCR 阶段接入。
+                </div>
+
+                <button
+                  onClick={handlePdfImport}
+                  disabled={submitting}
+                  className='rounded-2xl bg-violet-600 px-6 py-3 text-white font-semibold disabled:opacity-60'
+                >
+                  {submitting ? '解析中...' : '开始导入 PDF'}
+                </button>
+              </div>
+            )}
+          </div>
+
+          <div className='rounded-3xl bg-white p-6 border border-slate-200 shadow-sm'>
+            <h2 className='text-xl font-bold text-slate-800 mb-4'>最近导入记录</h2>
+            <div className='space-y-3'>
+              {imports.length === 0 && <div className='text-sm text-slate-500'>还没有导入记录。</div>}
+              {imports.map((item) => (
+                <div key={item._id} className='rounded-2xl border border-slate-200 bg-slate-50 p-4'>
+                  <div className='font-semibold text-slate-800'>{item.originalFileName || '未命名导入'}</div>
+                  <div className='mt-1 text-sm text-slate-500'>{item.sourceType} · {item.status}</div>
+                  <div className='mt-1 text-xs text-slate-400'>{formatDateTime(item.createdAt)}</div>
+                  {item.failureReason && <div className='mt-2 text-sm text-rose-600'>{item.failureReason}</div>}
+                  <div className='mt-3 flex gap-2'>
+                    <button onClick={() => navigate(`/imports/${item._id}/confirm`)} className='text-sm text-violet-700 font-semibold'>
+                      查看
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </DashboardLayout>
+  )
+}
+
+export default ImportsPage
