@@ -1,20 +1,54 @@
-import React, { useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { Check } from 'lucide-react'
-import { DUMMY_RESUME_DATA, resumeTemplates } from '../utils/data'
+import { DUMMY_RESUME_DATA } from '../utils/data'
 import RenderResume from './RenderResume'
 import Tabs from './Tabs'
 import { useTranslation } from 'react-i18next'
+import axiosInstance from '../utils/axiosInstance'
+import { API_PATHS } from '../utils/apiPaths'
+import { getRegisteredTemplates, mergeTemplateMetadata } from '../utils/templateRegistry'
 
 const ThemeSelector = ({ selectedTheme, setSelectedTheme, resumeData, onClose }) => {
   const { t } = useTranslation()
   const TAB_DATA = [{ label: t('themeSelector.templates') }]
-  const initialIndex = resumeTemplates.findIndex(t => t.id === selectedTheme)
+  const [tabValue, setTabValue] = useState('Templates')
+  const [templates, setTemplates] = useState(getRegisteredTemplates())
   const [selectedTemplate, setSelectedTemplate] = useState({
-    theme: selectedTheme || resumeTemplates[0]?.id || '',
-    index: initialIndex >= 0 ? initialIndex : 0
+    theme: selectedTheme || getRegisteredTemplates()[0]?.id || '',
+    index: 0,
   })
 
-  const [tabValue, setTabValue] = useState('Templates')
+  useEffect(() => {
+    const fetchTemplates = async () => {
+      try {
+        const response = await axiosInstance.get(API_PATHS.TEMPLATES.GET_ALL)
+        setTemplates(mergeTemplateMetadata(response.data))
+      } catch (error) {
+        setTemplates(getRegisteredTemplates())
+      }
+    }
+
+    fetchTemplates()
+  }, [])
+
+  const selectedIndex = useMemo(() => {
+    const currentIndex = templates.findIndex((template) => template.id === selectedTemplate.theme)
+    return currentIndex >= 0 ? currentIndex : 0
+  }, [templates, selectedTemplate.theme])
+
+  useEffect(() => {
+    if (!templates.length) return
+
+    const preferredTheme = templates.some((template) => template.id === selectedTheme)
+      ? selectedTheme
+      : templates[0]?.id || ''
+    const hasCurrentTheme = templates.some((template) => template.id === selectedTemplate.theme)
+
+    setSelectedTemplate(() => ({
+      theme: hasCurrentTheme ? selectedTemplate.theme : preferredTheme,
+      index: selectedIndex,
+    }))
+  }, [templates, selectedTheme, selectedIndex, selectedTemplate.theme])
 
   const handleThemeSelection = () => {
     setSelectedTheme(selectedTemplate.theme)
@@ -31,15 +65,14 @@ const ThemeSelector = ({ selectedTheme, setSelectedTheme, resumeData, onClose })
       </div>
 
       <div className='grid grid-cols-1 lg:grid-cols-5 gap-6 lg:gap-8'>
-        {/* 左侧 - 模板选择（显示实际预览） */}
         <div className='lg:col-span-2 bg-white rounded-2xl border border-gray-100 p-4 sm:p-6'>
           <div className='grid grid-cols-2 gap-4 max-h-[60vh] lg:max-h-[70vh] overflow-auto p-2'>
-            {resumeTemplates.map((template, index) => (
+            {templates.map((template, index) => (
               <div
-                key={`template_${index}`}
+                key={template.id}
                 onClick={() => setSelectedTemplate({
                   theme: template.id,
-                  index
+                  index,
                 })}
                 className={`
                   cursor-pointer rounded-2xl overflow-hidden border-2 transition-all duration-300 h-64 relative
@@ -49,7 +82,6 @@ const ThemeSelector = ({ selectedTheme, setSelectedTheme, resumeData, onClose })
                   }
                 `}
               >
-                {/* 模板标题 */}
                 <div className={`
                   absolute top-0 left-0 right-0 z-10 px-2 py-1 text-xs font-semibold text-center
                   ${selectedTemplate.index === index ? 'bg-violet-500 text-white' : 'bg-gray-100 text-gray-700'}
@@ -57,7 +89,6 @@ const ThemeSelector = ({ selectedTheme, setSelectedTheme, resumeData, onClose })
                   {template.name || `${t('themeSelector.template')} ${template.id}`}
                 </div>
 
-                {/* 实际预览 - 缩小显示 */}
                 <div className='absolute inset-0 p-1 pt-7 bg-gray-50 overflow-hidden' style={{ transform: 'scale(0.35)', transformOrigin: 'top left', width: '285%', height: '285%' }}>
                   <RenderResume
                     templateId={template.id}
@@ -66,7 +97,6 @@ const ThemeSelector = ({ selectedTheme, setSelectedTheme, resumeData, onClose })
                   />
                 </div>
 
-                {/* 选中指示器 */}
                 {selectedTemplate.index === index && (
                   <div className='absolute top-1 right-1 w-5 h-5 bg-violet-500 rounded-full flex items-center justify-center shadow-lg z-20'>
                     <Check size={12} className='text-white' />
@@ -77,7 +107,6 @@ const ThemeSelector = ({ selectedTheme, setSelectedTheme, resumeData, onClose })
           </div>
         </div>
 
-        {/* 右侧 - 大预览 */}
         <div className='lg:col-span-3 bg-white rounded-2xl border border-gray-100 p-4 sm:p-6'>
           <RenderResume
             templateId={selectedTemplate?.theme || ''}

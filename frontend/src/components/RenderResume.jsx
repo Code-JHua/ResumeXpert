@@ -1,7 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react'
-import TemplateOne from './TemplateOne.jsx'
-import TemplateTwo from './TemplateTwo.jsx'
-import TemplateThree from './TemplateThree.jsx'
+import { getTemplateById } from '../utils/templateRegistry.js'
 
 // 逐字母动画组件 - 支持输入淡入和删除淡出
 export const AnimatedText = ({ children, className = '' }) => {
@@ -93,24 +91,14 @@ const RenderResume = ({
   resumeData,
   containerWidth
 }) => {
-  switch (templateId) {
-    case '01':
-      return (
-        <TemplateOne resumeData={resumeData} containerWidth={containerWidth} />
-      )
-    case '02':
-      return (
-        <TemplateTwo resumeData={resumeData} containerWidth={containerWidth} />
-      )
-    case '03':
-      return (
-        <TemplateThree resumeData={resumeData} containerWidth={containerWidth} />
-      )
-    default:
-      return (
-        <TemplateOne resumeData={resumeData} containerWidth={containerWidth} />
-      )
+  const template = getTemplateById(templateId)
+  const Renderer = template?.renderer
+
+  if (!Renderer) {
+    return null
   }
+
+  return <Renderer resumeData={resumeData} containerWidth={containerWidth} />
 }
 
 export default RenderResume

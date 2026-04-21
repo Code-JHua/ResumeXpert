@@ -1,10 +1,8 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { Palette, Trash2, Download } from 'lucide-react'
 import toast from 'react-hot-toast'
 import DashboardLayout from './DashboardLayout'
-import { buttonStyles, containerStyles, iconStyles, statusStyles } from '../assets/dummystyle'
-import { TitleInput } from './Inputs'
+import { containerStyles, iconStyles, statusStyles } from '../assets/dummystyle'
 import StepProgress from './StepProgress'
 import {
   ProfileInfoForm,
@@ -18,14 +16,18 @@ import {
 } from './Forms'
 import axiosInstance from '../utils/axiosInstance'
 import { API_PATHS } from '../utils/apiPaths'
-import html2pdf from 'html2pdf.js'
-import { ArrowLeft, Save, Loader2, AlertCircle, Check } from 'lucide-react'
+import { Loader2, Check } from 'lucide-react'
 import html2canvas from 'html2canvas'
 import { fixTailwindColors, dataURLtoFile } from '../utils/helper'
 import ThemeSelector from './ThemeSelector'
 import RenderResume from './RenderResume'
 import Modal from './Modal'
 import { useTranslation } from 'react-i18next'
+import ResumeVersionManager from './ResumeVersionManager.jsx'
+import ResumeEditorHeader from './resume-editor/ResumeEditorHeader.jsx'
+import ResumePreviewPanel from './resume-editor/ResumePreviewPanel.jsx'
+import ResumeEditorActions from './resume-editor/ResumeEditorActions.jsx'
+import { exportResumeAsPdf } from '../services/resumeExportService.js'
 
 
 
@@ -53,6 +55,7 @@ const EditResume = () => {
 
   const [openThemeSelector, setOpenThemeSelector] = useState(false)
   const [openPreviewModal, setOpenPreviewModal] = useState(false)
+  const [openVersionModal, setOpenVersionModal] = useState(false)
   const [currentPage, setCurrentPage] = useState("profile-info")
   const pages = ["profile-info", "contact-info", "work-experience", "education-info", "skills", "projects", "certifications", "additionalInfo"]
   const [progress, setProgress] = useState(Math.round((pages.indexOf("profile-info") / (pages.length - 1)) * 100))
@@ -73,7 +76,7 @@ const EditResume = () => {
       summary: "",
     },
     template: {
-      theme: "modern",
+      theme: "01",
       colorPalette: []
     },
     contactInfo: {
@@ -616,65 +619,34 @@ const EditResume = () => {
   }
 
   const downloadPDF = async () => {
-    const element = resumeDownloadRef.current;
+    const element = resumeDownloadRef.current
     if (!element) {
-      toast.error(t('editResume.toast.pdfErrorDetail'));
-      return;
+      toast.error(t('editResume.toast.pdfErrorDetail'))
+      return
     }
 
-    setIsDownloading(true);
-    setDownloadSuccess(false);
-    const toastId = toast.loading(t('editResume.toast.pdfGenerating'));
-
-    const override = document.createElement("style");
-    override.id = "__pdf_color_override__";
-    override.textContent = `
-      * {
-        color: #000 !important;
-        background-color: #fff !important;
-        border-color: #000 !important;
-      }
-    `;
-    document.head.appendChild(override);
+    setIsDownloading(true)
+    setDownloadSuccess(false)
+    const toastId = toast.loading(t('editResume.toast.pdfGenerating'))
 
     try {
-      await html2pdf()
-        .set({
-          margin: 0,
-          filename: `${resumeData.title.replace(/[^a-z0-9]/gi, "_")}.pdf`,
-          image: { type: "png", quality: 1.0 },
-          html2canvas: {
-            scale: 2,
-            useCORS: true,
-            backgroundColor: "#FFFFFF",
-            logging: false,
-            windowWidth: element.scrollWidth,
-          },
-          jsPDF: {
-            unit: "mm",
-            format: "a4",
-            orientation: "portrait",
-          },
-          pagebreak: {
-            mode: ['avoid-all', 'css', 'legacy']
-          }
-        })
-        .from(element)
-        .save();
+      await exportResumeAsPdf({
+        element,
+        fileName: `${resumeData.title.replace(/[^a-z0-9]/gi, "_")}.pdf`,
+        resumeId,
+        templateId: resumeData?.template?.theme || '01',
+      })
 
-      toast.success(t('editResume.toast.pdfSuccess'), { id: toastId });
-      setDownloadSuccess(true);
-      setTimeout(() => setDownloadSuccess(false), 3000);
-
+      toast.success(t('editResume.toast.pdfSuccess'), { id: toastId })
+      setDownloadSuccess(true)
+      setTimeout(() => setDownloadSuccess(false), 3000)
     } catch (err) {
-      console.error("PDF error:", err);
-      toast.error(t('editResume.toast.pdfError'), { id: toastId });
-
+      console.error('PDF error:', err)
+      toast.error(t('editResume.toast.pdfError'), { id: toastId })
     } finally {
-      document.getElementById("__pdf_color_override__")?.remove();
-      setIsDownloading(false);
+      setIsDownloading(false)
     }
-  };
+  }
 
   const updateTheme = (theme) => {
     setResumeData(prev => ({
@@ -696,83 +668,71 @@ const EditResume = () => {
     <div>
       <DashboardLayout>
         <div className={containerStyles.main}>
-          <div className={containerStyles.header}>
-            <TitleInput title={resumeData.title} setTitle={(value) => setResumeData(prev => ({ ...prev, title: value }))} />
-            <div className='flex flex-wrap items-center gap-3'>
-              <button onClick={() => setOpenThemeSelector(true)} className={buttonStyles.theme}>
-                <Palette size={16} />
-                <span className='text-sm'>{t('editResume.buttons.theme')}</span>
-              </button>
-              <button onClick={handleDeleteResume} className={buttonStyles.delete} disabled={isLoading}>
-                <Trash2 size={16} />
-                <span className='text-sm'>{t('editResume.buttons.delete')}</span>
-              </button>
-              <button onClick={() => setOpenPreviewModal(true)} className={buttonStyles.download}>
-                <Download size={16} />
-                <span className='text-sm'>{t('editResume.buttons.download')}</span>
-              </button>
-            </div>
-          </div>
+          <ResumeEditorHeader
+            title={resumeData.title}
+            setTitle={(value) => setResumeData(prev => ({ ...prev, title: value }))}
+            onOpenVersions={() => setOpenVersionModal(true)}
+            onOpenThemeSelector={() => setOpenThemeSelector(true)}
+            onDeleteResume={handleDeleteResume}
+            onOpenPreview={() => setOpenPreviewModal(true)}
+            isLoading={isLoading}
+            t={t}
+          />
 
           <div className={containerStyles.grid}>
             <div className={containerStyles.formContainer}>
               <StepProgress progress={progress} />
               {renderForm()}
-              <div className=' p-4 sm:p-6'>
-                {errorMsg && (
-                  <div className={statusStyles.error}>
-                    <AlertCircle size={16} />
-                    {errorMsg}
-                  </div>
-                )}
-
-                <div className=' flex flex-wrap items-center justify-end gap-3'>
-                  <button className={buttonStyles.back} onClick={goBack} disabled={isLoading}>
-                    <ArrowLeft size={16} />
-                    <span className='text-sm'>{t('editResume.buttons.back')}</span>
-                  </button>
-
-                  <button className={buttonStyles.save} onClick={uploadResumeImages} disabled={isLoading}>
-                    {isLoading ? <Loader2 size={16} className='animate-spin' /> : <Save size={16} />}
-                    {isLoading ? t('editResume.saving') : t('editResume.buttons.save')}
-                  </button>
-
-                  <button className={buttonStyles.next} onClick={validateAndNext} disabled={isLoading}>
-                    {currentPage === "additionalInfo" && <Download size={16} />}
-                    {currentPage === "additionalInfo" ? t('editResume.buttons.previewAndDownload') : t('editResume.buttons.next')}
-                    {currentPage === 'additionalInfo' && <ArrowLeft size={16}  className=' rotate-180'/>}
-                  </button>
-                </div>
-              </div>
+              <ResumeEditorActions
+                errorMsg={errorMsg}
+                goBack={goBack}
+                uploadResumeImages={uploadResumeImages}
+                validateAndNext={validateAndNext}
+                currentPage={currentPage}
+                isLoading={isLoading}
+                t={t}
+              />
             </div>
 
-            <div className=' hidden lg:block'>
-              <div className={containerStyles.previewContainer}>
-                <div className='text-center mb-4'>
-                  <div className={statusStyles.completionBadge}>
-                    <div className={iconStyles.pulseDot}></div>
-                    <span >{t('editResume.preview')} - {completionPercentage}% {t('editResume.completion')}</span>
-                  </div>
-                </div>
-
-                <div className=' preview-container relative' ref={previewContainerRef}>
-                  <div className={containerStyles.previewInner}>
-                    <RenderResume key={`preview-${resumeData?.template?.theme}`}
-                      templateId={resumeData?.template?.theme || ''}
-                      resumeData={resumeData}
-                      containerWidth={previewWidth}
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
+            <ResumePreviewPanel
+              completionPercentage={completionPercentage}
+              previewContainerRef={previewContainerRef}
+              previewWidth={previewWidth}
+              templateId={resumeData?.template?.theme || '01'}
+              resumeData={resumeData}
+              t={t}
+            />
           </div>
         </div>
 
         <Modal isOpen={openThemeSelector} onClose={() => setOpenThemeSelector(false)} title={t('editResume.modal.changeTheme')}>
           <div className={containerStyles.modalContent}>
             <ThemeSelector selectedTheme={resumeData?.template?.theme}
-              setSelectedTheme={updateTheme} onClose={() => setOpenThemeSelector(false)}
+              setSelectedTheme={updateTheme} resumeData={resumeData} onClose={() => setOpenThemeSelector(false)}
+            />
+          </div>
+        </Modal>
+
+        <Modal isOpen={openVersionModal} onClose={() => setOpenVersionModal(false)} title='历史版本管理'>
+          <div className={containerStyles.modalContent}>
+            <ResumeVersionManager
+              resumeId={resumeId}
+              onRestore={(restoredResume) => {
+                setResumeData((prevState) => ({
+                  ...prevState,
+                  title: restoredResume?.title || prevState.title,
+                  template: restoredResume?.template || prevState.template,
+                  profileInfo: restoredResume?.profileInfo || prevState.profileInfo,
+                  contactInfo: restoredResume?.contactInfo || prevState.contactInfo,
+                  workExperience: restoredResume?.workExperience || prevState.workExperience,
+                  education: restoredResume?.education || prevState.education,
+                  skills: restoredResume?.skills || prevState.skills,
+                  projects: restoredResume?.projects || prevState.projects,
+                  certifications: restoredResume?.certifications || prevState.certifications,
+                  languages: restoredResume?.languages || prevState.languages,
+                  interests: restoredResume?.interests || prevState.interests,
+                }))
+              }}
             />
           </div>
         </Modal>

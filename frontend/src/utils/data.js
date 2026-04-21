@@ -1,25 +1,3 @@
-import Resume1 from "../assets/Resume1.png"
-import Resume2 from "../assets/Resume2.png"
-import Resume3 from "../assets/Resume3.png"
-
-export const resumeTemplates = [
-  {
-    id: "01",
-    thumbnailImg: Resume1,
-    colorPaletteCode: "themeOne"
-  },
-  {
-    id: "02",
-    thumbnailImg: Resume2,
-    colorPaletteCode: "themeTwo"
-  },
-  {
-    id: "03",
-    thumbnailImg: Resume3,
-    colorPaletteCode: "themeThree"
-  },
-]
-
 export const DUMMY_RESUME_DATA = {
   profileInfo: {
     previewUrl: "",
