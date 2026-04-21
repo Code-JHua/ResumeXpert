@@ -47,6 +47,8 @@ export const API_PATHS = {
   },
   ATS: {
     ANALYZE: '/api/ats/analyze',
+    DERIVE_RESUME: '/api/ats/derive-resume',
+    GET_RECORD: (id) => `/api/ats/records/${id}`,
   },
   COVER_LETTERS: {
     CREATE: '/api/cover-letters',

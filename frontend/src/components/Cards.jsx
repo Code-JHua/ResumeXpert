@@ -81,6 +81,7 @@ export const ResumeSummaryCard = ({
   onDelete,
   completion = 85,
   contentSource = 'structured',
+  isDerived = false,
 }) => {
   const [isHovered, setIsHovered] = useState(false);
   const { t } = useTranslation();
@@ -208,6 +209,11 @@ export const ResumeSummaryCard = ({
             {contentSource !== 'structured' && (
               <div className='inline-flex mt-2 rounded-full bg-violet-50 px-3 py-1 text-xs font-semibold text-violet-700'>
                 {contentSource === 'markdown' ? 'Markdown 导入' : '导入创建'}
+              </div>
+            )}
+            {isDerived && (
+              <div className='inline-flex mt-2 ml-2 rounded-full bg-sky-50 px-3 py-1 text-xs font-semibold text-sky-700'>
+                岗位定制版
               </div>
             )}
             <div className={cardStyles.dateInfo}>

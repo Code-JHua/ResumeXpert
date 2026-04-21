@@ -11,9 +11,19 @@ const CoverLetterSchema = new mongoose.Schema({
     ref: 'Resume',
     default: null,
   },
+  resumeVersionId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'ResumeVersion',
+    default: null,
+  },
   jobDescriptionId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'JobDescription',
+    default: null,
+  },
+  sourceAnalysisId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'AtsAnalysisRecord',
     default: null,
   },
   title: {

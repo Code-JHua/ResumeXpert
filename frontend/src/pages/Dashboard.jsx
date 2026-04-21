@@ -229,6 +229,7 @@ const Dashboard = () => {
                   onDelete={() => handleDeleteClick(resume._id)}
                   completion={resume.completion || 0}
                   contentSource={resume.contentSource}
+                  isDerived={Boolean(resume.derivedFromResumeId || resume.targetJobDescriptionId)}
                   isPremium={resume.isPremium}
                   isNew={moment().diff(moment(resume.createdAt), 'day') < 7}
                 />

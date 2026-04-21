@@ -20,6 +20,7 @@ vi.mock('../../utils/axiosInstance', () => ({
 vi.mock('../../services/resumeExportService', () => ({
   exportResumeAsPdf: vi.fn(() => Promise.resolve()),
   exportResumeAsMarkdown: vi.fn(() => Promise.resolve({ status: 'ready', content: '# Resume' })),
+  getResumeMarkdownExport: vi.fn(() => Promise.resolve({ status: 'ready', content: '# Resume' })),
 }))
 
 vi.mock('../../components/RenderResume', () => ({

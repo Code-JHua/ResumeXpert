@@ -4,7 +4,7 @@ import toast from 'react-hot-toast'
 import DashboardLayout from '../components/DashboardLayout'
 import axiosInstance from '../utils/axiosInstance'
 import { API_PATHS } from '../utils/apiPaths'
-import { exportResumeAsMarkdown, exportResumeAsPdf } from '../services/resumeExportService'
+import { exportResumeAsMarkdown, exportResumeAsPdf, getResumeMarkdownExport } from '../services/resumeExportService'
 import RenderResume from '../components/RenderResume'
 
 const formatDateTime = (value) => {
@@ -113,7 +113,12 @@ const ShareManagementPage = () => {
       toast.success('PDF 已导出')
       await refreshCurrentBundle()
     } catch (error) {
-      toast.error('导出 PDF 失败')
+      const detail = error?.message?.includes('clone')
+        ? '页面渲染节点准备失败，请刷新页面后重试'
+        : error?.message?.includes('canvas')
+          ? '截图渲染失败，请检查模板内容是否过长或样式是否异常'
+          : '浏览器导出 PDF 失败，请稍后重试'
+      toast.error(detail)
     } finally {
       setActionLoading('')
     }
@@ -209,6 +214,27 @@ const ShareManagementPage = () => {
       toast.success('分享链接已复制')
     } catch (error) {
       toast.error('复制链接失败')
+    }
+  }
+
+  const handleCopyMarkdown = async () => {
+    if (!resume) return
+
+    try {
+      setActionLoading('copy-markdown')
+      const response = await getResumeMarkdownExport(resume._id)
+
+      if (response.status === 'not_ready') {
+        toast.error('Markdown 尚未准备好，请先进入 Markdown 页面同步')
+        return
+      }
+
+      await navigator.clipboard.writeText(response.content || '')
+      toast.success('Markdown 内容已复制')
+    } catch (error) {
+      toast.error('复制 Markdown 失败')
+    } finally {
+      setActionLoading('')
     }
   }
 
@@ -328,6 +354,13 @@ const ShareManagementPage = () => {
                         >
                           {actionLoading === 'markdown' ? '导出中...' : '导出 Markdown'}
                         </button>
+                        <button
+                          onClick={handleCopyMarkdown}
+                          disabled={actionLoading === 'copy-markdown'}
+                          className='rounded-2xl border border-slate-200 px-5 py-3 font-semibold text-slate-700 disabled:opacity-60'
+                        >
+                          {actionLoading === 'copy-markdown' ? '复制中...' : '复制 Markdown'}
+                        </button>
                         <Link to={`/resume/${resume._id}/markdown`} className='rounded-2xl border border-emerald-200 px-5 py-3 font-semibold text-emerald-700'>
                           进入 Markdown 模式
                         </Link>
@@ -339,6 +372,11 @@ const ShareManagementPage = () => {
                       <div className='mt-4 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-4 text-sm text-slate-600 break-all'>
                         {selectedShareUrl || '当前还没有分享链接，点击下方按钮创建。'}
                       </div>
+                      {shareInfo?.lastPublishedAt && (
+                        <div className='mt-3 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800'>
+                          当前公开页展示的是最近一次“重新发布”时的快照。如果你刚修改了简历内容，需要再次点击“重新发布”才会更新公开页。
+                        </div>
+                      )}
                       <div className='mt-5 flex flex-wrap gap-3'>
                         {!shareInfo && (
                           <button
@@ -414,8 +452,10 @@ const ShareManagementPage = () => {
                               <tr>
                                 <th className='pb-3 font-semibold'>格式</th>
                                 <th className='pb-3 font-semibold'>状态</th>
+                                <th className='pb-3 font-semibold'>模板</th>
                                 <th className='pb-3 font-semibold'>来源</th>
                                 <th className='pb-3 font-semibold'>文件 / 动作</th>
+                                <th className='pb-3 font-semibold'>错误信息</th>
                                 <th className='pb-3 font-semibold'>时间</th>
                               </tr>
                             </thead>
@@ -434,10 +474,12 @@ const ShareManagementPage = () => {
                                       {log.status}
                                     </span>
                                   </td>
+                                  <td className='py-3'>{log.templateId || '—'}</td>
                                   <td className='py-3'>{log.metadata?.triggerSource || '—'}</td>
                                   <td className='py-3'>
                                     {log.metadata?.fileName || log.metadata?.action || log.metadata?.errorMessage || '—'}
                                   </td>
+                                  <td className='py-3'>{log.metadata?.errorMessage || '—'}</td>
                                   <td className='py-3'>{formatDateTime(log.createdAt)}</td>
                                 </tr>
                               ))}

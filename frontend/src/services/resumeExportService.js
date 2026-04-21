@@ -29,6 +29,11 @@ export const recordExportLog = async (resumeId, payload) => {
   }
 }
 
+export const getResumeMarkdownExport = async (resumeId) => {
+  const response = await axiosInstance.get(API_PATHS.RESUME.EXPORT_MARKDOWN(resumeId))
+  return response.data
+}
+
 export const exportResumeAsPdf = async ({ element, fileName, resumeId, templateId, triggerSource = 'editor' }) => {
   const startedAt = Date.now()
   applyPdfOverride()
@@ -93,25 +98,25 @@ export const exportResumeAsMarkdown = async ({ resumeId, fileName, triggerSource
   const startedAt = Date.now()
 
   try {
-    const response = await axiosInstance.get(API_PATHS.RESUME.EXPORT_MARKDOWN(resumeId))
+    const response = await getResumeMarkdownExport(resumeId)
 
-    if (response.data.status === 'not_ready') {
+    if (response.status === 'not_ready') {
       await recordExportLog(resumeId, {
         format: 'markdown',
         status: 'failed',
         fileName,
         triggerSource,
-        errorMessage: response.data.message,
+        errorMessage: response.message,
         exportDurationMs: Date.now() - startedAt,
         metadata: {
           status: 'not_ready',
         },
       })
 
-      return response.data
+      return response
     }
 
-    const content = response.data.content || ''
+    const content = response.content || ''
     const blob = new Blob([content], { type: 'text/markdown;charset=utf-8' })
     const url = URL.createObjectURL(blob)
     const anchor = window.document.createElement('a')
@@ -128,7 +133,7 @@ export const exportResumeAsMarkdown = async ({ resumeId, fileName, triggerSource
       exportDurationMs: Date.now() - startedAt,
     })
 
-    return response.data
+    return response
   } catch (error) {
     await recordExportLog(resumeId, {
       format: 'markdown',

@@ -3,18 +3,28 @@ import JobDescription from '../models/jobDescriptionModel.js'
 import Resume from '../models/resumeModel.js'
 import { analyzeResumeAgainstJob, buildAiEnhancement, generateCoverLetterContent } from '../services/atsService.js'
 
+const populateConfig = [
+  { path: 'resumeId', select: 'title' },
+  { path: 'resumeVersionId', select: 'versionName' },
+  { path: 'jobDescriptionId', select: 'title company' },
+  { path: 'sourceAnalysisId', select: 'overallScore createdAt' },
+]
+
 export const createCoverLetter = async (req, res) => {
   try {
     const coverLetter = await CoverLetter.create({
       userId: req.user._id,
       resumeId: req.body.resumeId || null,
+      resumeVersionId: req.body.resumeVersionId || null,
       jobDescriptionId: req.body.jobDescriptionId || null,
+      sourceAnalysisId: req.body.sourceAnalysisId || null,
       title: req.body.title || '未命名求职信',
       content: req.body.content || '',
       generationMode: req.body.generationMode || 'manual',
     })
 
-    res.status(201).json(coverLetter)
+    const populated = await coverLetter.populate(populateConfig)
+    res.status(201).json(populated)
   } catch (error) {
     res.status(500).json({ message: 'Failed to create cover letter', error: error.message })
   }
@@ -22,7 +32,7 @@ export const createCoverLetter = async (req, res) => {
 
 export const generateCoverLetter = async (req, res) => {
   try {
-    const { resumeId, jobDescriptionId, title } = req.body
+    const { resumeId, resumeVersionId, jobDescriptionId, sourceAnalysisId, title } = req.body
     const [resume, jobDescription] = await Promise.all([
       Resume.findOne({ _id: resumeId, userId: req.user._id }),
       jobDescriptionId ? JobDescription.findOne({ _id: jobDescriptionId, userId: req.user._id }) : null,
@@ -42,14 +52,18 @@ export const generateCoverLetter = async (req, res) => {
     const coverLetter = await CoverLetter.create({
       userId: req.user._id,
       resumeId,
+      resumeVersionId: resumeVersionId || null,
       jobDescriptionId: jobDescriptionId || null,
+      sourceAnalysisId: sourceAnalysisId || null,
       title: title || `${resume.title} 求职信`,
       content: generateCoverLetterContent({ resume, jobDescription, analysis }),
       generationMode: aiEnhancement ? 'ai-enhanced' : 'template',
     })
 
+    const populated = await coverLetter.populate(populateConfig)
+
     res.status(201).json({
-      ...coverLetter.toObject(),
+      ...populated.toObject(),
       analysis,
       aiEnhancement,
     })
@@ -60,7 +74,7 @@ export const generateCoverLetter = async (req, res) => {
 
 export const getCoverLetters = async (req, res) => {
   try {
-    const coverLetters = await CoverLetter.find({ userId: req.user._id }).sort({ updatedAt: -1 })
+    const coverLetters = await CoverLetter.find({ userId: req.user._id }).populate(populateConfig).sort({ updatedAt: -1 })
     res.json(coverLetters)
   } catch (error) {
     res.status(500).json({ message: 'Failed to fetch cover letters', error: error.message })
@@ -69,7 +83,7 @@ export const getCoverLetters = async (req, res) => {
 
 export const getCoverLetterById = async (req, res) => {
   try {
-    const coverLetter = await CoverLetter.findOne({ _id: req.params.id, userId: req.user._id })
+    const coverLetter = await CoverLetter.findOne({ _id: req.params.id, userId: req.user._id }).populate(populateConfig)
     if (!coverLetter) {
       return res.status(404).json({ message: 'Cover letter not found' })
     }
@@ -86,7 +100,7 @@ export const updateCoverLetter = async (req, res) => {
       return res.status(404).json({ message: 'Cover letter not found' })
     }
 
-    ;['title', 'content', 'resumeId', 'jobDescriptionId'].forEach((field) => {
+    ;['title', 'content', 'resumeId', 'resumeVersionId', 'jobDescriptionId', 'sourceAnalysisId'].forEach((field) => {
       if (req.body[field] !== undefined) {
         coverLetter[field] = req.body[field]
       }
@@ -97,7 +111,8 @@ export const updateCoverLetter = async (req, res) => {
     }
 
     const saved = await coverLetter.save()
-    res.json(saved)
+    const populated = await saved.populate(populateConfig)
+    res.json(populated)
   } catch (error) {
     res.status(500).json({ message: 'Failed to update cover letter', error: error.message })
   }

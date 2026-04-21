@@ -5,10 +5,47 @@ const populateConfig = [
   { path: 'resumeVersionId', select: 'versionName createdAt note' },
   { path: 'jobDescriptionId', select: 'title company' },
   { path: 'coverLetterId', select: 'title updatedAt generationMode' },
+  { path: 'sourceAnalysisId', select: 'overallScore createdAt' },
 ]
 
 export const createApplication = async (req, res) => {
   try {
+    const timelineEvents = []
+
+    if (req.body.sourceAnalysisId) {
+      timelineEvents.push({
+        type: 'ats_completed',
+        title: '已完成 ATS 分析',
+        time: req.body.appliedAt || new Date(),
+        description: '该投递记录来自 ATS 分析后的闭环流程。',
+      })
+    }
+
+    if (req.body.resumeId && req.body.resumeVersionId) {
+      timelineEvents.push({
+        type: 'derived_resume_created',
+        title: '已绑定岗位版简历',
+        time: req.body.appliedAt || new Date(),
+        description: '投递记录自动关联了目标岗位的简历版本。',
+      })
+    }
+
+    if (req.body.coverLetterId) {
+      timelineEvents.push({
+        type: 'cover_letter_generated',
+        title: '已绑定求职信',
+        time: req.body.appliedAt || new Date(),
+        description: '投递记录自动关联了对应求职信资产。',
+      })
+    }
+
+    timelineEvents.push({
+      type: 'application_created',
+      title: '已创建投递记录',
+      time: req.body.appliedAt || new Date(),
+      description: '该投递记录已进入流程追踪。',
+    })
+
     const application = await Application.create({
       userId: req.user._id,
       company: req.body.company,
@@ -17,11 +54,12 @@ export const createApplication = async (req, res) => {
       resumeVersionId: req.body.resumeVersionId || null,
       jobDescriptionId: req.body.jobDescriptionId || null,
       coverLetterId: req.body.coverLetterId || null,
+      sourceAnalysisId: req.body.sourceAnalysisId || null,
       status: req.body.status || 'draft',
       appliedAt: req.body.appliedAt || null,
       nextActionAt: req.body.nextActionAt || null,
       notes: req.body.notes || '',
-      timeline: req.body.timeline || [],
+      timeline: [...timelineEvents, ...(req.body.timeline || [])],
     })
 
     const populated = await application.populate(populateConfig)
@@ -81,7 +119,7 @@ export const updateApplication = async (req, res) => {
 
     const updatableFields = [
       'company', 'position', 'resumeId', 'resumeVersionId', 'jobDescriptionId',
-      'coverLetterId', 'status', 'appliedAt', 'nextActionAt', 'notes',
+      'coverLetterId', 'sourceAnalysisId', 'status', 'appliedAt', 'nextActionAt', 'notes',
     ]
 
     updatableFields.forEach((field) => {

@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react'
-import { useSearchParams } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import DashboardLayout from '../components/DashboardLayout'
 import axiosInstance from '../utils/axiosInstance'
 import { API_PATHS } from '../utils/apiPaths'
@@ -13,6 +13,7 @@ const emptyForm = {
   resumeVersionId: '',
   jobDescriptionId: '',
   coverLetterId: '',
+  sourceAnalysisId: '',
   status: 'draft',
   appliedAt: '',
   nextActionAt: '',
@@ -30,8 +31,13 @@ const ApplicationsPage = () => {
   const [filters, setFilters] = useState({ status: '', company: '', position: '' })
   const [form, setForm] = useState({
     ...emptyForm,
+    company: searchParams.get('company') || '',
+    position: searchParams.get('position') || '',
     resumeId: searchParams.get('resumeId') || '',
+    resumeVersionId: searchParams.get('resumeVersionId') || '',
     jobDescriptionId: searchParams.get('jobDescriptionId') || '',
+    coverLetterId: searchParams.get('coverLetterId') || '',
+    sourceAnalysisId: searchParams.get('sourceAnalysisId') || '',
   })
   const [activeApplication, setActiveApplication] = useState(null)
   const [timelineForm, setTimelineForm] = useState({
@@ -215,6 +221,7 @@ const ApplicationsPage = () => {
               <option value=''>关联求职信（可选）</option>
               {letters.map((letter) => <option key={letter._id} value={letter._id}>{letter.title}</option>)}
             </select>
+            <input value={form.sourceAnalysisId} onChange={(e) => setForm((prev) => ({ ...prev, sourceAnalysisId: e.target.value }))} placeholder='关联 ATS 分析记录（可选）' className='w-full rounded-2xl border border-slate-200 px-4 py-3' />
             <select value={form.status} onChange={(e) => setForm((prev) => ({ ...prev, status: e.target.value }))} className='w-full rounded-2xl border border-slate-200 px-4 py-3'>
               {APPLICATION_STATUS_OPTIONS.map((item) => <option key={item.value} value={item.value}>{item.label}</option>)}
             </select>
@@ -283,9 +290,33 @@ const ApplicationsPage = () => {
                         <div>下次行动：{formatDateTime(activeApplicationDetail.nextActionAt)}</div>
                         <div>关联简历：{activeApplicationDetail.resumeId?.title || '—'}</div>
                         <div>关联版本：{activeApplicationDetail.resumeVersionId?.versionName || '—'}</div>
+                        <div>关联岗位：{activeApplicationDetail.jobDescriptionId?.title || '—'}</div>
                         <div>关联求职信：{activeApplicationDetail.coverLetterId?.title || '—'}</div>
+                        <div>分析记录：{activeApplicationDetail.sourceAnalysisId?._id || activeApplicationDetail.sourceAnalysisId || '—'}</div>
                       </div>
                       {activeApplicationDetail.notes && <div className='mt-3 text-sm text-slate-700'>{activeApplicationDetail.notes}</div>}
+                      <div className='mt-4 flex flex-wrap gap-3'>
+                        {activeApplicationDetail.resumeId?._id && (
+                          <Link to={`/resume/${activeApplicationDetail.resumeId._id}`} className='rounded-2xl border border-violet-200 px-4 py-2 text-sm font-semibold text-violet-700'>
+                            查看简历
+                          </Link>
+                        )}
+                        {activeApplicationDetail.resumeId?._id && activeApplicationDetail.resumeVersionId?._id && (
+                          <Link to={`/resume/${activeApplicationDetail.resumeId._id}?openVersions=1&versionId=${activeApplicationDetail.resumeVersionId._id}`} className='rounded-2xl border border-sky-200 px-4 py-2 text-sm font-semibold text-sky-700'>
+                            查看版本
+                          </Link>
+                        )}
+                        {activeApplicationDetail.jobDescriptionId?._id && (
+                          <Link to={`/jobs?resumeId=${activeApplicationDetail.resumeId?._id || ''}&jobId=${activeApplicationDetail.jobDescriptionId._id}`} className='rounded-2xl border border-amber-200 px-4 py-2 text-sm font-semibold text-amber-700'>
+                            查看岗位
+                          </Link>
+                        )}
+                        {activeApplicationDetail.coverLetterId?._id && (
+                          <Link to={`/cover-letters?coverLetterId=${activeApplicationDetail.coverLetterId._id}&resumeId=${activeApplicationDetail.resumeId?._id || ''}&jobDescriptionId=${activeApplicationDetail.jobDescriptionId?._id || ''}&resumeVersionId=${activeApplicationDetail.resumeVersionId?._id || ''}&sourceAnalysisId=${activeApplicationDetail.sourceAnalysisId?._id || ''}`} className='rounded-2xl border border-emerald-200 px-4 py-2 text-sm font-semibold text-emerald-700'>
+                            查看求职信
+                          </Link>
+                        )}
+                      </div>
                     </div>
 
                     <div className='rounded-2xl bg-slate-50 p-4 border border-slate-100 space-y-3'>

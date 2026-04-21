@@ -4,7 +4,7 @@ import axiosInstance from '../utils/axiosInstance'
 import { API_PATHS } from '../utils/apiPaths'
 import { formatDateTime } from '../utils/career'
 
-const ResumeVersionManager = ({ resumeId, onRestore }) => {
+const ResumeVersionManager = ({ resumeId, onRestore, highlightVersionId = '' }) => {
   const [versions, setVersions] = useState([])
   const [versionName, setVersionName] = useState('')
   const [note, setNote] = useState('')
@@ -102,12 +102,27 @@ const ResumeVersionManager = ({ resumeId, onRestore }) => {
         )}
 
         {versions.map((version) => (
-          <div key={version._id} className='rounded-2xl border border-slate-200 bg-white p-4'>
+          <div key={version._id} className={`rounded-2xl border bg-white p-4 ${
+            highlightVersionId && highlightVersionId === version._id
+              ? 'border-sky-300 ring-2 ring-sky-100'
+              : 'border-slate-200'
+          }`}>
             <div className='flex flex-col gap-3 md:flex-row md:items-center md:justify-between'>
               <div>
-                <div className='font-semibold text-slate-800'>{version.versionName}</div>
+                <div className='font-semibold text-slate-800'>
+                  {version.versionName}
+                  {highlightVersionId && highlightVersionId === version._id && (
+                    <span className='ml-2 rounded-full bg-sky-100 px-2 py-0.5 text-xs font-semibold text-sky-700'>
+                      当前关联版本
+                    </span>
+                  )}
+                </div>
                 <div className='text-sm text-slate-500'>{formatDateTime(version.createdAt)}</div>
                 {version.note && <div className='mt-1 text-sm text-slate-600'>{version.note}</div>}
+                <div className='mt-2 flex flex-wrap gap-2 text-xs'>
+                  {version.sourceType && <span className='rounded-full bg-slate-100 px-3 py-1 text-slate-700'>来源：{version.sourceType}</span>}
+                  {version.targetJobDescriptionId && <span className='rounded-full bg-amber-100 px-3 py-1 text-amber-700'>岗位派生</span>}
+                </div>
               </div>
               <div className='flex gap-2'>
                 <button onClick={() => handleRestore(version._id)} className='px-4 py-2 rounded-xl bg-emerald-600 text-white text-sm'>

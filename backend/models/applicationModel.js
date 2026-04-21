@@ -70,6 +70,11 @@ const ApplicationSchema = new mongoose.Schema({
     ref: 'CoverLetter',
     default: null,
   },
+  sourceAnalysisId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'AtsAnalysisRecord',
+    default: null,
+  },
   status: {
     type: String,
     enum: APPLICATION_STATUSES,

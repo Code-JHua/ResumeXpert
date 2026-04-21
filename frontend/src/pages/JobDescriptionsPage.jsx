@@ -15,13 +15,16 @@ const JobDescriptionsPage = () => {
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
   const initialResumeId = searchParams.get('resumeId') || ''
+  const initialJobId = searchParams.get('jobId') || ''
 
   const [jobForm, setJobForm] = useState(defaultForm)
   const [jobs, setJobs] = useState([])
   const [resumes, setResumes] = useState([])
   const [selectedResumeId, setSelectedResumeId] = useState(initialResumeId)
-  const [selectedJobId, setSelectedJobId] = useState('')
+  const [selectedJobId, setSelectedJobId] = useState(initialJobId)
   const [analysis, setAnalysis] = useState(null)
+  const [analysisRecordId, setAnalysisRecordId] = useState('')
+  const [derivedContext, setDerivedContext] = useState(null)
   const [loading, setLoading] = useState(false)
 
   const selectedJob = useMemo(
@@ -81,6 +84,8 @@ const JobDescriptionsPage = () => {
         jobDescriptionId: selectedJobId,
       })
       setAnalysis(response.data)
+      setAnalysisRecordId(response.data.analysisRecordId || '')
+      setDerivedContext(null)
       toast.success('ATS 分析完成')
     } catch (error) {
       toast.error('ATS 分析失败')
@@ -104,11 +109,94 @@ const JobDescriptionsPage = () => {
   }
 
   const handleCreateApplication = () => {
-    if (!analysis) {
+    if (!analysis || !selectedJob) {
       toast.error('请先完成 ATS 分析')
       return
     }
-    navigate(`/applications?resumeId=${selectedResumeId}&jobDescriptionId=${selectedJobId}`)
+
+    const resumeId = derivedContext?.resumeId || selectedResumeId
+    const resumeVersionId = derivedContext?.versionId || ''
+    const query = new URLSearchParams({
+      resumeId,
+      jobDescriptionId: selectedJobId,
+      sourceAnalysisId: analysisRecordId || '',
+      company: selectedJob.company || '',
+      position: selectedJob.title || '',
+    })
+
+    if (resumeVersionId) {
+      query.set('resumeVersionId', resumeVersionId)
+    }
+
+    navigate(`/applications?${query.toString()}`)
+  }
+
+  const handleDeriveResume = async () => {
+    if (!analysis || !selectedJobId || !selectedResumeId) {
+      toast.error('请先完成 ATS 分析')
+      return
+    }
+
+    try {
+      setLoading(true)
+      const response = await axiosInstance.post(API_PATHS.ATS.DERIVE_RESUME, {
+        resumeId: selectedResumeId,
+        jobDescriptionId: selectedJobId,
+        analysisRecordId,
+      })
+
+      setDerivedContext({
+        resumeId: response.data.resumeId,
+        versionId: response.data.versionId,
+      })
+      toast.success('岗位定制版简历已创建')
+      navigate(`/resume/${response.data.resumeId}?derivedFromJob=1&jobDescriptionId=${selectedJobId}&versionId=${response.data.versionId}`)
+    } catch (error) {
+      toast.error('创建岗位版简历失败')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleGenerateCoverLetter = async () => {
+    if (!analysis || !selectedJob) {
+      toast.error('请先完成 ATS 分析')
+      return
+    }
+
+    const resumeId = derivedContext?.resumeId || selectedResumeId
+    const resumeVersionId = derivedContext?.versionId || ''
+
+    try {
+      setLoading(true)
+      const response = await axiosInstance.post(API_PATHS.COVER_LETTERS.GENERATE, {
+        resumeId,
+        resumeVersionId: resumeVersionId || null,
+        jobDescriptionId: selectedJobId,
+        sourceAnalysisId: analysisRecordId || null,
+      })
+
+      toast.success('求职信已生成')
+      const query = new URLSearchParams({
+        resumeId,
+        jobDescriptionId: selectedJobId,
+        coverLetterId: response.data._id,
+      })
+
+      if (resumeVersionId) {
+        query.set('resumeVersionId', resumeVersionId)
+      }
+
+      if (analysisRecordId) {
+        query.set('sourceAnalysisId', analysisRecordId)
+      }
+
+      navigate(`/cover-letters?${query.toString()}`)
+    } catch (error) {
+      toast.error('生成求职信失败')
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -168,6 +256,12 @@ const JobDescriptionsPage = () => {
               <button onClick={handleRunAnalysis} disabled={loading} className='rounded-2xl bg-slate-900 px-5 py-3 text-white font-semibold'>
                 {loading ? '分析中...' : '运行 ATS 分析'}
               </button>
+              <button onClick={handleDeriveResume} disabled={loading || !analysis} className='rounded-2xl bg-violet-600 px-5 py-3 text-white font-semibold disabled:opacity-60'>
+                {loading && analysis ? '处理中...' : '一键派生岗位版简历'}
+              </button>
+              <button onClick={handleGenerateCoverLetter} disabled={loading || !analysis} className='rounded-2xl bg-sky-600 px-5 py-3 text-white font-semibold disabled:opacity-60'>
+                基于当前分析生成求职信
+              </button>
               <button onClick={handleCreateApplication} className='rounded-2xl bg-emerald-600 px-5 py-3 text-white font-semibold'>
                 一键创建投递记录
               </button>
@@ -218,7 +312,17 @@ const JobDescriptionsPage = () => {
                       <div className='text-sm text-slate-500'>总匹配度</div>
                       <div className='text-4xl font-black text-violet-700'>{analysis.overallScore}%</div>
                       {selectedJob && <div className='mt-2 text-sm text-slate-500'>{selectedJob.title} {selectedJob.company ? `· ${selectedJob.company}` : ''}</div>}
+                      {analysisRecordId && <div className='mt-2 text-xs text-slate-400'>分析记录：{analysisRecordId}</div>}
                     </div>
+                    {(derivedContext?.resumeId || analysisRecordId) && (
+                      <div className='rounded-2xl bg-sky-50 p-4 border border-sky-200 text-sm text-sky-900'>
+                        <div className='font-semibold'>闭环下一步</div>
+                        <div className='mt-2 space-y-1'>
+                          <div>{derivedContext?.resumeId ? '岗位定制版简历已创建，可继续优化。' : '建议先创建岗位定制版简历，再继续生成求职信或投递记录。'}</div>
+                          {derivedContext?.versionId && <div>当前关联版本：{derivedContext.versionId}</div>}
+                        </div>
+                      </div>
+                    )}
                     <div>
                       <div className='text-sm font-semibold text-slate-700 mb-2'>命中关键词</div>
                       <div className='flex flex-wrap gap-2'>

@@ -93,8 +93,48 @@ describe('Career Tools API Tests', () => {
       })
 
     expect(analysisResponse.status).toBe(200)
+    expect(analysisResponse.body.analysisRecordId).toBeDefined()
     expect(analysisResponse.body).toHaveProperty('overallScore')
     expect(Array.isArray(analysisResponse.body.recommendations)).toBe(true)
+  })
+
+  it('should derive a job-specific resume from an ATS analysis record', async () => {
+    const createJobResponse = await request(app)
+      .post('/api/job-descriptions')
+      .set('Authorization', `Bearer ${authToken}`)
+      .send({
+        title: 'Senior Frontend Engineer',
+        company: 'Career Labs',
+        sourceText: 'Need React, Node.js, TypeScript and communication for cross-functional product work.',
+      })
+
+    jobDescriptionId = createJobResponse.body._id
+
+    const analyzeResponse = await request(app)
+      .post('/api/ats/analyze')
+      .set('Authorization', `Bearer ${authToken}`)
+      .send({
+        resumeId,
+        jobDescriptionId,
+      })
+
+    expect(analyzeResponse.status).toBe(200)
+    expect(analyzeResponse.body.analysisRecordId).toBeDefined()
+
+    const deriveResponse = await request(app)
+      .post('/api/ats/derive-resume')
+      .set('Authorization', `Bearer ${authToken}`)
+      .send({
+        resumeId,
+        jobDescriptionId,
+        analysisRecordId: analyzeResponse.body.analysisRecordId,
+      })
+
+    expect(deriveResponse.status).toBe(201)
+    expect(deriveResponse.body.resume.derivedFromResumeId.toString()).toBe(resumeId)
+    expect(deriveResponse.body.resume.targetJobDescriptionId.toString()).toBe(jobDescriptionId)
+    expect(deriveResponse.body.version.sourceType).toBe('derived')
+    expect(deriveResponse.body.analysisRecordId).toBe(analyzeResponse.body.analysisRecordId)
   })
 
   it('should create, list, restore and delete resume versions', async () => {
@@ -529,12 +569,15 @@ describe('Career Tools API Tests', () => {
       .set('Authorization', `Bearer ${authToken}`)
       .send({
         resumeId,
+        resumeVersionId: versionId,
         jobDescriptionId,
+        sourceAnalysisId: '6805a2d5d4f8b9c4a1234567',
         title: 'Hiring Co 求职信',
       })
 
     expect(coverLetterResponse.status).toBe(201)
     expect(coverLetterResponse.body.content).toContain('尊敬的招聘团队')
+    expect(coverLetterResponse.body.resumeVersionId._id || coverLetterResponse.body.resumeVersionId).toBeDefined()
     coverLetterId = coverLetterResponse.body._id
 
     const applicationResponse = await request(app)
@@ -547,6 +590,7 @@ describe('Career Tools API Tests', () => {
         resumeVersionId: versionId,
         jobDescriptionId,
         coverLetterId,
+        sourceAnalysisId: '6805a2d5d4f8b9c4a1234567',
         status: 'applied',
         appliedAt: '2026-04-21T10:00:00.000Z',
         nextActionAt: '2026-04-25T10:00:00.000Z',
@@ -554,6 +598,7 @@ describe('Career Tools API Tests', () => {
       })
 
     expect(applicationResponse.status).toBe(201)
+    expect(applicationResponse.body.timeline.length).toBeGreaterThan(1)
     applicationId = applicationResponse.body._id
 
     const timelineResponse = await request(app)
@@ -568,7 +613,7 @@ describe('Career Tools API Tests', () => {
       })
 
     expect(timelineResponse.status).toBe(200)
-    expect(timelineResponse.body.timeline.length).toBe(1)
+    expect(timelineResponse.body.timeline.length).toBeGreaterThan(1)
 
     const statsResponse = await request(app)
       .get('/api/applications/stats/summary')
