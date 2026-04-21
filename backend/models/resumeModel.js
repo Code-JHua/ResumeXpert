@@ -16,13 +16,52 @@ const ResumeSchema = new mongoose.Schema({
   template: {
     theme: {
       type: String,
-      default: 'modern'
+      default: '01'
     },
     colorPalette: [String]
   },
   completion: {
     type: Number,
     default: 0
+  },
+  contentSource: {
+    type: String,
+    enum: ['structured', 'markdown', 'imported'],
+    default: 'structured'
+  },
+  sourceDocumentId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'ResumeMarkdownDocument',
+    default: null
+  },
+  sourceImportId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'ResumeImport',
+    default: null
+  },
+  derivedFromResumeId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Resume',
+    default: null
+  },
+  derivedFromVersionId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'ResumeVersion',
+    default: null
+  },
+  targetJobDescriptionId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'JobDescription',
+    default: null
+  },
+  freeBlocks: {
+    type: [mongoose.Schema.Types.Mixed],
+    default: []
+  },
+  status: {
+    type: String,
+    enum: ['draft', 'active', 'archived'],
+    default: 'active'
   },
 
   profileInfo: {

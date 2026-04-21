@@ -65,6 +65,9 @@ describe('Resume API Tests', () => {
       expect(response.body).toHaveProperty('workExperience');
       expect(response.body).toHaveProperty('education');
       expect(response.body).toHaveProperty('skills');
+      expect(response.body.contentSource).toBe('structured');
+      expect(response.body.status).toBe('active');
+      expect(Array.isArray(response.body.freeBlocks)).toBe(true);
     });
 
     it('should not create resume without authentication', async () => {
@@ -204,6 +207,27 @@ describe('Resume API Tests', () => {
       expect(response.body.title).toBe('Updated Title');
       expect(response.body.profileInfo.fullName).toBe('John Doe');
       expect(response.body.contactInfo.email).toBe('john@example.com');
+    });
+
+    it('should update platformized resume fields', async () => {
+      const createResponse = await request(app)
+        .post('/api/resume')
+        .set('Authorization', `Bearer ${authToken}`)
+        .send({ title: 'Platform Resume' });
+
+      const response = await request(app)
+        .put(`/api/resume/${createResponse.body._id}`)
+        .set('Authorization', `Bearer ${authToken}`)
+        .send({
+          contentSource: 'imported',
+          status: 'draft',
+          freeBlocks: [{ type: 'notes', content: 'Needs review' }],
+        });
+
+      expect(response.status).toBe(200);
+      expect(response.body.contentSource).toBe('imported');
+      expect(response.body.status).toBe('draft');
+      expect(response.body.freeBlocks).toHaveLength(1);
     });
 
     it('should update template information', async () => {

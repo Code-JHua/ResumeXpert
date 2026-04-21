@@ -71,6 +71,14 @@ export const createResume = async (req, res) => {
         },
       ],
       interests: [''],
+      contentSource: 'structured',
+      sourceDocumentId: null,
+      sourceImportId: null,
+      derivedFromResumeId: null,
+      derivedFromVersionId: null,
+      targetJobDescriptionId: null,
+      freeBlocks: [],
+      status: 'active',
     };
 
     // Create a new resume document
@@ -124,6 +132,14 @@ export const updateResume = async (req, res) => {
     if (req.body.title !== undefined) resume.title = req.body.title
     if (req.body.thumbnailLink !== undefined) resume.thumbnailLink = req.body.thumbnailLink
     if (req.body.completion !== undefined) resume.completion = req.body.completion
+    if (req.body.contentSource !== undefined) resume.contentSource = req.body.contentSource
+    if (req.body.sourceDocumentId !== undefined) resume.sourceDocumentId = req.body.sourceDocumentId
+    if (req.body.sourceImportId !== undefined) resume.sourceImportId = req.body.sourceImportId
+    if (req.body.derivedFromResumeId !== undefined) resume.derivedFromResumeId = req.body.derivedFromResumeId
+    if (req.body.derivedFromVersionId !== undefined) resume.derivedFromVersionId = req.body.derivedFromVersionId
+    if (req.body.targetJobDescriptionId !== undefined) resume.targetJobDescriptionId = req.body.targetJobDescriptionId
+    if (req.body.freeBlocks !== undefined) resume.freeBlocks = req.body.freeBlocks
+    if (req.body.status !== undefined) resume.status = req.body.status
 
     if (req.body.profileInfo) resume.profileInfo = { ...resume.profileInfo, ...req.body.profileInfo }
     if (req.body.contactInfo) resume.contactInfo = { ...resume.contactInfo, ...req.body.contactInfo }
