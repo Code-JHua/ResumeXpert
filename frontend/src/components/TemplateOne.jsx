@@ -12,8 +12,6 @@ import {
 import { formatYearMonth } from "../utils/helper";
 import { AnimatedText } from "./RenderResume";
 
-const DEFAULT_THEME = ["#ffffff", "#0d47a1", "#1e88e5", "#64b5f6", "#bbdefb"];
-
 const Title = ({ text, color }) => (
   <div className="relative w-fit mb-2 resume-section-title">
     <h2 className="relative text-base font-bold uppercase tracking-wide pb-2" style={{ color }}>
@@ -23,7 +21,7 @@ const Title = ({ text, color }) => (
   </div>
 );
 
-const TemplateOne = ({ resumeData = {}, colorPalette, containerWidth }) => {
+const TemplateOne = ({ resumeData = {}, containerWidth, theme = {} }) => {
   const { t } = useTranslation();
   const {
     profileInfo = {},
@@ -61,15 +59,17 @@ const TemplateOne = ({ resumeData = {}, colorPalette, containerWidth }) => {
         transform: containerWidth > 0 ? `scale(${scale})` : undefined,
         transformOrigin: "top left",
         width: containerWidth > 0 ? `${baseWidth}px` : undefined,
+        fontFamily: theme.fontFamily,
       }}
     >
-      {/* Header */}
       <div className="resume-section flex justify-between items-start mb-6">
         <div>
-          <h1 className="text-3xl font-bold pb-2">
+          <h1 className="text-3xl font-bold pb-2" style={{ color: theme.headingColor }}>
             <AnimatedText>{profileInfo.fullName}</AnimatedText>
           </h1>
-          <p className="text-lg font-medium pb-2"><AnimatedText>{profileInfo.designation}</AnimatedText></p>
+          <p className="text-lg font-medium pb-2" style={{ color: theme.accentColor }}>
+            <AnimatedText>{profileInfo.designation}</AnimatedText>
+          </p>
           <div className="flex flex-wrap gap-3 text-sm">
             {contactInfo.email && (
               <div className="flex items-center">
@@ -98,7 +98,7 @@ const TemplateOne = ({ resumeData = {}, colorPalette, containerWidth }) => {
           {contactInfo.linkedin && (
             <div className="flex items-center mb-1">
               <RiLinkedinLine className="mr-1" />
-              <a href={contactInfo.linkedin} target="_blank" rel="noopener noreferrer" className="hover:underline">
+              <a href={contactInfo.linkedin} target="_blank" rel="noopener noreferrer" className="hover:underline" style={{ color: theme.accentColor }}>
                 <AnimatedText>{t('template.links.linkedin')}</AnimatedText>
               </a>
             </div>
@@ -106,7 +106,7 @@ const TemplateOne = ({ resumeData = {}, colorPalette, containerWidth }) => {
           {contactInfo.github && (
             <div className="flex items-center mb-1">
               <LuGithub className="mr-1" />
-              <a href={contactInfo.github} target="_blank" rel="noopener noreferrer" className="hover:underline">
+              <a href={contactInfo.github} target="_blank" rel="noopener noreferrer" className="hover:underline" style={{ color: theme.accentColor }}>
                 <AnimatedText>{t('template.links.github')}</AnimatedText>
               </a>
             </div>
@@ -114,7 +114,7 @@ const TemplateOne = ({ resumeData = {}, colorPalette, containerWidth }) => {
           {contactInfo.website && (
             <div className="flex items-center">
               <LuGlobe className="mr-1" />
-              <a href={contactInfo.website} target="_blank" rel="noopener noreferrer" className="hover:underline">
+              <a href={contactInfo.website} target="_blank" rel="noopener noreferrer" className="hover:underline" style={{ color: theme.accentColor }}>
                 <AnimatedText>{t('template.links.portfolio')}</AnimatedText>
               </a>
             </div>
@@ -122,32 +122,27 @@ const TemplateOne = ({ resumeData = {}, colorPalette, containerWidth }) => {
         </div>
       </div>
 
-      {/* Professional Summary */}
       {profileInfo.summary && (
         <div className="resume-section mb-3">
-          <Title text={t('template.sections.professionalSummary')} />
+          <Title text={t('template.sections.professionalSummary')} color={theme.accentColor} />
           <p className="text-sm leading-relaxed"><AnimatedText>{profileInfo.summary}</AnimatedText></p>
         </div>
       )}
 
       <div className="grid grid-cols-3 gap-8">
-        {/* Left Column */}
         <div className="col-span-2 space-y-4">
           {workExperience.length > 0 && (
             <div className="resume-section">
-              <Title text={t('template.sections.workExperience')} />
+              <Title text={t('template.sections.workExperience')} color={theme.accentColor} />
               <div className="space-y-6">
                 {workExperience.map((exp, i) => (
                   <WorkExperience
                     key={i}
                     company={exp.company}
                     role={exp.role}
-                    duration={`${formatYearMonth(exp.startDate)} - ${formatYearMonth(
-                      exp.endDate
-                    )}`}
+                    duration={`${formatYearMonth(exp.startDate)} - ${formatYearMonth(exp.endDate)}`}
                     description={exp.description}
-                    durationColor={[2]}
-
+                    durationColor={theme.accentColor}
                   />
                 ))}
               </div>
@@ -156,7 +151,7 @@ const TemplateOne = ({ resumeData = {}, colorPalette, containerWidth }) => {
 
           {projects.length > 0 && (
             <div className="resume-section">
-              <Title text={t('template.sections.projects')} />
+              <Title text={t('template.sections.projects')} color={theme.accentColor} />
               <div className="space-y-4">
                 {projects.map((proj, i) => (
                   <ProjectInfo
@@ -165,8 +160,8 @@ const TemplateOne = ({ resumeData = {}, colorPalette, containerWidth }) => {
                     description={proj.description}
                     githubLink={proj.github}
                     liveDemoUrl={proj.liveDemo}
-                    bgColor={[4]}
-                    headingClass="pb-2" // Added pb-2 to subheadings
+                    bgColor={theme.tagBackground}
+                    headingClass="pb-2"
                   />
                 ))}
               </div>
@@ -175,23 +170,22 @@ const TemplateOne = ({ resumeData = {}, colorPalette, containerWidth }) => {
 
           {freeBlocks.length > 0 && (
             <div className="resume-section">
-              <Title text="Additional Information" />
+              <Title text="Additional Information" color={theme.accentColor} />
               <FreeBlocksSection blocks={freeBlocks} itemClassName="mb-4 last:mb-0" />
             </div>
           )}
         </div>
 
-        {/* Right Column */}
         <div className="col-span-1 space-y-6">
           {skills.length > 0 && (
             <div className="resume-section">
-              <Title text={t('template.sections.skills')} />
+              <Title text={t('template.sections.skills')} color={theme.accentColor} />
               <div className="flex flex-wrap gap-2">
                 {skills.map((skill, i) => (
                   <span
                     key={i}
                     className="text-xs font-medium px-2 py-1 rounded"
-                    style={{ backgroundColor: [4] }}
+                    style={{ backgroundColor: theme.tagBackground, color: theme.headingColor }}
                   >
                     <AnimatedText>{skill.name}</AnimatedText>
                   </span>
@@ -202,17 +196,14 @@ const TemplateOne = ({ resumeData = {}, colorPalette, containerWidth }) => {
 
           {education.length > 0 && (
             <div className="resume-section">
-              <Title text={t('template.sections.education')} />
+              <Title text={t('template.sections.education')} color={theme.accentColor} />
               <div className="space-y-4 pb-2">
                 {education.map((edu, i) => (
                   <EducationInfo
                     key={i}
                     degree={edu.degree}
                     institution={edu.institution}
-                    duration={`${formatYearMonth(edu.startDate)} - ${formatYearMonth(
-                      edu.endDate
-                    )}`}
-
+                    duration={`${formatYearMonth(edu.startDate)} - ${formatYearMonth(edu.endDate)}`}
                   />
                 ))}
                 <br />
@@ -222,7 +213,7 @@ const TemplateOne = ({ resumeData = {}, colorPalette, containerWidth }) => {
 
           {visibleCertifications.length > 0 && (
             <div className="resume-section">
-              <Title text={t('template.sections.certifications')} />
+              <Title text={t('template.sections.certifications')} color={theme.accentColor} />
               <div className="space-y-2">
                 {visibleCertifications.map((cert, i) => (
                   <CertificationInfo
@@ -230,8 +221,7 @@ const TemplateOne = ({ resumeData = {}, colorPalette, containerWidth }) => {
                     title={cert.title}
                     issuer={cert.issuer}
                     year={cert.year}
-                    bgColor={[4]}
-
+                    bgColor={theme.tagBackground}
                   />
                 ))}
               </div>
@@ -240,13 +230,13 @@ const TemplateOne = ({ resumeData = {}, colorPalette, containerWidth }) => {
 
           {languages.length > 0 && (
             <div className="resume-section">
-              <Title text={t('template.sections.languages')} />
+              <Title text={t('template.sections.languages')} color={theme.accentColor} />
               <div className="flex flex-wrap gap-2">
                 {languages.map((lang, i) => (
                   <span
                     key={i}
                     className="text-xs font-medium px-2 py-1 rounded"
-                    style={{ backgroundColor: [4] }}
+                    style={{ backgroundColor: theme.tagBackground, color: theme.headingColor }}
                   >
                     <AnimatedText>{lang.name}</AnimatedText>
                   </span>
@@ -257,14 +247,14 @@ const TemplateOne = ({ resumeData = {}, colorPalette, containerWidth }) => {
 
           {interests.length > 0 && interests.some((i) => i) && (
             <div className="resume-section">
-              <Title text={t('template.sections.interests')} />
+              <Title text={t('template.sections.interests')} color={theme.accentColor} />
               <div className="flex flex-wrap gap-2">
                 {interests.map((int, i) =>
                   int ? (
                     <span
                       key={i}
                       className="text-xs font-medium px-2 py-1 rounded"
-                      style={{ backgroundColor: [4] }}
+                      style={{ backgroundColor: theme.tagBackground, color: theme.headingColor }}
                     >
                       <AnimatedText>{int}</AnimatedText>
                     </span>

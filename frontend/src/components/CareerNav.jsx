@@ -8,6 +8,7 @@ const items = [
   { to: '/cover-letters', label: '求职信' },
   { to: '/applications', label: '投递管理' },
   { to: '/share', label: '分享管理' },
+  { to: '/templates', label: '模板中心' },
 ]
 
 const CareerNav = () => {

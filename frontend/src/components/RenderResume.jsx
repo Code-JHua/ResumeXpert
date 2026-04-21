@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react'
-import { getTemplateById } from '../utils/templateRegistry.js'
+import { getTemplateMetadata, getTemplateRenderer } from '../utils/templateRegistry.js'
+import { getDensityClassName, resolveTemplateTheme } from '../utils/templateTheme.js'
 
 // 逐字母动画组件 - 支持输入淡入和删除淡出
 export const AnimatedText = ({ children, className = '' }) => {
@@ -88,17 +89,31 @@ export const AnimatedText = ({ children, className = '' }) => {
 
 const RenderResume = ({
   templateId,
+  templateMeta,
   resumeData,
   containerWidth
 }) => {
-  const template = getTemplateById(templateId)
+  const template = getTemplateMetadata(templateMeta) || getTemplateRenderer(templateId)
   const Renderer = template?.renderer
+  const theme = resolveTemplateTheme(template, resumeData?.template)
 
   if (!Renderer) {
     return null
   }
 
-  return <Renderer resumeData={resumeData} containerWidth={containerWidth} />
+  return (
+    <div
+      className={getDensityClassName(theme.density)}
+      style={{
+        '--resume-accent': theme.accentColor,
+        '--resume-heading': theme.headingColor,
+        '--resume-tag-bg': theme.tagBackground,
+        '--resume-font-family': theme.fontFamily,
+      }}
+    >
+      <Renderer resumeData={resumeData} containerWidth={containerWidth} theme={theme} />
+    </div>
+  )
 }
 
 export default RenderResume

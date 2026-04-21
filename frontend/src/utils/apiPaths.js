@@ -79,6 +79,12 @@ export const API_PATHS = {
   TEMPLATES: {
     GET_ALL: '/api/templates',
     GET_PREVIEW: (id) => `/api/templates/${id}/preview`,
+    GET_BY_ID: (id) => `/api/templates/${id}`,
+    CREATE: '/api/templates',
+    UPDATE: (id) => `/api/templates/${id}`,
+    TOGGLE_FAVORITE: (id) => `/api/templates/${id}/favorite`,
+    DUPLICATE: (id) => `/api/templates/${id}/duplicate`,
+    APPLY: (id) => `/api/templates/${id}/apply`,
   },
   PUBLIC: {
     GET_SHARE: (slug) => `/api/public/share/${slug}`,

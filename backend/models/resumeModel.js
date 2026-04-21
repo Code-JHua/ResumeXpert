@@ -14,11 +14,19 @@ const ResumeSchema = new mongoose.Schema({
     type: String,
   },
   template: {
+    templateId: {
+      type: String,
+      default: 'official-classic-professional',
+    },
     theme: {
       type: String,
       default: '01'
     },
-    colorPalette: [String]
+    colorPalette: [String],
+    settings: {
+      type: mongoose.Schema.Types.Mixed,
+      default: {},
+    },
   },
   completion: {
     type: Number,

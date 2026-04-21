@@ -73,6 +73,12 @@ export const createResume = async (req, res) => {
         },
       ],
       interests: [''],
+      template: {
+        templateId: 'official-classic-professional',
+        theme: '01',
+        colorPalette: [],
+        settings: {},
+      },
       contentSource: 'structured',
       sourceDocumentId: null,
       sourceImportId: null,

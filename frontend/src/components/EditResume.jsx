@@ -16,7 +16,7 @@ import {
 } from './Forms'
 import axiosInstance from '../utils/axiosInstance'
 import { API_PATHS } from '../utils/apiPaths'
-import { Loader2, Check } from 'lucide-react'
+import { Loader2, Check, Download } from 'lucide-react'
 import html2canvas from 'html2canvas'
 import { fixTailwindColors, dataURLtoFile } from '../utils/helper'
 import ThemeSelector from './ThemeSelector'
@@ -83,8 +83,10 @@ const EditResume = () => {
       summary: "",
     },
     template: {
+      templateId: "official-classic-professional",
       theme: "01",
-      colorPalette: []
+      colorPalette: [],
+      settings: {},
     },
     contactInfo: {
       email: "",
@@ -693,8 +695,11 @@ const EditResume = () => {
     setResumeData(prev => ({
       ...prev,
       template: {
-        theme: theme,
-        colorPalette: []
+        ...(prev.template || {}),
+        theme: typeof theme === 'string' ? theme : theme.theme,
+        templateId: typeof theme === 'string' ? prev.template?.templateId || 'official-classic-professional' : theme.templateId,
+        colorPalette: [],
+        settings: typeof theme === 'string' ? (prev.template?.settings || {}) : (theme.settings || {}),
       }
     }));
   }

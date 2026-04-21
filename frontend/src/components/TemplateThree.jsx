@@ -4,7 +4,7 @@ import { formatYearMonth } from "../utils/helper";
 import { AnimatedText } from "./RenderResume";
 import { FreeBlocksSection } from "./ResumeSection";
 
-const TemplateThree = ({ resumeData = {}, containerWidth }) => {
+const TemplateThree = ({ resumeData = {}, containerWidth, theme = {} }) => {
   const { t } = useTranslation();
   const {
     profileInfo = {},
@@ -35,7 +35,6 @@ const TemplateThree = ({ resumeData = {}, containerWidth }) => {
     }
   }, [containerWidth]);
 
-  // Group skills by category
   const groupedSkills = {
     automationTools: [],
     productManagement: [],
@@ -55,6 +54,9 @@ const TemplateThree = ({ resumeData = {}, containerWidth }) => {
     }
   });
 
+  const headingStyle = { color: theme.headingColor }
+  const borderHeadingStyle = { color: theme.headingColor, borderColor: theme.accentColor }
+
   return (
     <div
       ref={resumeRef}
@@ -64,17 +66,15 @@ const TemplateThree = ({ resumeData = {}, containerWidth }) => {
         transformOrigin: "top left",
         width: containerWidth > 0 ? `${baseWidth}px` : "auto",
         height: "auto",
+        fontFamily: theme.fontFamily,
       }}
     >
-      {/* Header Section */}
       <header className="px-8 pt-8 pb-4 mb-2">
         <div className="text-center">
-          <h1 className="text-3xl font-bold uppercase mb-3"><AnimatedText>{profileInfo.fullName}</AnimatedText></h1>
-
-          <h2 className="text-lg font-semibold text-gray-700 mb-4">
+          <h1 className="text-3xl font-bold uppercase mb-3" style={headingStyle}><AnimatedText>{profileInfo.fullName}</AnimatedText></h1>
+          <h2 className="text-lg font-semibold mb-4" style={{ color: theme.accentColor }}>
             <AnimatedText>{profileInfo.designation}</AnimatedText>
           </h2>
-
         </div>
 
         <p className="text-sm text-gray-700 leading-tight mb-4">
@@ -82,13 +82,10 @@ const TemplateThree = ({ resumeData = {}, containerWidth }) => {
         </p>
       </header>
 
-      {/* Two-Column Layout */}
       <div className="grid grid-cols-12 gap-4 px-8 pb-8">
-        {/* LEFT SIDEBAR - 5 columns */}
         <aside className="col-span-5 space-y-5 pr-4 border-r border-gray-300">
-          {/* Contact */}
           <section>
-            <h2 className="text-sm font-bold uppercase text-gray-800 mb-2 tracking-wider">CONTACT</h2>
+            <h2 className="text-sm font-bold uppercase mb-2 tracking-wider" style={headingStyle}>CONTACT</h2>
             <ul className="text-xs text-gray-700 space-y-2 pb-2">
               <li className="flex items-start">
                 <span className="font-semibold min-w-[65px]">Location:</span>
@@ -100,17 +97,14 @@ const TemplateThree = ({ resumeData = {}, containerWidth }) => {
               </li>
               <li className="flex items-start">
                 <span className="font-semibold min-w-[65px]">Email:</span>
-                <a href={`mailto:${contactInfo.email}`}
-                  className="text-blue-600 hover:underline">
+                <a href={`mailto:${contactInfo.email}`} className="hover:underline" style={{ color: theme.accentColor }}>
                   <AnimatedText>{contactInfo.email}</AnimatedText>
                 </a>
               </li>
               {contactInfo.linkedin && (
                 <li className="flex items-start ">
                   <span className="font-semibold min-w-[65px]">{t('template.links.linkedin')}:</span>
-                  <a href={contactInfo.linkedin}
-                    className="text-blue-600 hover:underline truncate pb-1"
-                    title={contactInfo.linkedin}>
+                  <a href={contactInfo.linkedin} className="hover:underline truncate pb-1" style={{ color: theme.accentColor }} title={contactInfo.linkedin}>
                     linkedin.com/in/{contactInfo.linkedin.split('/').pop()}
                   </a>
                 </li>
@@ -118,9 +112,7 @@ const TemplateThree = ({ resumeData = {}, containerWidth }) => {
               {contactInfo.github && (
                 <li className="flex items-start">
                   <span className="font-semibold min-w-[65px] ">{t('template.links.github')}:</span>
-                  <a href={contactInfo.github}
-                    className="text-blue-600 hover:underline pb-2 truncate"
-                    title={contactInfo.github}>
+                  <a href={contactInfo.github} className="hover:underline pb-2 truncate" style={{ color: theme.accentColor }} title={contactInfo.github}>
                     github.com/{contactInfo.github.split('/').pop()}
                   </a>
                 </li>
@@ -128,9 +120,7 @@ const TemplateThree = ({ resumeData = {}, containerWidth }) => {
               {contactInfo.website && (
                 <li className="flex items-start">
                   <span className="font-semibold min-w-[65px]">{t('template.links.portfolio')}:</span>
-                  <a href={contactInfo.website}
-                    className="text-blue-600 hover:underline pb-2 truncate"
-                    title={contactInfo.website}>
+                  <a href={contactInfo.website} className="hover:underline pb-2 truncate" style={{ color: theme.accentColor }} title={contactInfo.website}>
                     {contactInfo.website.replace(/(^\w+:|^)\/\//, '')}
                   </a>
                 </li>
@@ -138,9 +128,8 @@ const TemplateThree = ({ resumeData = {}, containerWidth }) => {
             </ul>
           </section>
 
-          {/* Skills */}
           <section>
-            <h2 className="text-sm font-bold uppercase text-gray-800 mb-2 tracking-wider">{t('template.sections.skills')}</h2>
+            <h2 className="text-sm font-bold uppercase mb-2 tracking-wider" style={headingStyle}>{t('template.sections.skills')}</h2>
             {Object.entries(groupedSkills).map(([category, skillsList]) => (
               skillsList.length > 0 && (
                 <div key={category} className="mb-2">
@@ -157,10 +146,9 @@ const TemplateThree = ({ resumeData = {}, containerWidth }) => {
             ))}
           </section>
 
-          {/* Education */}
           {education.length > 0 && (
             <section>
-              <h2 className="text-sm font-bold uppercase text-gray-800 mb-3 tracking-wider">{t('template.sections.education')}</h2>
+              <h2 className="text-sm font-bold uppercase mb-3 tracking-wider" style={headingStyle}>{t('template.sections.education')}</h2>
               <div className="space-y-3">
                 {education.map((edu, idx) => (
                   <div key={idx} className="text-xs">
@@ -172,10 +160,9 @@ const TemplateThree = ({ resumeData = {}, containerWidth }) => {
             </section>
           )}
 
-          {/* Certifications */}
           {visibleCertifications.length > 0 && (
             <section>
-              <h2 className="text-sm font-bold uppercase text-gray-800 mb-2 tracking-wider">{t('template.sections.certifications')}</h2>
+              <h2 className="text-sm font-bold uppercase mb-2 tracking-wider" style={headingStyle}>{t('template.sections.certifications')}</h2>
               <ul className="text-xs text-gray-700 space-y-1">
                 {visibleCertifications.map((cert, idx) => (
                   <li key={idx}>
@@ -186,10 +173,9 @@ const TemplateThree = ({ resumeData = {}, containerWidth }) => {
             </section>
           )}
 
-          {/* Interests */}
           {interests.length > 0 && (
             <section>
-              <h2 className="text-sm font-bold uppercase text-gray-800 mb-2 tracking-wider">{t('template.sections.interests')}</h2>
+              <h2 className="text-sm font-bold uppercase mb-2 tracking-wider" style={headingStyle}>{t('template.sections.interests')}</h2>
               <ul className="text-xs text-gray-700 space-y-1">
                 {interests.map((interest, idx) => (
                   <li key={idx}>• <AnimatedText>{interest}</AnimatedText></li>
@@ -199,12 +185,10 @@ const TemplateThree = ({ resumeData = {}, containerWidth }) => {
           )}
         </aside>
 
-        {/* MAIN CONTENT - 7 columns */}
         <main className="col-span-7 space-y-5 pl-4">
-          {/* Work Experience */}
           {workExperience.length > 0 && (
             <section>
-              <h2 className="text-sm font-bold uppercase text-gray-800 mb-3 tracking-wider border-b border-gray-400 pb-1">{t('template.sections.workExperience')}</h2>
+              <h2 className="text-sm font-bold uppercase mb-3 tracking-wider border-b pb-1" style={borderHeadingStyle}>{t('template.sections.workExperience')}</h2>
               <div className="space-y-5">
                 {workExperience.map((exp, idx) => (
                   <div key={idx} className="text-xs">
@@ -231,10 +215,9 @@ const TemplateThree = ({ resumeData = {}, containerWidth }) => {
             </section>
           )}
 
-          {/* Projects Section */}
           {projects.length > 0 && (
             <section>
-              <h2 className="text-sm font-bold uppercase text-gray-800 mb-3 tracking-wider border-b border-gray-400 pb-1">{t('template.sections.projects')}</h2>
+              <h2 className="text-sm font-bold uppercase mb-3 tracking-wider border-b pb-1" style={borderHeadingStyle}>{t('template.sections.projects')}</h2>
               <div className="space-y-4">
                 {projects.map((proj, idx) => (
                   <div key={idx} className="text-xs">
@@ -251,20 +234,18 @@ const TemplateThree = ({ resumeData = {}, containerWidth }) => {
 
                     <div className="flex flex-wrap gap-2 mt-1">
                       {proj.github && (
-                        <a href={proj.github}
-                          className="text-blue-600 hover:underline flex items-center text-xs">
+                        <a href={proj.github} className="hover:underline flex items-center text-xs" style={{ color: theme.accentColor }}>
                           <AnimatedText>{t('template.links.github')}</AnimatedText>
                         </a>
                       )}
                       {proj.liveDemo && (
-                        <a href={proj.liveDemo}
-                          className="text-blue-600 hover:underline flex items-center text-xs">
+                        <a href={proj.liveDemo} className="hover:underline flex items-center text-xs" style={{ color: theme.accentColor }}>
                           <AnimatedText>{t('template.links.liveDemo')}</AnimatedText>
                         </a>
                       )}
                       {proj.technologies && (
-                        <span className="text-gray-600">
-                          <strong>Tech:</strong> <AnimatedText>{proj.technologies.join(", ")}</AnimatedText>
+                        <span className="px-2 py-0.5 rounded-full" style={{ backgroundColor: theme.tagBackground }}>
+                          <strong>Tech:</strong> <AnimatedText>{Array.isArray(proj.technologies) ? proj.technologies.join(", ") : proj.technologies}</AnimatedText>
                         </span>
                       )}
                     </div>
@@ -276,7 +257,7 @@ const TemplateThree = ({ resumeData = {}, containerWidth }) => {
 
           {freeBlocks.length > 0 && (
             <section>
-              <h2 className="text-sm font-bold uppercase text-gray-800 mb-3 tracking-wider border-b border-gray-400 pb-1">Additional Information</h2>
+              <h2 className="text-sm font-bold uppercase mb-3 tracking-wider border-b pb-1" style={borderHeadingStyle}>Additional Information</h2>
               <FreeBlocksSection blocks={freeBlocks} itemClassName="mb-4 last:mb-0" />
             </section>
           )}

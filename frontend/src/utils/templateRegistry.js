@@ -5,64 +5,60 @@ import TemplateOne from '../components/TemplateOne.jsx'
 import TemplateTwo from '../components/TemplateTwo.jsx'
 import TemplateThree from '../components/TemplateThree.jsx'
 
-const TEMPLATE_REGISTRY = [
+const RENDERER_REGISTRY = [
   {
-    id: '01',
+    rendererKey: '01',
     name: 'Classic Professional',
     renderer: TemplateOne,
     thumbnail: Resume1,
-    category: 'official',
-    description: 'Balanced one-column resume for general professional use.',
-    supportedContentTypes: ['structured', 'markdown', 'imported'],
-    themeSchema: {
-      colorPalette: [],
-      typography: 'default',
-    },
   },
   {
-    id: '02',
+    rendererKey: '02',
     name: 'Modern Sidebar',
     renderer: TemplateTwo,
     thumbnail: Resume2,
-    category: 'official',
-    description: 'Two-column layout highlighting skills and contact details.',
-    supportedContentTypes: ['structured', 'markdown', 'imported'],
-    themeSchema: {
-      colorPalette: [],
-      typography: 'default',
-    },
   },
   {
-    id: '03',
+    rendererKey: '03',
     name: 'Compact ATS',
     renderer: TemplateThree,
     thumbnail: Resume3,
-    category: 'official',
-    description: 'Compact layout optimized for dense professional experience.',
-    supportedContentTypes: ['structured', 'markdown', 'imported'],
-    themeSchema: {
-      colorPalette: [],
-      typography: 'default',
-    },
   },
 ]
 
-export const getRegisteredTemplates = () => TEMPLATE_REGISTRY
+const registryMap = new Map(RENDERER_REGISTRY.map((template) => [template.rendererKey, template]))
 
-export const getTemplateById = (templateId) => {
-  return TEMPLATE_REGISTRY.find((template) => template.id === templateId) || TEMPLATE_REGISTRY[0]
+export const getRegisteredTemplates = () => RENDERER_REGISTRY
+
+export const getTemplateRenderer = (rendererKey) => {
+  return registryMap.get(rendererKey) || RENDERER_REGISTRY[0]
+}
+
+export const getTemplateMetadata = (template) => {
+  if (!template) return null
+
+  const registryTemplate = getTemplateRenderer(template.rendererKey || template.theme || template.id)
+  return {
+    ...registryTemplate,
+    ...template,
+    thumbnail: template.thumbnail || registryTemplate?.thumbnail,
+    rendererKey: template.rendererKey || registryTemplate?.rendererKey,
+  }
 }
 
 export const mergeTemplateMetadata = (templates = []) => {
-  const registryMap = new Map(TEMPLATE_REGISTRY.map((template) => [template.id, template]))
-
   if (!templates.length) {
-    return TEMPLATE_REGISTRY
+    return RENDERER_REGISTRY.map((template) => ({
+      id: template.rendererKey,
+      templateId: template.rendererKey,
+      sourceType: 'official',
+      category: 'general',
+      description: '',
+      supportedContentTypes: ['structured', 'markdown', 'imported'],
+      tags: [],
+      ...template,
+    }))
   }
 
-  return templates.map((template) => ({
-    ...registryMap.get(template.id),
-    ...template,
-    thumbnail: registryMap.get(template.id)?.thumbnail || template.thumbnail,
-  }))
+  return templates.map((template) => getTemplateMetadata(template))
 }
