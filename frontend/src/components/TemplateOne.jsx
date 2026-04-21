@@ -4,6 +4,7 @@ import { RiLinkedinLine } from "react-icons/ri";
 import { useTranslation } from "react-i18next";
 import {
   EducationInfo,
+  FreeBlocksSection,
   WorkExperience,
   ProjectInfo,
   CertificationInfo,
@@ -34,6 +35,7 @@ const TemplateOne = ({ resumeData = {}, colorPalette, containerWidth }) => {
     skills = [],
     certifications = [],
     interests = [],
+    freeBlocks = [],
   } = resumeData;
   const visibleCertifications = certifications.filter(
     (cert) => cert?.title?.trim() || cert?.issuer?.trim() || cert?.year?.trim()
@@ -168,6 +170,13 @@ const TemplateOne = ({ resumeData = {}, colorPalette, containerWidth }) => {
                   />
                 ))}
               </div>
+            </div>
+          )}
+
+          {freeBlocks.length > 0 && (
+            <div className="resume-section">
+              <Title text="Additional Information" />
+              <FreeBlocksSection blocks={freeBlocks} itemClassName="mb-4 last:mb-0" />
             </div>
           )}
         </div>

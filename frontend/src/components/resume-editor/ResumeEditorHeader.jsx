@@ -1,5 +1,5 @@
 import React from 'react'
-import { Palette, Trash2, Download, Save, FileCode2 } from 'lucide-react'
+import { Palette, Trash2, Download, Save, FileCode2, RefreshCw } from 'lucide-react'
 import { buttonStyles, containerStyles } from '../../assets/dummystyle'
 import { TitleInput } from '../Inputs'
 
@@ -7,6 +7,9 @@ const ResumeEditorHeader = ({
   title,
   setTitle,
   onOpenMarkdown,
+  onSyncMarkdown,
+  markdownSyncing,
+  markdownSyncState,
   onOpenVersions,
   onOpenThemeSelector,
   onDeleteResume,
@@ -21,6 +24,21 @@ const ResumeEditorHeader = ({
         <button onClick={onOpenMarkdown} className={buttonStyles.theme}>
           <FileCode2 size={16} />
           <span className='text-sm'>Markdown</span>
+          {markdownSyncState?.hasDocument && (
+            <span className={`ml-2 rounded-full px-2 py-0.5 text-xs font-semibold ${
+              markdownSyncState.syncStatus === 'synced'
+                ? 'bg-emerald-100 text-emerald-700'
+                : markdownSyncState.syncStatus === 'outdated'
+                  ? 'bg-amber-100 text-amber-700'
+                  : 'bg-slate-100 text-slate-600'
+            }`}>
+              {markdownSyncState.syncStatus}
+            </span>
+          )}
+        </button>
+        <button onClick={onSyncMarkdown} className={buttonStyles.theme} disabled={markdownSyncing}>
+          <RefreshCw size={16} className={markdownSyncing ? 'animate-spin' : ''} />
+          <span className='text-sm'>{markdownSyncing ? '同步中' : '同步 Markdown'}</span>
         </button>
         <button onClick={onOpenVersions} className={buttonStyles.theme}>
           <Save size={16} />

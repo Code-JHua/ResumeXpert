@@ -194,6 +194,115 @@ describe('Career Tools API Tests', () => {
     expect(getExportLogsResponse.body.length).toBe(1)
   })
 
+  it('should mark markdown document outdated after structured resume updates', async () => {
+    const createMarkdownResponse = await request(app)
+      .post(`/api/resume/${resumeId}/markdown`)
+      .set('Authorization', `Bearer ${authToken}`)
+      .send({
+        title: 'Sync Resume Markdown',
+        content: '# Career User',
+        parsedStructuredSnapshot: {
+          title: 'Frontend Engineer Resume',
+        },
+        syncStatus: 'synced',
+        lastSyncedAt: '2026-04-21T10:00:00.000Z',
+      })
+
+    expect(createMarkdownResponse.status).toBe(201)
+
+    const updateResumeResponse = await request(app)
+      .put(`/api/resume/${resumeId}`)
+      .set('Authorization', `Bearer ${authToken}`)
+      .send({
+        profileInfo: {
+          summary: 'Updated from structured editor.',
+        },
+      })
+
+    expect(updateResumeResponse.status).toBe(200)
+
+    const markdownResponse = await request(app)
+      .get(`/api/resume/${resumeId}/markdown`)
+      .set('Authorization', `Bearer ${authToken}`)
+
+    expect(markdownResponse.status).toBe(200)
+    expect(markdownResponse.body.syncStatus).toBe('outdated')
+  })
+
+  it('should sync markdown from resume and apply markdown back to structured resume', async () => {
+    const syncResponse = await request(app)
+      .post(`/api/resume/${resumeId}/markdown/sync-from-resume`)
+      .set('Authorization', `Bearer ${authToken}`)
+      .send({})
+
+    expect(syncResponse.status).toBe(200)
+    expect(syncResponse.body.content).toContain('Career User')
+    expect(syncResponse.body.document.syncStatus).toBe('synced')
+
+    const applyResponse = await request(app)
+      .post(`/api/resume/${resumeId}/markdown/apply-to-resume`)
+      .set('Authorization', `Bearer ${authToken}`)
+      .send({
+        title: 'Updated Resume Markdown',
+        content: [
+          '# Career User',
+          'Staff Frontend Engineer',
+          '',
+          '## Summary',
+          'Builds resume workflows with React and Node.js.',
+          '',
+          '## Skills',
+          '- React',
+          '- TypeScript',
+          '',
+          '## Awards',
+          'Hackathon Winner',
+          '',
+          'career@example.com',
+        ].join('\n'),
+      })
+
+    expect(applyResponse.status).toBe(200)
+    expect(applyResponse.body.resume.profileInfo.designation).toBe('Staff Frontend Engineer')
+    expect(applyResponse.body.resume.skills[1].name).toBe('TypeScript')
+    expect(applyResponse.body.resume.freeBlocks[0].title).toBe('awards')
+
+    const updatedResumeResponse = await request(app)
+      .get(`/api/resume/${resumeId}`)
+      .set('Authorization', `Bearer ${authToken}`)
+
+    expect(updatedResumeResponse.status).toBe(200)
+    expect(updatedResumeResponse.body.profileInfo.designation).toBe('Staff Frontend Engineer')
+    expect(updatedResumeResponse.body.contactInfo.email).toBe('career@example.com')
+    expect(updatedResumeResponse.body.freeBlocks.length).toBeGreaterThan(0)
+  })
+
+  it('should preview markdown apply changes before overwriting resume', async () => {
+    const previewResponse = await request(app)
+      .post(`/api/resume/${resumeId}/markdown/preview-apply`)
+      .set('Authorization', `Bearer ${authToken}`)
+      .send({
+        content: [
+          '# Career User',
+          'Principal Frontend Engineer',
+          '',
+          '## Summary',
+          'Builds structured and markdown resume flows.',
+          '',
+          'preview@example.com',
+        ].join('\n'),
+      })
+
+    expect(previewResponse.status).toBe(200)
+    expect(Array.isArray(previewResponse.body.overwriteSummary)).toBe(true)
+    expect(previewResponse.body.overwriteSummary).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ field: 'profileInfo.designation', nextValue: 'Principal Frontend Engineer' }),
+        expect.objectContaining({ field: 'contactInfo.email', nextValue: 'preview@example.com' }),
+      ])
+    )
+  })
+
   it('should manage imports and expose template metadata', async () => {
     const createImportResponse = await request(app)
       .post('/api/imports')

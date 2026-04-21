@@ -21,7 +21,7 @@ let t;
 const setT = (tFn) => { t = tFn; };
 
 // AdditionalInfoForm Component
-export const AdditionalInfoForm = ({ languages, interests, updateArrayItem, addArrayItem, removeArrayItem }) => {
+export const AdditionalInfoForm = ({ languages, interests, freeBlocks, updateArrayItem, addArrayItem, removeArrayItem }) => {
   const { t } = useTranslation();
   return (
     <div className={additionalInfoStyles.container}>
@@ -108,6 +108,78 @@ export const AdditionalInfoForm = ({ languages, interests, updateArrayItem, addA
             onClick={() => addArrayItem("interests", "")}
           >
             <Plus size={16} /> {t('forms.additional.addInterest')}
+          </button>
+        </div>
+      </div>
+
+      <div className="mb-6">
+        <h3 className={additionalInfoStyles.sectionHeading}>
+          <div className={additionalInfoStyles.dotViolet}></div>
+          自由内容块
+        </h3>
+        <p className="text-sm text-slate-500 mb-4">
+          这里会承接 Markdown 或导入流程里暂时无法结构化映射的内容，避免切换编辑模式时丢信息。
+        </p>
+        <div className="space-y-4">
+          {freeBlocks?.length === 0 && (
+            <div className="rounded-2xl border border-dashed border-slate-300 bg-slate-50 px-4 py-5 text-sm text-slate-500">
+              暂无自由内容块。如果你在 Markdown 中有自定义章节，它们会显示在这里。
+            </div>
+          )}
+
+          {freeBlocks?.map((block, index) => (
+            <div key={index} className="relative rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <Input
+                  label="块标题"
+                  placeholder="例如：Awards / Publications / Side Notes"
+                  value={block.title || ""}
+                  onChange={({ target }) => updateArrayItem("freeBlocks", index, "title", target.value)}
+                />
+                <Input
+                  label="来源标记"
+                  placeholder="markdown / imported / manual"
+                  value={block.source || ""}
+                  onChange={({ target }) => updateArrayItem("freeBlocks", index, "source", target.value)}
+                />
+              </div>
+
+              <div className="mt-4">
+                <label className="block text-sm font-bold text-slate-700 mb-3">内容</label>
+                <textarea
+                  className={profileInfoStyles.textarea}
+                  rows={4}
+                  placeholder="填写这段补充内容"
+                  value={block.content || ""}
+                  onChange={({ target }) => updateArrayItem("freeBlocks", index, "content", target.value)}
+                />
+              </div>
+
+              <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                <Input
+                  label="类型"
+                  placeholder="markdown_section / imported_text / manual"
+                  value={block.type || ""}
+                  onChange={({ target }) => updateArrayItem("freeBlocks", index, "type", target.value)}
+                />
+              </div>
+
+              <button
+                type="button"
+                className={commonStyles.trashButton}
+                onClick={() => removeArrayItem("freeBlocks", index)}
+              >
+                <Trash2 size={16} />
+              </button>
+            </div>
+          ))}
+
+          <button
+            type="button"
+            className={`${commonStyles.addButtonBase} ${additionalInfoStyles.addButtonLanguage}`}
+            onClick={() => addArrayItem("freeBlocks", { type: "manual", title: "", content: "", source: "manual" })}
+          >
+            <Plus size={16} /> 添加自由内容块
           </button>
         </div>
       </div>

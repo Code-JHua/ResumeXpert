@@ -1,4 +1,5 @@
 import Resume from '../models/resumeModel.js'
+import ResumeMarkdownDocument from '../models/resumeMarkdownDocumentModel.js'
 import path from 'path'
 import fs from 'fs'
 
@@ -128,6 +129,25 @@ export const updateResume = async (req, res) => {
       return res.status(404).json({ message: "Resume not found or not authorized" });
     }
 
+    const shouldMarkMarkdownOutdated = Boolean(
+      resume.sourceDocumentId &&
+      req.body.skipMarkdownOutdated !== true &&
+      (
+        req.body.title !== undefined ||
+        req.body.profileInfo ||
+        req.body.contactInfo ||
+        req.body.template ||
+        req.body.workExperience ||
+        req.body.education ||
+        req.body.skills ||
+        req.body.projects ||
+        req.body.certifications ||
+        req.body.languages ||
+        req.body.interests ||
+        req.body.freeBlocks !== undefined
+      )
+    )
+
     // Update each field individually to avoid issues with nested objects and _id
     if (req.body.title !== undefined) resume.title = req.body.title
     if (req.body.thumbnailLink !== undefined) resume.thumbnailLink = req.body.thumbnailLink
@@ -155,6 +175,16 @@ export const updateResume = async (req, res) => {
 
     // Save updated resume
     const savedResume = await resume.save()
+
+    if (shouldMarkMarkdownOutdated) {
+      await ResumeMarkdownDocument.findOneAndUpdate(
+        { _id: resume.sourceDocumentId, userId: req.user._id },
+        {
+          syncStatus: 'outdated',
+        }
+      )
+    }
+
     console.log('Resume updated successfully')
     res.json(savedResume)
   } catch (error) {

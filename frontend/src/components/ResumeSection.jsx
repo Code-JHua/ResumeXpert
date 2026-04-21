@@ -116,3 +116,22 @@ export const WorkExperience = ({ company, role, duration, durationColor, descrip
     <p className={styles.workDesc}>{description}</p>
   </div>
 );
+
+export const FreeBlocksSection = ({ blocks = [], title = "Additional Information", className = "", itemClassName = "" }) => {
+  const visibleBlocks = blocks.filter((block) => block?.content?.trim());
+
+  if (!visibleBlocks.length) {
+    return null;
+  }
+
+  return (
+    <div className={className}>
+      {visibleBlocks.map((block, index) => (
+        <div key={`${block.title || "free-block"}-${index}`} className={itemClassName}>
+          {block.title && <h3 className="font-semibold text-sm text-gray-800 mb-2">{block.title}</h3>}
+          <p className="whitespace-pre-wrap text-sm leading-relaxed text-gray-700">{block.content}</p>
+        </div>
+      ))}
+    </div>
+  );
+};

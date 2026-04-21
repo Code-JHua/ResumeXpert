@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { formatYearMonth } from "../utils/helper";
 import { AnimatedText } from "./RenderResume";
+import { FreeBlocksSection } from "./ResumeSection";
 
 const TemplateThree = ({ resumeData = {}, containerWidth }) => {
   const { t } = useTranslation();
@@ -14,6 +15,7 @@ const TemplateThree = ({ resumeData = {}, containerWidth }) => {
     skills = [],
     certifications = [],
     interests = [],
+    freeBlocks = [],
   } = resumeData;
   const visibleCertifications = certifications.filter(
     (cert) => cert?.title?.trim() || cert?.issuer?.trim() || cert?.year?.trim()
@@ -269,6 +271,13 @@ const TemplateThree = ({ resumeData = {}, containerWidth }) => {
                   </div>
                 ))}
               </div>
+            </section>
+          )}
+
+          {freeBlocks.length > 0 && (
+            <section>
+              <h2 className="text-sm font-bold uppercase text-gray-800 mb-3 tracking-wider border-b border-gray-400 pb-1">Additional Information</h2>
+              <FreeBlocksSection blocks={freeBlocks} itemClassName="mb-4 last:mb-0" />
             </section>
           )}
         </main>

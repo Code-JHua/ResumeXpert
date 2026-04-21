@@ -10,6 +10,14 @@ const defaultDocument = {
   content: '',
   syncStatus: 'not_synced',
   lastSyncedAt: null,
+  parsedStructuredSnapshot: null,
+}
+
+const defaultApplyResult = {
+  unresolvedFields: [],
+  confidenceSummary: {},
+  parsedSections: null,
+  overwriteSummary: [],
 }
 
 const buildInitialMarkdown = (resume) => {
@@ -76,6 +84,50 @@ const formatLastSync = (value) => {
   return new Date(value).toLocaleString('zh-CN')
 }
 
+const buildDriftSummary = (snapshot, resume) => {
+  if (!snapshot || !resume) return []
+
+  const diffs = []
+
+  if ((snapshot.title || '') !== (resume.title || '')) {
+    diffs.push('简历标题已变化')
+  }
+
+  if ((snapshot.profileInfo?.fullName || '') !== (resume.profileInfo?.fullName || '')) {
+    diffs.push('姓名已变化')
+  }
+
+  if ((snapshot.profileInfo?.designation || '') !== (resume.profileInfo?.designation || '')) {
+    diffs.push('职位已变化')
+  }
+
+  if ((snapshot.profileInfo?.summary || '') !== (resume.profileInfo?.summary || '')) {
+    diffs.push('个人简介已变化')
+  }
+
+  if ((snapshot.contactInfo?.email || '') !== (resume.contactInfo?.email || '')) {
+    diffs.push('邮箱已变化')
+  }
+
+  if ((snapshot.workExperience?.length || 0) !== (resume.workExperience?.length || 0)) {
+    diffs.push('工作经历条目数已变化')
+  }
+
+  if ((snapshot.education?.length || 0) !== (resume.education?.length || 0)) {
+    diffs.push('教育经历条目数已变化')
+  }
+
+  if ((snapshot.skills?.length || 0) !== (resume.skills?.length || 0)) {
+    diffs.push('技能条目数已变化')
+  }
+
+  if ((snapshot.freeBlocks?.length || 0) !== (resume.freeBlocks?.length || 0)) {
+    diffs.push('自由块数量已变化')
+  }
+
+  return diffs
+}
+
 const ResumeMarkdownPage = () => {
   const { id } = useParams()
   const navigate = useNavigate()
@@ -84,10 +136,18 @@ const ResumeMarkdownPage = () => {
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [creating, setCreating] = useState(false)
+  const [syncingFromResume, setSyncingFromResume] = useState(false)
+  const [applyingToResume, setApplyingToResume] = useState(false)
+  const [previewingApply, setPreviewingApply] = useState(false)
+  const [applyResult, setApplyResult] = useState(defaultApplyResult)
 
   const previewContent = useMemo(() => {
     return document.content || '还没有 Markdown 内容，先在左侧开始编写。'
   }, [document.content])
+
+  const driftSummary = useMemo(() => {
+    return buildDriftSummary(document.parsedStructuredSnapshot, resume)
+  }, [document.parsedStructuredSnapshot, resume])
 
   const fetchResumeAndDocument = async () => {
     try {
@@ -102,6 +162,7 @@ const ResumeMarkdownPage = () => {
           content: documentResponse.data.content || '',
           syncStatus: documentResponse.data.syncStatus || 'not_synced',
           lastSyncedAt: documentResponse.data.lastSyncedAt || null,
+          parsedStructuredSnapshot: documentResponse.data.parsedStructuredSnapshot || null,
         })
       } catch (error) {
         if (error.response?.status !== 404) {
@@ -114,6 +175,7 @@ const ResumeMarkdownPage = () => {
           content: generatedMarkdown,
           syncStatus: 'not_synced',
           lastSyncedAt: null,
+          parsedStructuredSnapshot: null,
         })
       }
     } catch (error) {
@@ -132,15 +194,13 @@ const ResumeMarkdownPage = () => {
   const saveDocument = async () => {
     try {
       setSaving(true)
+      const nextSyncStatus = 'outdated'
       const payload = {
         title: document.title || `${resume?.title || 'Resume'} Markdown`,
         content: document.content,
-        parsedStructuredSnapshot: {
-          resumeId: id,
-          title: resume?.title || '',
-        },
-        syncStatus: 'synced',
-        lastSyncedAt: new Date().toISOString(),
+        parsedStructuredSnapshot: document.parsedStructuredSnapshot || null,
+        syncStatus: nextSyncStatus,
+        lastSyncedAt: document.lastSyncedAt || null,
       }
 
       try {
@@ -156,15 +216,88 @@ const ResumeMarkdownPage = () => {
 
       setDocument((prev) => ({
         ...prev,
-        syncStatus: 'synced',
-        lastSyncedAt: new Date().toISOString(),
+        syncStatus: nextSyncStatus,
       }))
-      toast.success('Markdown 已保存')
+      toast.success('Markdown 草稿已保存，等待同步到简历')
     } catch (error) {
       toast.error('保存 Markdown 失败')
     } finally {
       setSaving(false)
       setCreating(false)
+    }
+  }
+
+  const syncFromResume = async () => {
+    try {
+      setSyncingFromResume(true)
+      const response = await axiosInstance.post(API_PATHS.RESUME.SYNC_MARKDOWN_FROM_RESUME(id), {
+        title: document.title || `${resume?.title || 'Resume'} Markdown`,
+      })
+
+      setDocument({
+        title: response.data.document?.title || `${resume?.title || 'Resume'} Markdown`,
+        content: response.data.content || '',
+        syncStatus: response.data.document?.syncStatus || 'synced',
+        lastSyncedAt: response.data.document?.lastSyncedAt || new Date().toISOString(),
+        parsedStructuredSnapshot: response.data.document?.parsedStructuredSnapshot || resume,
+      })
+      setResume((prev) => (prev ? { ...prev, contentSource: 'markdown' } : prev))
+      toast.success('已根据表单内容重新生成 Markdown')
+    } catch (error) {
+      toast.error('从表单生成 Markdown 失败')
+    } finally {
+      setSyncingFromResume(false)
+    }
+  }
+
+  const applyToResume = async () => {
+    try {
+      setApplyingToResume(true)
+      const response = await axiosInstance.post(API_PATHS.RESUME.APPLY_MARKDOWN_TO_RESUME(id), {
+        title: document.title || `${resume?.title || 'Resume'} Markdown`,
+        content: document.content,
+      })
+
+      setResume(response.data.resume)
+      setDocument({
+        title: response.data.document?.title || document.title,
+        content: response.data.document?.content || document.content,
+        syncStatus: response.data.document?.syncStatus || 'synced',
+        lastSyncedAt: response.data.document?.lastSyncedAt || new Date().toISOString(),
+        parsedStructuredSnapshot: response.data.document?.parsedStructuredSnapshot || response.data.resume,
+      })
+      setApplyResult({
+        unresolvedFields: response.data.unresolvedFields || [],
+        confidenceSummary: response.data.confidenceSummary || {},
+        parsedSections: response.data.parsedSections || null,
+        overwriteSummary: [],
+      })
+      toast.success('Markdown 已回写到简历')
+    } catch (error) {
+      toast.error('应用 Markdown 到简历失败')
+    } finally {
+      setApplyingToResume(false)
+    }
+  }
+
+  const previewApplyToResume = async () => {
+    try {
+      setPreviewingApply(true)
+      const response = await axiosInstance.post(API_PATHS.RESUME.PREVIEW_APPLY_MARKDOWN(id), {
+        content: document.content,
+      })
+
+      setApplyResult({
+        unresolvedFields: response.data.unresolvedFields || [],
+        confidenceSummary: response.data.confidenceSummary || {},
+        parsedSections: response.data.parsedSections || null,
+        overwriteSummary: response.data.overwriteSummary || [],
+      })
+      toast.success('已生成应用前差异预览')
+    } catch (error) {
+      toast.error('预览应用影响失败')
+    } finally {
+      setPreviewingApply(false)
     }
   }
 
@@ -191,11 +324,20 @@ const ResumeMarkdownPage = () => {
         <div className='rounded-3xl bg-white p-6 border border-slate-200 shadow-sm flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between'>
           <div>
             <h1 className='text-3xl font-black text-slate-900'>Markdown 编辑模式</h1>
-            <p className='mt-2 text-slate-600'>维护这份简历对应的 Markdown 文档资产。当前版本支持加载、创建、保存与导出。</p>
+            <p className='mt-2 text-slate-600'>维护这份简历对应的 Markdown 文档资产。现在已经支持从表单重新生成 Markdown，以及把 Markdown 解析结果回写到结构化简历。</p>
           </div>
           <div className='flex flex-wrap gap-3'>
             <button onClick={() => navigate(`/resume/${id}`)} className='rounded-2xl border border-slate-200 px-5 py-3 font-semibold text-slate-700'>
               返回表单编辑
+            </button>
+            <button onClick={syncFromResume} disabled={syncingFromResume} className='rounded-2xl border border-emerald-200 px-5 py-3 font-semibold text-emerald-700 disabled:opacity-60'>
+              {syncingFromResume ? '生成中...' : '从表单重新生成'}
+            </button>
+            <button onClick={previewApplyToResume} disabled={previewingApply} className='rounded-2xl border border-amber-200 px-5 py-3 font-semibold text-amber-700 disabled:opacity-60'>
+              {previewingApply ? '预览中...' : '预览应用影响'}
+            </button>
+            <button onClick={applyToResume} disabled={applyingToResume} className='rounded-2xl border border-sky-200 px-5 py-3 font-semibold text-sky-700 disabled:opacity-60'>
+              {applyingToResume ? '应用中...' : '应用到简历'}
             </button>
             <button onClick={exportMarkdown} className='rounded-2xl border border-violet-200 px-5 py-3 font-semibold text-violet-700'>
               导出 Markdown
@@ -244,6 +386,22 @@ const ResumeMarkdownPage = () => {
               </div>
 
               <div className='rounded-3xl bg-white p-6 border border-slate-200 shadow-sm'>
+                <h2 className='text-xl font-bold text-slate-800 mb-4'>漂移摘要</h2>
+                {driftSummary.length === 0 && (
+                  <div className='text-sm text-emerald-600'>当前结构化简历与 Markdown 快照没有检测到明显漂移。</div>
+                )}
+                {driftSummary.length > 0 && (
+                  <div className='space-y-2'>
+                    {driftSummary.map((item) => (
+                      <div key={item} className='rounded-2xl bg-amber-50 border border-amber-200 px-4 py-3 text-sm text-amber-800'>
+                        {item}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              <div className='rounded-3xl bg-white p-6 border border-slate-200 shadow-sm'>
                 <h2 className='text-xl font-bold text-slate-800 mb-4'>结构化来源摘要</h2>
                 <div className='space-y-2 text-sm text-slate-600'>
                   <div>姓名：{resume?.profileInfo?.fullName || '—'}</div>
@@ -251,7 +409,49 @@ const ResumeMarkdownPage = () => {
                   <div>工作经历：{resume?.workExperience?.length || 0} 条</div>
                   <div>教育经历：{resume?.education?.length || 0} 条</div>
                   <div>技能：{resume?.skills?.length || 0} 项</div>
+                  <div>自由块：{resume?.freeBlocks?.length || 0} 个</div>
                 </div>
+              </div>
+
+              <div className='rounded-3xl bg-white p-6 border border-slate-200 shadow-sm'>
+                <h2 className='text-xl font-bold text-slate-800 mb-4'>同步结果</h2>
+                <div className='space-y-3 text-sm text-slate-600'>
+                  <div>未解析字段：{applyResult.unresolvedFields.length || 0} 项</div>
+                  {applyResult.parsedSections && (
+                    <div>识别标题：{applyResult.parsedSections.headings?.length || 0} 个</div>
+                  )}
+                  <div>高置信：{applyResult.confidenceSummary.high || 0}</div>
+                  <div>中置信：{applyResult.confidenceSummary.medium || 0}</div>
+                  <div>低置信：{applyResult.confidenceSummary.low || 0}</div>
+                </div>
+
+                {applyResult.unresolvedFields.length > 0 && (
+                  <div className='mt-4 space-y-2'>
+                    {applyResult.unresolvedFields.map((field) => (
+                      <div key={field} className='rounded-2xl bg-amber-50 border border-amber-200 px-4 py-3 text-sm text-amber-800'>
+                        {field}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              <div className='rounded-3xl bg-white p-6 border border-slate-200 shadow-sm'>
+                <h2 className='text-xl font-bold text-slate-800 mb-4'>应用前覆盖摘要</h2>
+                {applyResult.overwriteSummary.length === 0 && (
+                  <div className='text-sm text-slate-500'>先点击“预览应用影响”，这里会列出 Markdown 回写将覆盖的关键字段。</div>
+                )}
+                {applyResult.overwriteSummary.length > 0 && (
+                  <div className='space-y-3'>
+                    {applyResult.overwriteSummary.map((item) => (
+                      <div key={item.field} className='rounded-2xl bg-sky-50 border border-sky-200 p-4 text-sm text-sky-900'>
+                        <div className='font-semibold'>{item.field}</div>
+                        <div className='mt-2'>当前值：{item.currentValue || '—'}</div>
+                        <div className='mt-1'>新值：{item.nextValue || '—'}</div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
 
               <div className='rounded-3xl bg-white p-6 border border-slate-200 shadow-sm'>

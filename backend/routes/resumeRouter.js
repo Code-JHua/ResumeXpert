@@ -11,9 +11,12 @@ import {
   restoreResumeVersion,
 } from '../controllers/resumeVersionController.js'
 import {
+  applyMarkdownToResume,
   createResumeMarkdownDocument,
   deleteResumeMarkdownDocument,
   getResumeMarkdownDocument,
+  previewApplyMarkdownToResume,
+  syncMarkdownFromResume,
   updateResumeMarkdownDocument,
 } from '../controllers/resumeMarkdownController.js'
 import {
@@ -30,6 +33,9 @@ resumeRouter.get('/:id', protect, getResumeById)
 resumeRouter.get('/:id/markdown', protect, getResumeMarkdownDocument)
 resumeRouter.post('/:id/markdown', protect, createResumeMarkdownDocument)
 resumeRouter.put('/:id/markdown', protect, updateResumeMarkdownDocument)
+resumeRouter.post('/:id/markdown/sync-from-resume', protect, syncMarkdownFromResume)
+resumeRouter.post('/:id/markdown/preview-apply', protect, previewApplyMarkdownToResume)
+resumeRouter.post('/:id/markdown/apply-to-resume', protect, applyMarkdownToResume)
 resumeRouter.delete('/:id/markdown', protect, deleteResumeMarkdownDocument)
 resumeRouter.get('/:id/export/markdown', protect, exportResumeMarkdown)
 resumeRouter.post('/:id/exports/log', protect, createExportLog)

@@ -4,6 +4,7 @@ import { LuExternalLink, LuGithub } from "react-icons/lu";
 import { useTranslation } from "react-i18next";
 import { formatYearMonth } from "../utils/helper";
 import { AnimatedText } from "./RenderResume";
+import { FreeBlocksSection } from "./ResumeSection";
 
 const sectionTitleClass = "text-base font-bold uppercase tracking-wide mb-1 pb-1 border-b border-gray-300";
 
@@ -19,6 +20,7 @@ const TemplateTwo = ({ resumeData = {}, containerWidth }) => {
     skills = [],
     certifications = [],
     interests = [],
+    freeBlocks = [],
   } = resumeData;
   const visibleCertifications = certifications.filter(
     (cert) => cert?.title?.trim() || cert?.issuer?.trim() || cert?.year?.trim()
@@ -241,6 +243,13 @@ const TemplateTwo = ({ resumeData = {}, containerWidth }) => {
               </div>
             )}
           </div>
+        </section>
+      )}
+
+      {freeBlocks.length > 0 && (
+        <section className="mt-2">
+          <h2 className={sectionTitleClass}>Additional Information</h2>
+          <FreeBlocksSection blocks={freeBlocks} itemClassName="mb-3 last:mb-0" />
         </section>
       )}
     </div>

@@ -64,6 +64,12 @@ const EditResume = () => {
   const [downloadSuccess, setDownloadSuccess] = useState(false)
   const [errorMsg, setErrorMsg] = useState("")
   const [completionPercentage, setCompletionPercentage] = useState(0)
+  const [markdownSyncing, setMarkdownSyncing] = useState(false)
+  const [markdownSyncState, setMarkdownSyncState] = useState({
+    hasDocument: false,
+    syncStatus: 'not_synced',
+    lastSyncedAt: null,
+  })
 
   const { width: previewWidth, ref: previewContainerRef } = useResizeObserver();
 
@@ -132,6 +138,7 @@ const EditResume = () => {
       },
     ],
     interests: [""],
+    freeBlocks: [],
   })
 
   // Calculate completion percentage
@@ -406,6 +413,7 @@ const EditResume = () => {
           <AdditionalInfoForm
             languages={resumeData.languages}
             interests={resumeData.interests}
+            freeBlocks={resumeData.freeBlocks || []}
             updateArrayItem={(section, index, key, value) => updateArrayItem(section, index, key, value)}
             addArrayItem={(section, newItem) => addArrayItem(section, newItem)}
             removeArrayItem={(section, index) => removeArrayItem(section, index)}
@@ -485,7 +493,31 @@ const EditResume = () => {
           certifications: resumeInfo?.certifications || prevState?.certifications,
           languages: resumeInfo?.languages || prevState?.languages,
           interests: resumeInfo?.interests || prevState?.interests,
+          freeBlocks: resumeInfo?.freeBlocks || prevState?.freeBlocks,
         }))
+
+        if (resumeInfo?.sourceDocumentId) {
+          try {
+            const markdownResponse = await axiosInstance.get(API_PATHS.RESUME.GET_MARKDOWN(resumeId))
+            setMarkdownSyncState({
+              hasDocument: true,
+              syncStatus: markdownResponse.data.syncStatus || 'not_synced',
+              lastSyncedAt: markdownResponse.data.lastSyncedAt || null,
+            })
+          } catch (markdownError) {
+            setMarkdownSyncState({
+              hasDocument: true,
+              syncStatus: 'error',
+              lastSyncedAt: null,
+            })
+          }
+        } else {
+          setMarkdownSyncState({
+            hasDocument: false,
+            syncStatus: 'not_synced',
+            lastSyncedAt: null,
+          })
+        }
       }
     } catch (error) {
       console.error("Error fetching resume:", error)
@@ -597,6 +629,13 @@ const EditResume = () => {
         thumbnailLink: thumbnailLink || "",
         completion: completionPercentage,
       })
+
+      if (markdownSyncState.hasDocument) {
+        setMarkdownSyncState((prev) => ({
+          ...prev,
+          syncStatus: 'outdated',
+        }))
+      }
     } catch (err) {
       console.error("Error updating resume:", err)
       // Re-throw the error so the caller can handle it
@@ -658,6 +697,28 @@ const EditResume = () => {
     }));
   }
 
+  const handleSyncMarkdown = async () => {
+    try {
+      setMarkdownSyncing(true)
+      const response = await axiosInstance.post(API_PATHS.RESUME.SYNC_MARKDOWN_FROM_RESUME(resumeId), {
+        title: `${resumeData.title || 'Resume'} Markdown`,
+      })
+
+      setMarkdownSyncState({
+        hasDocument: true,
+        syncStatus: response.data.document?.syncStatus || 'synced',
+        lastSyncedAt: response.data.document?.lastSyncedAt || new Date().toISOString(),
+      })
+
+      toast.success('已根据当前表单内容同步 Markdown')
+    } catch (error) {
+      console.error('Error syncing markdown from resume:', error)
+      toast.error('同步 Markdown 失败')
+    } finally {
+      setMarkdownSyncing(false)
+    }
+  }
+
   useEffect(() => {
     if (resumeId) {
       fetchResumeDetailsById()
@@ -672,6 +733,9 @@ const EditResume = () => {
             title={resumeData.title}
             setTitle={(value) => setResumeData(prev => ({ ...prev, title: value }))}
             onOpenMarkdown={() => navigate(`/resume/${resumeId}/markdown`)}
+            onSyncMarkdown={handleSyncMarkdown}
+            markdownSyncing={markdownSyncing}
+            markdownSyncState={markdownSyncState}
             onOpenVersions={() => setOpenVersionModal(true)}
             onOpenThemeSelector={() => setOpenThemeSelector(true)}
             onDeleteResume={handleDeleteResume}
@@ -679,6 +743,25 @@ const EditResume = () => {
             isLoading={isLoading}
             t={t}
           />
+
+          {markdownSyncState.hasDocument && (
+            <div className='mb-6 rounded-3xl border border-amber-200 bg-amber-50 px-5 py-4 text-sm text-amber-900'>
+              <div className='font-semibold'>Markdown 同步提醒</div>
+              <div className='mt-1'>
+                当前 Markdown 文档状态：{markdownSyncState.syncStatus}
+                {markdownSyncState.lastSyncedAt ? `，上次同步时间：${new Date(markdownSyncState.lastSyncedAt).toLocaleString('zh-CN')}` : ''}
+              </div>
+              <div className='mt-2'>
+                如果你刚修改了表单内容，建议进入 Markdown 模式重新生成，避免两种编辑模式的内容不同步。
+              </div>
+              <button
+                onClick={() => navigate(`/resume/${resumeId}/markdown`)}
+                className='mt-3 rounded-2xl border border-amber-300 bg-white px-4 py-2 font-semibold text-amber-800'
+              >
+                前往 Markdown 模式处理同步
+              </button>
+            </div>
+          )}
 
           <div className={containerStyles.grid}>
             <div className={containerStyles.formContainer}>
@@ -732,6 +815,7 @@ const EditResume = () => {
                   certifications: restoredResume?.certifications || prevState.certifications,
                   languages: restoredResume?.languages || prevState.languages,
                   interests: restoredResume?.interests || prevState.interests,
+                  freeBlocks: restoredResume?.freeBlocks || prevState.freeBlocks,
                 }))
               }}
             />

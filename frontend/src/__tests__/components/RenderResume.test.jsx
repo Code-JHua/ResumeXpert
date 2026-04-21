@@ -27,4 +27,26 @@ describe('RenderResume', () => {
 
     expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Alex Johnson')
   })
+
+  it('renders free blocks in registered templates', () => {
+    render(
+      <RenderResume
+        templateId='01'
+        resumeData={{
+          ...DUMMY_RESUME_DATA,
+          freeBlocks: [
+            {
+              title: 'Awards',
+              content: 'Global Hackathon Winner',
+              source: 'markdown',
+            },
+          ],
+        }}
+        containerWidth={null}
+      />
+    )
+
+    expect(screen.getByText('Awards')).toBeInTheDocument()
+    expect(screen.getByText('Global Hackathon Winner')).toBeInTheDocument()
+  })
 })
