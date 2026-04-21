@@ -35,6 +35,9 @@ const TemplateOne = ({ resumeData = {}, colorPalette, containerWidth }) => {
     certifications = [],
     interests = [],
   } = resumeData;
+  const visibleCertifications = certifications.filter(
+    (cert) => cert?.title?.trim() || cert?.issuer?.trim() || cert?.year?.trim()
+  );
 
   const resumeRef = useRef(null);
   const [baseWidth, setBaseWidth] = useState(800);
@@ -208,11 +211,11 @@ const TemplateOne = ({ resumeData = {}, colorPalette, containerWidth }) => {
             </div>
           )}
 
-          {certifications.length > 0 && (
+          {visibleCertifications.length > 0 && (
             <div className="resume-section">
               <Title text={t('template.sections.certifications')} />
               <div className="space-y-2">
-                {certifications.map((cert, i) => (
+                {visibleCertifications.map((cert, i) => (
                   <CertificationInfo
                     key={i}
                     title={cert.title}

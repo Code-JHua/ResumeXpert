@@ -15,6 +15,9 @@ const TemplateThree = ({ resumeData = {}, containerWidth }) => {
     certifications = [],
     interests = [],
   } = resumeData;
+  const visibleCertifications = certifications.filter(
+    (cert) => cert?.title?.trim() || cert?.issuer?.trim() || cert?.year?.trim()
+  );
 
   const resumeRef = useRef(null);
   const [baseWidth, setBaseWidth] = useState(1100);
@@ -168,12 +171,14 @@ const TemplateThree = ({ resumeData = {}, containerWidth }) => {
           )}
 
           {/* Certifications */}
-          {certifications.length > 0 && (
+          {visibleCertifications.length > 0 && (
             <section>
               <h2 className="text-sm font-bold uppercase text-gray-800 mb-2 tracking-wider">{t('template.sections.certifications')}</h2>
               <ul className="text-xs text-gray-700 space-y-1">
-                {certifications.map((cert, idx) => (
-                  <li key={idx}><AnimatedText>{cert.title} ({cert.year})</AnimatedText></li>
+                {visibleCertifications.map((cert, idx) => (
+                  <li key={idx}>
+                    <AnimatedText>{`${cert.title}${cert.year ? ` (${cert.year})` : ''}`}</AnimatedText>
+                  </li>
                 ))}
               </ul>
             </section>
@@ -204,11 +209,11 @@ const TemplateThree = ({ resumeData = {}, containerWidth }) => {
                     <div className="flex justify-between items-start mb-1">
                       <div>
                         <h3 className="font-bold pb-2"><AnimatedText>{exp.role}</AnimatedText></h3>
-                        <p className="italic"><AnimatedText>{exp.company}{exp.location && `, ${exp.location}`}</AnimatedText></p>
+                        <p className="italic"><AnimatedText>{`${exp.company}${exp.location ? `, ${exp.location}` : ''}`}</AnimatedText></p>
                       </div>
                       {exp.startDate && exp.endDate && (
                         <div className="text-right italic">
-                          <AnimatedText>{formatYearMonth(exp.startDate)} – {formatYearMonth(exp.endDate)}</AnimatedText>
+                          <AnimatedText>{`${formatYearMonth(exp.startDate)} – ${formatYearMonth(exp.endDate)}`}</AnimatedText>
                         </div>
                       )}
                     </div>
@@ -235,7 +240,7 @@ const TemplateThree = ({ resumeData = {}, containerWidth }) => {
                       <h3 className="font-bold"><AnimatedText>{proj.title}</AnimatedText></h3>
                       {proj.startDate && proj.endDate && (
                         <div className="text-right italic">
-                          <AnimatedText>{formatYearMonth(proj.startDate)} – {formatYearMonth(proj.endDate)}</AnimatedText>
+                          <AnimatedText>{`${formatYearMonth(proj.startDate)} – ${formatYearMonth(proj.endDate)}`}</AnimatedText>
                         </div>
                       )}
                     </div>

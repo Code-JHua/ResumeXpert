@@ -260,7 +260,10 @@ const EditResume = () => {
         break
 
       case "certifications":
-        resumeData.certifications.forEach(({ title, issuer }, index) => {
+        resumeData.certifications.forEach(({ title = "", issuer = "", year = "" }, index) => {
+          const hasAnyValue = [title, issuer, year].some((value) => value.trim())
+          if (!hasAnyValue) return
+
           if (!title.trim()) errors.push(t('editResume.validation.certTitleRequired', { index: index + 1 }))
           if (!issuer.trim()) errors.push(t('editResume.validation.issuerRequired', { index: index + 1 }))
         })

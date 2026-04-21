@@ -20,6 +20,9 @@ const TemplateTwo = ({ resumeData = {}, containerWidth }) => {
     certifications = [],
     interests = [],
   } = resumeData;
+  const visibleCertifications = certifications.filter(
+    (cert) => cert?.title?.trim() || cert?.issuer?.trim() || cert?.year?.trim()
+  );
 
   const resumeRef = useRef(null);
   const [baseWidth, setBaseWidth] = useState(800);
@@ -98,7 +101,7 @@ const TemplateTwo = ({ resumeData = {}, containerWidth }) => {
                   </div>
                   <div className="text-[11px] text-right text-gray-600">
                     <p className="italic">
-                      <AnimatedText>{formatYearMonth(exp.startDate)} - {formatYearMonth(exp.endDate)}</AnimatedText>
+                      <AnimatedText>{`${formatYearMonth(exp.startDate)} - ${formatYearMonth(exp.endDate)}`}</AnimatedText>
                     </p>
                     {exp.location && <p className="text-[11px]"><AnimatedText>{exp.location}</AnimatedText></p>}
                   </div>
@@ -168,7 +171,7 @@ const TemplateTwo = ({ resumeData = {}, containerWidth }) => {
                 <div className="flex justify-between items-center">
                   <h3 className="font-semibold text-[12px] pb-2 text-gray-800"><AnimatedText>{edu.degree}</AnimatedText></h3>
                   <p className="italic text-[11px] pb-2 text-gray-600">
-                    <AnimatedText>{formatYearMonth(edu.startDate)} - {formatYearMonth(edu.endDate)}</AnimatedText>
+                    <AnimatedText>{`${formatYearMonth(edu.startDate)} - ${formatYearMonth(edu.endDate)}`}</AnimatedText>
                   </p>
                 </div>
                 <p className="italic text-[11px] text-gray-700"><AnimatedText>{edu.institution}</AnimatedText></p>
@@ -196,13 +199,13 @@ const TemplateTwo = ({ resumeData = {}, containerWidth }) => {
       )}
 
       {/* Certifications */}
-      {certifications.length > 0 && (
+      {visibleCertifications.length > 0 && (
         <section className="mb-2">
           <h2 className={sectionTitleClass}>{t('template.sections.certifications')}</h2>
           <ul className="list-disc list-inside text-[11px] text-gray-700">
-            {certifications.map((cert, idx) => (
+            {visibleCertifications.map((cert, idx) => (
               <li key={idx} className="leading-tight">
-                <AnimatedText>{cert.title} — {cert.issuer} ({cert.year})</AnimatedText>
+                <AnimatedText>{`${cert.title}${cert.issuer ? ` — ${cert.issuer}` : ''}${cert.year ? ` (${cert.year})` : ''}`}</AnimatedText>
               </li>
             ))}
           </ul>
