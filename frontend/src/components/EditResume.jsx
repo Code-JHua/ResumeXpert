@@ -225,7 +225,7 @@ const EditResume = () => {
       case "contact-info":
         const { email, phone } = resumeData.contactInfo
         if (!email.trim() || !/^\S+@\S+\.\S+$/.test(email)) errors.push(t('editResume.validation.validEmailRequired'))
-        if (!phone.trim() || !/^\d{10}$/.test(phone)) errors.push(t('editResume.validation.validPhoneRequired'))
+        if (!phone.trim() || !/^\d{11}$/.test(phone)) errors.push(t('editResume.validation.validPhoneRequired'))
         break
 
       case "work-experience":
