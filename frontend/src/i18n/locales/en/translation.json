@@ -345,6 +345,514 @@
   "navbar": {
     "appName": "ResumeXpert"
   },
+  "careerNav": {
+    "dashboard": "Resume Hub",
+    "share": "Share Center",
+    "templates": "Template Hub",
+    "settings": "Settings"
+  },
+  "templateThemeConfigurator": {
+    "title": "Theme Settings",
+    "description": "This template supports colors, fonts, and density controls, and community templates will reuse the same parameter contract.",
+    "presets": "Presets",
+    "fields": {
+      "accentColor": "Accent Color",
+      "headingColor": "Heading Color",
+      "tagBackground": "Tag Background",
+      "fontFamily": "Font Family",
+      "density": "Content Density"
+    },
+    "density": {
+      "compact": "Compact",
+      "comfortable": "Comfortable",
+      "spacious": "Spacious"
+    },
+    "fonts": {
+      "modernSans": "Modern Sans",
+      "yaheiChinese": "YaHei Chinese",
+      "classicSerif": "Classic Serif"
+    }
+  },
+  "templateBlockConfigurator": {
+    "title": "Template Block System",
+    "description": "Control block visibility, titles, order, and column placement. This is the foundation of Phase G freeform creation.",
+    "layoutMode": "Layout Mode",
+    "blockTitlePlaceholder": "Block Title",
+    "showBlock": "Show this block",
+    "layouts": {
+      "single": "Single Column",
+      "twoColumn": "Two Column"
+    },
+    "columns": {
+      "main": "Main",
+      "sidebar": "Sidebar",
+      "full": "Full Width"
+    }
+  },
+  "resumeVersionManager": {
+    "empty": "There are no saved versions yet. Save one to get started.",
+    "currentVersion": "Current linked version",
+    "source": "Source: ",
+    "placeholders": {
+      "versionName": "e.g. Backend Application V1",
+      "note": "Version note (optional)"
+    },
+    "buttons": {
+      "saving": "Saving...",
+      "saveVersion": "Save Version",
+      "restore": "Restore",
+      "delete": "Delete"
+    },
+    "toasts": {
+      "loadFailed": "Failed to load version list",
+      "nameRequired": "Please enter a version name",
+      "created": "Saved as a new version",
+      "createFailed": "Failed to create version",
+      "restored": "Version restored",
+      "restoreFailed": "Failed to restore version",
+      "deleted": "Version deleted",
+      "deleteFailed": "Failed to delete version"
+    }
+  },
+  "themeSelector": {
+    "previewBadge": "Theme Preview",
+    "previewTitle": "Template Preview & Switch",
+    "previewDescription": "Browse templates and preview them live here. Once selected, the template is applied directly to the current resume without editing theme parameters on this screen.",
+    "listTitle": "Template List",
+    "templateListDescription": "Pick a template on the left and preview it on the right.",
+    "loadingCount": "Loading",
+    "count": "{{count}} items",
+    "noDescription": "No description",
+    "previewOnly": "Preview Only",
+    "previewName": "Template Preview",
+    "previewHelp": "Render the current resume content live and apply it to the editor once everything looks right.",
+    "sourceType": {
+      "official": "Official",
+      "custom": "Personal",
+      "community": "Community"
+    },
+    "sourceLabel": {
+      "official": "Official Template",
+      "custom": "Personal Template",
+      "community": "Community Template"
+    }
+  },
+  "settingsPage": {
+    "badge": "Settings",
+    "title": "Account & Preferences",
+    "description": "Manage your basic profile, login password, and language preferences here so your account stays aligned with the way you work.",
+    "currentAccount": "Current Account",
+    "accountStatus": "Account Status",
+    "status": {
+      "active": "Active",
+      "disabled": "Disabled"
+    },
+    "profile": {
+      "title": "Profile",
+      "description": "This first version only supports updating the display name. Account identity and role remain read-only.",
+      "nameLabel": "Display Name",
+      "namePlaceholder": "Enter your display name",
+      "accountLabel": "Account",
+      "role": "Role: ",
+      "status": "Status: "
+    },
+    "password": {
+      "title": "Change Password",
+      "description": "This first version lets you set a new password directly without entering the old one. The new password must be at least 8 characters.",
+      "label": "New Password",
+      "placeholder": "Enter a new login password (at least 8 characters)"
+    },
+    "language": {
+      "title": "Language Preference",
+      "description": "Reuse the existing language switcher. Changes take effect immediately and are stored locally.",
+      "interface": "Interface Language"
+    },
+    "buttons": {
+      "saving": "Saving...",
+      "saveProfile": "Save Profile",
+      "submitting": "Submitting...",
+      "updatePassword": "Update Password"
+    },
+    "toasts": {
+      "nameRequired": "Please enter a display name",
+      "profileUpdated": "Profile updated",
+      "profileUpdateFailed": "Failed to update profile",
+      "passwordRequired": "Please enter a new password",
+      "passwordUpdated": "Password updated",
+      "passwordUpdateFailed": "Failed to update password"
+    }
+  },
+  "publicSharePage": {
+    "badge": "ResumeXpert Share Page",
+    "title": "Online Resume Share",
+    "lastPublished": "Last published: ",
+    "backHome": "Back to Home",
+    "loading": "Loading share page...",
+    "accessCodePlaceholder": "Enter access code",
+    "errors": {
+      "passwordRequired": "This share page is protected by an access code. Please enter it to continue.",
+      "private": "This share page is currently private.",
+      "expired": "This share page has expired.",
+      "viewLimitReached": "This share page has reached its view limit.",
+      "notFound": "This share page is closed or does not exist.",
+      "loadFailed": "Failed to load the share page. Please try again later."
+    }
+  },
+  "shareManagementPage": {
+    "hero": {
+      "badge": "Output Studio",
+      "title": "Output & Share Center",
+      "description": "Bring PDF export, share publishing, and access governance into one console. Manage public links, traffic stats, and a reliable PDF delivery flow here.",
+      "stats": {
+        "exports": "Export Records",
+        "views": "Public Visits",
+        "governance": "Governance Status"
+      }
+    },
+    "resumeSelector": {
+      "title": "Select Resume",
+      "description": "Pick a resume first, then manage export, sharing, and access governance.",
+      "backLink": "Back to Resume Hub",
+      "loading": "Loading resume list...",
+      "empty": "There are no resumes ready for output yet. Create one first.",
+      "updated": "Recently Updated",
+      "selected": "Selected",
+      "unselectedHint": "Select a resume above and the share console will show export actions, link management, traffic stats, and output history."
+    },
+    "summary": {
+      "currentResume": "Current Resume",
+      "template": "Template",
+      "contentSource": "Content Source",
+      "goToEdit": "Open Editor",
+      "visitStats": "Traffic Stats",
+      "viewCount": "Total Views",
+      "uniqueVisitors": "Unique Visitors",
+      "deniedAccess": "Denied Requests"
+    },
+    "share": {
+      "title": "Share Status",
+      "lastPublished": "Last Published",
+      "lastViewed": "Last Viewed",
+      "governanceStatus": "Governance Status",
+      "managementBadge": "Share Control",
+      "managementTitle": "Control Public Links & Access Rules",
+      "managementDescription": "Link status, access restrictions, and governance notes all live in one publishing panel.",
+      "currentVisibility": "Current Visibility",
+      "publicLink": "Public Link",
+      "publicLinkEmpty": "There is no share link yet. Create one below.",
+      "governanceHint": "The public page shows the snapshot from the most recent republish. If you just edited the resume, republish again to update the public page.",
+      "fields": {
+        "visibility": "Visibility",
+        "expiresAt": "Expires At",
+        "maxViewLimit": "Max Visits",
+        "accessCode": "Access Code",
+        "governanceNotes": "Governance Notes"
+      },
+      "placeholders": {
+        "maxViewLimit": "Max visits",
+        "accessCode": "Access code",
+        "governanceNotes": "Governance notes, for example: only for this week's applications"
+      },
+      "visibilityOptions": {
+        "public": "Public Access",
+        "publicShort": "Public",
+        "unlisted": "Unlisted Link Only",
+        "password": "Access Code Protected",
+        "private": "Private"
+      },
+      "actions": {
+        "creating": "Creating...",
+        "createShare": "Create Share Link",
+        "copyShareLink": "Copy Share Link",
+        "publishing": "Publishing...",
+        "republish": "Republish",
+        "processing": "Processing...",
+        "disableShare": "Disable Sharing",
+        "enableShare": "Re-enable Sharing",
+        "openPublicPage": "Open Public Page"
+      }
+    },
+    "export": {
+      "badge": "Export",
+      "title": "One-Click Resume Output",
+      "description": "The output center currently keeps PDF export only, for the most stable and direct delivery flow.",
+      "currentTemplate": "Current Template",
+      "exporting": "Exporting...",
+      "exportPdf": "Export PDF"
+    },
+    "history": {
+      "title": "Export History",
+      "description": "Keep document export and share publishing records together so every output action is easy to review.",
+      "recordCount": "{{count}} records",
+      "empty": "There are no PDF export or share publishing records yet.",
+      "summary": {
+        "total": "Total",
+        "success": "Success",
+        "failed": "Failed"
+      },
+      "table": {
+        "format": "Format",
+        "status": "Status",
+        "template": "Template",
+        "source": "Source",
+        "fileOrAction": "File / Action",
+        "error": "Error",
+        "time": "Time"
+      },
+      "status": {
+        "success": "Success",
+        "failed": "Failed",
+        "pending": "Pending"
+      },
+      "triggerSource": {
+        "shareManagement": "Share Management",
+        "outputCenter": "Output Center"
+      }
+    },
+    "preview": {
+      "title": "Output Preview",
+      "description": "PDF export and the public share page reuse the same render result.",
+      "loading": "Preparing output preview...",
+      "exportLoading": "Preparing export canvas...",
+      "summary": "Share Summary",
+      "linkStatus": "Link Status",
+      "visibility": "Visibility",
+      "lastPublished": "Last Published",
+      "online": "Online",
+      "closed": "Closed",
+      "notGenerated": "Not Generated"
+    },
+    "status": {
+      "published": "Published",
+      "closed": "Closed",
+      "notCreated": "Not Created"
+    },
+    "toasts": {
+      "loadCenterFailed": "Failed to load the output center",
+      "loadResumeBundleFailed": "Failed to load resume output data",
+      "shareCreated": "Share link created",
+      "shareCreateFailed": "Failed to create share link",
+      "shareRepublished": "Share page republished",
+      "shareRepublishFailed": "Failed to republish",
+      "shareEnabled": "Sharing enabled",
+      "shareDisabled": "Sharing disabled",
+      "shareToggleFailed": "Failed to change share status",
+      "pdfExported": "PDF exported",
+      "pdfCloneFailed": "Failed to prepare the render node. Refresh the page and try again.",
+      "pdfCanvasFailed": "Snapshot rendering failed. Check whether the template content is too long or the styles are abnormal.",
+      "pdfExportFailed": "Browser PDF export failed. Please try again later.",
+      "shareCopied": "Share link copied",
+      "shareCopyFailed": "Failed to copy link"
+    }
+  },
+  "adminPage": {
+    "badge": "Admin Console",
+    "title": "Admin Console",
+    "description": "Handle template reviews and user management in one place, including account toggles and password resets.",
+    "noPermissionTitle": "This account does not have admin access",
+    "noPermissionDescription": "The admin console has been split out and is only available to users with the `admin` role.",
+    "pendingTemplates": "Pending Templates",
+    "totalUsers": "Total Users",
+    "navigation": "Console Navigation",
+    "reviewQueueTitle": "Templates Pending Review",
+    "reviewQueueDescription": "Process community submissions here without crowding the user-facing template center.",
+    "itemCount": "{{count}} items",
+    "communityCreator": "Community Creator",
+    "noDescription": "No description",
+    "noPendingTemplates": "There are no pending templates right now.",
+    "reviewStatus": {
+      "reserved": "Not Submitted",
+      "pending": "Pending Review",
+      "approved": "Approved",
+      "rejected": "Rejected"
+    },
+    "sourceType": {
+      "official": "Official",
+      "custom": "Personal",
+      "community": "Community"
+    },
+    "tabs": {
+      "templates": "Template Review",
+      "users": "User Management"
+    },
+    "templateReview": {
+      "noDescription": "No description",
+      "currentStatus": "Current Status",
+      "submitterNote": "Submission Note",
+      "notFilled": "Not provided",
+      "reviewNotes": "Review Notes",
+      "reviewNotesPlaceholder": "Record approval reasons, change requests, or rejection notes",
+      "previewTitle": "Template Preview",
+      "previewDescription": "Admins can inspect structure and render output here without taking space from the user-facing workflow.",
+      "actions": {
+        "approve": "Approve",
+        "reject": "Reject"
+      }
+    },
+    "userManagement": {
+      "title": "User List",
+      "description": "Search, filter, inspect details, and perform password resets or account status changes.",
+      "searchPlaceholder": "Search by name or email",
+      "filters": {
+        "allRoles": "All Roles",
+        "user": "User",
+        "admin": "Admin",
+        "allStatuses": "All Statuses",
+        "active": "Active",
+        "disabled": "Disabled"
+      }
+    },
+    "userDetail": {
+      "badge": "Account Detail",
+      "role": "Role",
+      "status": "Status",
+      "disable": "Disable Account",
+      "enable": "Re-enable",
+      "createdAt": "Created At"
+    },
+    "passwordReset": {
+      "title": "Reset Password",
+      "description": "Admins set a new password directly here without introducing an email flow.",
+      "placeholder": "Enter a new temporary password (at least 8 characters)",
+      "submit": "Submit Reset"
+    },
+    "toasts": {
+      "loadReviewQueueFailed": "Failed to load the review queue",
+      "loadUsersFailed": "Failed to load the user list",
+      "loadUserDetailFailed": "Failed to load user details",
+      "templateApproved": "Template approved",
+      "templateRejected": "Template rejected",
+      "reviewFailed": "Failed to process the review",
+      "userEnabled": "Account enabled",
+      "userDisabled": "Account disabled",
+      "updateUserStatusFailed": "Failed to update account status",
+      "passwordReset": "Password reset",
+      "passwordResetFailed": "Failed to reset password"
+    }
+  },
+  "templatesPage": {
+    "badge": "Template Manager",
+    "title": "Template Management Center",
+    "description": "Browse official templates, preview community templates, and manage your own template assets in one place. Applying templates has moved back to the resume editor.",
+    "currentSelection": "Current Selection",
+    "managementState": "Management State",
+    "loadingState": "Loading...",
+    "unselected": "No template selected",
+    "editable": "Editable",
+    "readonly": "Preview Only",
+    "searchPlaceholder": "Search templates, authors, or keywords",
+    "allSources": "All Sources",
+    "listTitle": "Template List",
+    "listDescription": "Use this area to find templates and switch the preview target.",
+    "loadingCount": "Loading",
+    "count": "{{count}} items",
+    "noDescription": "No description",
+    "defaultAuthor": "ResumeXpert",
+    "authorPrefix": "Author: ",
+    "namePrefix": "Template Name: ",
+    "categoryPrefix": "Category: ",
+    "reviewStatusPrefix": "Submission Status: ",
+    "untitledTemplate": "Untitled Template",
+    "favorited": "Favorited",
+    "owned": "My Template",
+    "favoriteTemplate": "Favorite Template",
+    "deleteTemplate": "Delete Template",
+    "duplicateTemplate": "Duplicate to My Templates",
+    "deleting": "Deleting...",
+    "duplicating": "Duplicating...",
+    "readonlyHint": "Official and community templates stay read-only. Duplicate one into your own library before editing its layout.",
+    "previewTitle": "Template Preview",
+    "previewDescription": "This area is only for checking the look of a template. It does not apply templates.",
+    "loadingDetails": "Loading template details...",
+    "workbenchTitle": "Template Workbench",
+    "workbenchDescription": "The right side is now a single-panel switcher that shows only the selected settings area.",
+    "detailsTitle": "Current Template Details",
+    "detailsDescription": "Manage template name, description, category, submission note, and layout configuration.",
+    "ownedHint": "This is your template. You can continue maintaining and submitting it.",
+    "officialHint": "This is an official template and only supports previewing and favoriting.",
+    "unsavedDetails": "You have unsaved template changes. Remember to save before leaving this page.",
+    "namePlaceholder": "Template Name",
+    "descriptionPlaceholder": "Template Description",
+    "submitterNotePlaceholder": "Community Submission Note",
+    "saveTemplate": "Save Template",
+    "saving": "Saving...",
+    "submitCommunity": "Submit for Community Review",
+    "submitting": "Submitting...",
+    "layoutTitle": "Layout Editor",
+    "layoutDescription": "Only theme settings and block layout are changed here. No real resume content is modified.",
+    "layoutOwnedHint": "Your own template can be recolored, re-fonted, and rearranged directly.",
+    "layoutReadonlyHint": "This template is read-only. Duplicate it before editing the layout.",
+    "unsavedLayout": "Layout changes are not saved yet. Save the template before they become part of your template asset.",
+    "layoutReadonlyHelp": "This template cannot be edited directly. Duplicate it first, then come back here to adjust colors, fonts, layout mode, and block order.",
+    "createTitle": "Create My Template",
+    "createDescription": "Create a new personal template asset that you can continue editing, deleting, or submitting later.",
+    "createDraftHint": "This draft template has not been created yet. After submission it will enter your template list and return to the details panel automatically.",
+    "createDescriptionPlaceholder": "Describe the scenario, style, and audience this template fits",
+    "createTemplate": "Create Personal Template",
+    "creating": "Creating...",
+    "empty": "No templates matched. Try switching filters or clearing the search keywords.",
+    "actionsBadge": "Template Actions",
+    "actionsTitle": "Template Asset Actions",
+    "actionsDescription": "Favoriting, community submission, and personal-template management stay here. Template application has moved back to the editor theme modal.",
+    "scopes": {
+      "all": "All Templates",
+      "favorites": "My Favorites",
+      "mine": "My Templates"
+    },
+    "reviewStatus": {
+      "reserved": "Not Submitted",
+      "pending": "Pending Review",
+      "approved": "Published",
+      "rejected": "Rejected",
+      "official": "Official Template"
+    },
+    "sourceType": {
+      "official": "Official",
+      "custom": "Personal",
+      "community": "Community"
+    },
+    "sourceLabel": {
+      "official": "Official Template",
+      "custom": "Personal Template",
+      "community": "Community Template"
+    },
+    "categories": {
+      "general": "General",
+      "product": "Product / Design",
+      "engineering": "Engineering / Tech",
+      "business": "Business / Operations"
+    },
+    "panels": {
+      "details": "Template Details",
+      "layout": "Layout Editor",
+      "create": "Create Template"
+    },
+    "renderers": {
+      "flex": "Flexible Layout Renderer",
+      "r01": "Renderer 01",
+      "r02": "Renderer 02",
+      "r03": "Renderer 03"
+    },
+    "toasts": {
+      "favorited": "Added to favorites",
+      "unfavorited": "Removed from favorites",
+      "favoriteFailed": "Failed to update favorite state",
+      "created": "Personal template created",
+      "createFailed": "Failed to create template",
+      "duplicated": "Duplicated to your template library. You can continue editing the layout now.",
+      "duplicateFailed": "Failed to duplicate template",
+      "updated": "Template updated",
+      "updateFailed": "Failed to save template",
+      "deleted": "Template deleted",
+      "deleteFailed": "Failed to delete template",
+      "submitted": "Template submitted for community review",
+      "submitFailed": "Failed to submit for community review",
+      "nameRequired": "Please enter a template name",
+      "onlyOwnedEditable": "Only your own templates can be edited",
+      "officialDeleteBlocked": "Official templates cannot be deleted",
+      "onlyOwnedSubmittable": "Only your own templates can be submitted to the community"
+    }
+  },
   "template": {
     "sections": {
       "professionalSummary": "Professional Summary",

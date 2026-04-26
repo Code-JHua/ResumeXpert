@@ -345,6 +345,514 @@
   "navbar": {
     "appName": "ResumeXpert"
   },
+  "careerNav": {
+    "dashboard": "简历中心",
+    "share": "分享管理",
+    "templates": "模板中心",
+    "settings": "设置"
+  },
+  "templateThemeConfigurator": {
+    "title": "主题参数",
+    "description": "当前模板支持颜色、字体与版式密度配置，后续社区模板会复用这套参数协议。",
+    "presets": "预设主题",
+    "fields": {
+      "accentColor": "强调色",
+      "headingColor": "标题色",
+      "tagBackground": "标签底色",
+      "fontFamily": "字体方案",
+      "density": "信息密度"
+    },
+    "density": {
+      "compact": "紧凑",
+      "comfortable": "标准",
+      "spacious": "舒展"
+    },
+    "fonts": {
+      "modernSans": "现代无衬线",
+      "yaheiChinese": "雅黑中文",
+      "classicSerif": "经典衬线"
+    }
+  },
+  "templateBlockConfigurator": {
+    "title": "模板片段系统",
+    "description": "你可以控制区块显隐、标题、顺序以及左右栏归属，这就是 Phase G 的自由创作基础。",
+    "layoutMode": "布局模式",
+    "blockTitlePlaceholder": "区块标题",
+    "showBlock": "显示该区块",
+    "layouts": {
+      "single": "单栏布局",
+      "twoColumn": "双栏布局"
+    },
+    "columns": {
+      "main": "主栏",
+      "sidebar": "侧栏",
+      "full": "全宽"
+    }
+  },
+  "resumeVersionManager": {
+    "empty": "还没有历史版本，先保存一个版本吧。",
+    "currentVersion": "当前关联版本",
+    "source": "来源：",
+    "placeholders": {
+      "versionName": "例如：后端投递版 V1",
+      "note": "版本备注（可选）"
+    },
+    "buttons": {
+      "saving": "保存中...",
+      "saveVersion": "保存为版本",
+      "restore": "恢复",
+      "delete": "删除"
+    },
+    "toasts": {
+      "loadFailed": "加载版本列表失败",
+      "nameRequired": "请输入版本名称",
+      "created": "已保存为新版本",
+      "createFailed": "创建版本失败",
+      "restored": "已恢复历史版本",
+      "restoreFailed": "恢复版本失败",
+      "deleted": "历史版本已删除",
+      "deleteFailed": "删除版本失败"
+    }
+  },
+  "themeSelector": {
+    "previewBadge": "Theme Preview",
+    "previewTitle": "模板预览与切换",
+    "previewDescription": "这里仅保留模板浏览和实时预览。选中后直接应用到当前简历，不再在这个页面修改主题参数。",
+    "listTitle": "模板列表",
+    "templateListDescription": "左侧选模板，右侧只负责预览效果。",
+    "loadingCount": "加载中",
+    "count": "{{count}} 个",
+    "noDescription": "暂无描述",
+    "previewOnly": "仅预览",
+    "previewName": "模板预览",
+    "previewHelp": "使用当前简历内容实时渲染效果，确认无误后再应用到编辑器。",
+    "sourceType": {
+      "official": "官方",
+      "custom": "个人",
+      "community": "社区"
+    },
+    "sourceLabel": {
+      "official": "官方模板",
+      "custom": "个人模板",
+      "community": "社区模板"
+    }
+  },
+  "settingsPage": {
+    "badge": "Settings",
+    "title": "账户与偏好设置",
+    "description": "在这里管理你的基础资料、登录密码和语言偏好，保持账户信息与使用习惯一致。",
+    "currentAccount": "当前账号",
+    "accountStatus": "账户状态",
+    "status": {
+      "active": "启用中",
+      "disabled": "已停用"
+    },
+    "profile": {
+      "title": "基础资料",
+      "description": "首版仅支持修改用户名，账号标识和角色信息保持只读。",
+      "nameLabel": "用户名",
+      "namePlaceholder": "请输入用户名",
+      "accountLabel": "账号",
+      "role": "角色：",
+      "status": "状态："
+    },
+    "password": {
+      "title": "修改密码",
+      "description": "首版直接设置新密码，不需要输入旧密码。新密码至少 8 位。",
+      "label": "新密码",
+      "placeholder": "请输入新的登录密码（至少 8 位）"
+    },
+    "language": {
+      "title": "语言偏好",
+      "description": "复用现有语言切换能力，切换后会立即生效并保存在本地。",
+      "interface": "界面语言"
+    },
+    "buttons": {
+      "saving": "保存中...",
+      "saveProfile": "保存资料",
+      "submitting": "提交中...",
+      "updatePassword": "更新密码"
+    },
+    "toasts": {
+      "nameRequired": "请输入用户名",
+      "profileUpdated": "账户资料已更新",
+      "profileUpdateFailed": "更新资料失败",
+      "passwordRequired": "请输入新密码",
+      "passwordUpdated": "密码已修改",
+      "passwordUpdateFailed": "修改密码失败"
+    }
+  },
+  "publicSharePage": {
+    "badge": "ResumeXpert 分享页",
+    "title": "在线简历分享",
+    "lastPublished": "最近发布：",
+    "backHome": "返回首页",
+    "loading": "正在加载分享页...",
+    "accessCodePlaceholder": "请输入访问码",
+    "errors": {
+      "passwordRequired": "该分享页受访问码保护，请输入访问码。",
+      "private": "该分享页当前为私有状态。",
+      "expired": "该分享页已过期。",
+      "viewLimitReached": "该分享页已达到访问次数上限。",
+      "notFound": "该分享页已关闭或不存在。",
+      "loadFailed": "加载分享页失败，请稍后重试。"
+    }
+  },
+  "shareManagementPage": {
+    "hero": {
+      "badge": "Output Studio",
+      "title": "输出与分享中心",
+      "description": "把 PDF 导出、分享发布和访问治理放进同一个控制台里。你可以在这里统一管理公开分享链接、访问统计和稳定的 PDF 输出链路。",
+      "stats": {
+        "exports": "导出记录",
+        "views": "公开访问",
+        "governance": "治理状态"
+      }
+    },
+    "resumeSelector": {
+      "title": "选择简历",
+      "description": "先锁定一份简历，再处理导出、分享与访问治理。",
+      "backLink": "返回简历中心",
+      "loading": "正在加载简历列表...",
+      "empty": "还没有可输出的简历，先去创建一份简历。",
+      "updated": "最近更新",
+      "selected": "当前选中",
+      "unselectedHint": "先在上方选择一份简历，分享控制台会显示导出动作、链接管理、访问统计和输出历史。"
+    },
+    "summary": {
+      "currentResume": "当前简历",
+      "template": "模板",
+      "contentSource": "内容来源",
+      "goToEdit": "前往编辑",
+      "visitStats": "访问统计",
+      "viewCount": "累计浏览量",
+      "uniqueVisitors": "唯一访客数",
+      "deniedAccess": "拒绝访问次数"
+    },
+    "share": {
+      "title": "分享状态",
+      "lastPublished": "最后发布",
+      "lastViewed": "最后访问",
+      "governanceStatus": "治理状态",
+      "managementBadge": "分享管理",
+      "managementTitle": "控制公开链接与访问规则",
+      "managementDescription": "链接状态、访问限制和治理备注都在同一个发布面板里完成。",
+      "currentVisibility": "当前可见性",
+      "publicLink": "公开链接",
+      "publicLinkEmpty": "当前还没有分享链接，点击下方按钮创建。",
+      "governanceHint": "当前公开页展示的是最近一次“重新发布”时的快照。如果你刚修改了简历内容，需要再次点击“重新发布”才会更新公开页。",
+      "fields": {
+        "visibility": "可见性",
+        "expiresAt": "到期时间",
+        "maxViewLimit": "最大访问次数",
+        "accessCode": "访问码",
+        "governanceNotes": "治理备注"
+      },
+      "placeholders": {
+        "maxViewLimit": "最大访问次数",
+        "accessCode": "访问码",
+        "governanceNotes": "治理备注，例如：仅限本周投递使用"
+      },
+      "visibilityOptions": {
+        "public": "公开访问",
+        "publicShort": "公开",
+        "unlisted": "仅持链路可见",
+        "password": "访问码保护",
+        "private": "私有"
+      },
+      "actions": {
+        "creating": "创建中...",
+        "createShare": "创建分享链接",
+        "copyShareLink": "复制分享链接",
+        "publishing": "发布中...",
+        "republish": "重新发布",
+        "processing": "处理中...",
+        "disableShare": "关闭分享",
+        "enableShare": "重新开启分享",
+        "openPublicPage": "打开公开页"
+      }
+    },
+    "export": {
+      "badge": "导出操作",
+      "title": "一键输出当前简历",
+      "description": "当前输出中心只保留 PDF 导出，保证最稳定、最直接的交付链路。",
+      "currentTemplate": "当前模板",
+      "exporting": "导出中...",
+      "exportPdf": "导出 PDF"
+    },
+    "history": {
+      "title": "导出历史",
+      "description": "把文档导出和分享发布记录串起来，方便回看每一次输出动作。",
+      "recordCount": "{{count}} 条记录",
+      "empty": "还没有 PDF 导出或分享发布记录。",
+      "summary": {
+        "total": "总记录",
+        "success": "成功",
+        "failed": "失败"
+      },
+      "table": {
+        "format": "格式",
+        "status": "状态",
+        "template": "模板",
+        "source": "来源",
+        "fileOrAction": "文件 / 动作",
+        "error": "错误信息",
+        "time": "时间"
+      },
+      "status": {
+        "success": "成功",
+        "failed": "失败",
+        "pending": "处理中"
+      },
+      "triggerSource": {
+        "shareManagement": "分享管理",
+        "outputCenter": "输出中心"
+      }
+    },
+    "preview": {
+      "title": "输出预览",
+      "description": "PDF 和公开分享页都会复用同一份渲染结果。",
+      "loading": "正在准备输出预览...",
+      "exportLoading": "正在准备导出画布...",
+      "summary": "分享摘要",
+      "linkStatus": "链接状态",
+      "visibility": "可见性",
+      "lastPublished": "最后发布",
+      "online": "在线中",
+      "closed": "已关闭",
+      "notGenerated": "未生成"
+    },
+    "status": {
+      "published": "已发布",
+      "closed": "已关闭",
+      "notCreated": "未创建"
+    },
+    "toasts": {
+      "loadCenterFailed": "加载输出中心失败",
+      "loadResumeBundleFailed": "加载简历输出信息失败",
+      "shareCreated": "分享链接已创建",
+      "shareCreateFailed": "创建分享链接失败",
+      "shareRepublished": "分享页已重新发布",
+      "shareRepublishFailed": "重新发布失败",
+      "shareEnabled": "分享已开启",
+      "shareDisabled": "分享已关闭",
+      "shareToggleFailed": "切换分享状态失败",
+      "pdfExported": "PDF 已导出",
+      "pdfCloneFailed": "页面渲染节点准备失败，请刷新页面后重试",
+      "pdfCanvasFailed": "截图渲染失败，请检查模板内容是否过长或样式是否异常",
+      "pdfExportFailed": "浏览器导出 PDF 失败，请稍后重试",
+      "shareCopied": "分享链接已复制",
+      "shareCopyFailed": "复制链接失败"
+    }
+  },
+  "adminPage": {
+    "badge": "Admin Console",
+    "title": "管理员后台",
+    "description": "集中处理模板审核与用户管理，快速完成账号启停、密码重置等后台操作。",
+    "noPermissionTitle": "当前账号没有管理员权限",
+    "noPermissionDescription": "管理员后台已独立拆出，仅 `admin` 角色可访问模板审核与用户管理能力。",
+    "pendingTemplates": "待处理模板",
+    "totalUsers": "用户总数",
+    "navigation": "后台导航",
+    "reviewQueueTitle": "待审核模板",
+    "reviewQueueDescription": "集中处理社区投稿，避免污染用户端模板中心。",
+    "itemCount": "{{count}} 项",
+    "communityCreator": "Community Creator",
+    "noDescription": "暂无描述",
+    "noPendingTemplates": "当前没有待处理模板。",
+    "reviewStatus": {
+      "reserved": "未提交",
+      "pending": "待审核",
+      "approved": "已通过",
+      "rejected": "已驳回"
+    },
+    "sourceType": {
+      "official": "官方",
+      "custom": "个人",
+      "community": "社区"
+    },
+    "tabs": {
+      "templates": "模板审核",
+      "users": "用户管理"
+    },
+    "templateReview": {
+      "noDescription": "暂无描述",
+      "currentStatus": "当前状态",
+      "submitterNote": "投稿说明",
+      "notFilled": "未填写",
+      "reviewNotes": "审核备注",
+      "reviewNotesPlaceholder": "记录通过理由、修改建议或驳回原因",
+      "previewTitle": "模板预览",
+      "previewDescription": "管理员在后台独立查看结构与渲染效果，不再占用用户端操作空间。",
+      "actions": {
+        "approve": "通过",
+        "reject": "驳回"
+      }
+    },
+    "userManagement": {
+      "title": "用户列表",
+      "description": "支持搜索、筛选、查看详情，并执行密码重置与账号启停。",
+      "searchPlaceholder": "搜索姓名或邮箱",
+      "filters": {
+        "allRoles": "全部角色",
+        "user": "普通用户",
+        "admin": "管理员",
+        "allStatuses": "全部状态",
+        "active": "启用中",
+        "disabled": "已停用"
+      }
+    },
+    "userDetail": {
+      "badge": "Account Detail",
+      "role": "角色",
+      "status": "状态",
+      "disable": "停用账号",
+      "enable": "重新启用",
+      "createdAt": "创建时间"
+    },
+    "passwordReset": {
+      "title": "重置密码",
+      "description": "管理员直接设置新密码，不引入邮件链路。",
+      "placeholder": "输入新的临时密码（至少 8 位）",
+      "submit": "提交重置"
+    },
+    "toasts": {
+      "loadReviewQueueFailed": "加载审核队列失败",
+      "loadUsersFailed": "加载用户列表失败",
+      "loadUserDetailFailed": "加载用户详情失败",
+      "templateApproved": "模板已通过审核",
+      "templateRejected": "模板已驳回",
+      "reviewFailed": "处理模板审核失败",
+      "userEnabled": "账号已启用",
+      "userDisabled": "账号已停用",
+      "updateUserStatusFailed": "更新账号状态失败",
+      "passwordReset": "密码已重置",
+      "passwordResetFailed": "重置密码失败"
+    }
+  },
+  "templatesPage": {
+    "badge": "Template Manager",
+    "title": "模板管理中心",
+    "description": "在这里统一浏览官方模板、预览社区模板，并管理你自己的模板资产。模板套用已迁回简历编辑页，不再在这里选择简历应用。",
+    "currentSelection": "当前选中模板",
+    "managementState": "管理状态",
+    "loadingState": "正在加载...",
+    "unselected": "未选择模板",
+    "editable": "可编辑",
+    "readonly": "只读预览",
+    "searchPlaceholder": "搜索模板、作者、关键词",
+    "allSources": "全部来源",
+    "listTitle": "模板列表",
+    "listDescription": "这里负责查找模板和切换预览对象。",
+    "loadingCount": "加载中",
+    "count": "{{count}} 个",
+    "noDescription": "暂无描述",
+    "defaultAuthor": "ResumeXpert",
+    "authorPrefix": "作者：",
+    "namePrefix": "模板名称：",
+    "categoryPrefix": "分类：",
+    "reviewStatusPrefix": "投稿状态：",
+    "untitledTemplate": "未命名模板",
+    "favorited": "已收藏",
+    "owned": "我的模板",
+    "favoriteTemplate": "收藏模板",
+    "deleteTemplate": "删除模板",
+    "duplicateTemplate": "复制为我的模板",
+    "deleting": "删除中...",
+    "duplicating": "复制中...",
+    "readonlyHint": "官方模板与社区模板保持只读。如果你想修改排版，请先复制成自己的模板后再编辑。",
+    "previewTitle": "模板预览",
+    "previewDescription": "这里仅用于确认模板外观，不承担模板套用行为。",
+    "loadingDetails": "正在加载模板详情...",
+    "workbenchTitle": "模板工作台",
+    "workbenchDescription": "右侧改成单面板切换，点击按钮后只显示对应设置区域。",
+    "detailsTitle": "当前模板详情",
+    "detailsDescription": "管理模板名称、描述、分类、投稿说明和排版配置。",
+    "ownedHint": "这是你的模板，可继续维护与投稿。",
+    "officialHint": "这是官方模板，仅支持预览与收藏。",
+    "unsavedDetails": "你有未保存的模板变更，记得保存后再离开当前页面。",
+    "namePlaceholder": "模板名称",
+    "descriptionPlaceholder": "模板描述",
+    "submitterNotePlaceholder": "社区投稿说明",
+    "saveTemplate": "保存模板",
+    "saving": "保存中...",
+    "submitCommunity": "提交社区审核",
+    "submitting": "提交中...",
+    "layoutTitle": "排版编辑",
+    "layoutDescription": "这里只修改模板的主题参数和区块布局，不会改动任何真实简历内容。",
+    "layoutOwnedHint": "你的模板可直接调色、调字体和调区块布局。",
+    "layoutReadonlyHint": "当前模板只读，复制后即可编辑排版。",
+    "unsavedLayout": "排版参数有未保存变更，保存模板后才会正式写入你的模板资产。",
+    "layoutReadonlyHelp": "当前模板不开放直接编辑。先点上方“复制为我的模板”，再到这里调整主题色、字体、布局模式和区块顺序。",
+    "createTitle": "新建我的模板",
+    "createDescription": "创建新的个人模板资产，后续可继续编辑、删除或投稿。",
+    "createDraftHint": "新模板草稿还没创建，提交后会进入你的模板列表并自动切回详情面板。",
+    "createDescriptionPlaceholder": "描述适用场景、风格与推荐人群",
+    "createTemplate": "创建个人模板",
+    "creating": "创建中...",
+    "empty": "没有匹配的模板，试试切换筛选或清空关键词。",
+    "actionsBadge": "Template Actions",
+    "actionsTitle": "模板资产操作",
+    "actionsDescription": "这里保留模板收藏、投稿和自有模板管理能力。模板套用已迁回编辑页的主题弹层。",
+    "scopes": {
+      "all": "全部模板",
+      "favorites": "我的收藏",
+      "mine": "我的模板"
+    },
+    "reviewStatus": {
+      "reserved": "未提交",
+      "pending": "待审核",
+      "approved": "已发布",
+      "rejected": "已驳回",
+      "official": "官方模板"
+    },
+    "sourceType": {
+      "official": "官方",
+      "custom": "个人",
+      "community": "社区"
+    },
+    "sourceLabel": {
+      "official": "官方模板",
+      "custom": "个人模板",
+      "community": "社区模板"
+    },
+    "categories": {
+      "general": "通用",
+      "product": "产品 / 设计",
+      "engineering": "工程 / 技术",
+      "business": "商业 / 运营"
+    },
+    "panels": {
+      "details": "模板详情",
+      "layout": "排版编辑",
+      "create": "新建模板"
+    },
+    "renderers": {
+      "flex": "灵活布局渲染器",
+      "r01": "渲染器 01",
+      "r02": "渲染器 02",
+      "r03": "渲染器 03"
+    },
+    "toasts": {
+      "favorited": "已加入收藏",
+      "unfavorited": "已取消收藏",
+      "favoriteFailed": "更新收藏失败",
+      "created": "个人模板已创建",
+      "createFailed": "创建模板失败",
+      "duplicated": "已复制到我的模板，继续编辑排版吧",
+      "duplicateFailed": "复制模板失败",
+      "updated": "模板已更新",
+      "updateFailed": "保存模板失败",
+      "deleted": "模板已删除",
+      "deleteFailed": "删除模板失败",
+      "submitted": "模板已提交社区审核",
+      "submitFailed": "提交社区审核失败",
+      "nameRequired": "请填写模板名称",
+      "onlyOwnedEditable": "只有你的模板可以编辑",
+      "officialDeleteBlocked": "官方模板不支持删除",
+      "onlyOwnedSubmittable": "只有你的模板可以提交社区"
+    }
+  },
   "template": {
     "sections": {
       "professionalSummary": "专业简介",
