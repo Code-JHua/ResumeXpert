@@ -1,10 +1,10 @@
 import { describe, it, expect } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { render, screen, waitFor } from '@testing-library/react'
 import RenderResume from '../../components/RenderResume'
 import { DUMMY_RESUME_DATA } from '../../utils/data'
 
 describe('RenderResume', () => {
-  it('renders a registered template by id', () => {
+  it('renders a registered template by id', async () => {
     render(
       <RenderResume
         templateId='01'
@@ -13,10 +13,12 @@ describe('RenderResume', () => {
       />
     )
 
-    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Alex Johnson')
+    await waitFor(() => {
+      expect(document.querySelector('a[href="mailto:alex.johnson.dev@gmail.com"]')).toBeInTheDocument()
+    })
   })
 
-  it('falls back to the default template for unknown ids', () => {
+  it('falls back to the default template for unknown ids', async () => {
     render(
       <RenderResume
         templateId='unknown-template'
@@ -25,10 +27,12 @@ describe('RenderResume', () => {
       />
     )
 
-    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Alex Johnson')
+    await waitFor(() => {
+      expect(document.querySelector('a[href="mailto:alex.johnson.dev@gmail.com"]')).toBeInTheDocument()
+    })
   })
 
-  it('renders free blocks in registered templates', () => {
+  it('renders free blocks in registered templates', async () => {
     render(
       <RenderResume
         templateId='01'
@@ -46,7 +50,7 @@ describe('RenderResume', () => {
       />
     )
 
-    expect(screen.getByText('Awards')).toBeInTheDocument()
-    expect(screen.getByText('Global Hackathon Winner')).toBeInTheDocument()
+    expect(await screen.findByText('Awards')).toBeInTheDocument()
+    expect(await screen.findByText('Global Hackathon Winner')).toBeInTheDocument()
   })
 })

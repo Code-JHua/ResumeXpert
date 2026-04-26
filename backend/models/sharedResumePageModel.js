@@ -39,8 +39,21 @@ const SharedResumePageSchema = new mongoose.Schema({
   },
   visibility: {
     type: String,
-    enum: ['public'],
+    enum: ['public', 'unlisted', 'password', 'private'],
     default: 'public',
+  },
+  accessCode: {
+    type: String,
+    default: '',
+    select: false,
+  },
+  expiresAt: {
+    type: Date,
+    default: null,
+  },
+  maxViewLimit: {
+    type: Number,
+    default: null,
   },
   lastPublishedAt: {
     type: Date,
@@ -58,6 +71,10 @@ const SharedResumePageSchema = new mongoose.Schema({
     type: Number,
     default: 0,
   },
+  deniedAccessCount: {
+    type: Number,
+    default: 0,
+  },
   visitorHashes: {
     type: [String],
     default: [],
@@ -70,6 +87,10 @@ const SharedResumePageSchema = new mongoose.Schema({
   themeSnapshot: {
     type: mongoose.Schema.Types.Mixed,
     default: null,
+  },
+  governanceNotes: {
+    type: String,
+    default: '',
   },
 }, { timestamps: true })
 

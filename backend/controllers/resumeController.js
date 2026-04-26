@@ -81,10 +81,7 @@ export const createResume = async (req, res) => {
       },
       contentSource: 'structured',
       sourceDocumentId: null,
-      sourceImportId: null,
-      derivedFromResumeId: null,
       derivedFromVersionId: null,
-      targetJobDescriptionId: null,
       freeBlocks: [],
       status: 'active',
     };
@@ -105,7 +102,7 @@ export const createResume = async (req, res) => {
 // Get Function
 export const getUserResumes = async (req, res) => {
   try {
-    const resumes = await Resume.find({ userId: req.user._id }).sort({ updatedAt: -1 })
+    const resumes = await Resume.find({ userId: req.user._id }).sort({ updatedAt: -1 }).lean()
     res.json(resumes)
   } catch (error) {
     res.status(500).json({ message: "Failed to get resumes", error: error.message });
@@ -161,10 +158,7 @@ export const updateResume = async (req, res) => {
     if (req.body.completion !== undefined) resume.completion = req.body.completion
     if (req.body.contentSource !== undefined) resume.contentSource = req.body.contentSource
     if (req.body.sourceDocumentId !== undefined) resume.sourceDocumentId = req.body.sourceDocumentId
-    if (req.body.sourceImportId !== undefined) resume.sourceImportId = req.body.sourceImportId
-    if (req.body.derivedFromResumeId !== undefined) resume.derivedFromResumeId = req.body.derivedFromResumeId
     if (req.body.derivedFromVersionId !== undefined) resume.derivedFromVersionId = req.body.derivedFromVersionId
-    if (req.body.targetJobDescriptionId !== undefined) resume.targetJobDescriptionId = req.body.targetJobDescriptionId
     if (req.body.freeBlocks !== undefined) resume.freeBlocks = req.body.freeBlocks
     if (req.body.status !== undefined) resume.status = req.body.status
 

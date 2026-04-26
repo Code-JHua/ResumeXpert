@@ -42,24 +42,18 @@ const ResumeSchema = new mongoose.Schema({
     ref: 'ResumeMarkdownDocument',
     default: null
   },
-  sourceImportId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'ResumeImport',
-    default: null
-  },
-  derivedFromResumeId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Resume',
-    default: null
-  },
   derivedFromVersionId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'ResumeVersion',
     default: null
   },
-  targetJobDescriptionId: {
+  canonicalContentVersion: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'JobDescription',
+    ref: 'ResumeVersion',
+    default: null
+  },
+  canonicalContentUpdatedAt: {
+    type: Date,
     default: null
   },
   freeBlocks: {

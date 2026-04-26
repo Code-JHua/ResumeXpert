@@ -8,4 +8,19 @@ export default defineConfig({
     react(),
     tailwindcss(),
   ],
+  build: {
+    sourcemap: false,
+    chunkSizeWarningLimit: 900,
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (id.includes('node_modules')) {
+            if (id.includes('react-router')) return 'vendor-router'
+            if (id.includes('@tanstack/react-query')) return 'vendor-query'
+            if (id.includes('i18next')) return 'vendor-i18n'
+          }
+        },
+      },
+    },
+  },
 })

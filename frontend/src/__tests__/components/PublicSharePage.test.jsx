@@ -60,4 +60,19 @@ describe('PublicSharePage', () => {
 
     expect(await screen.findByText('该分享页已关闭或不存在。')).toBeInTheDocument()
   })
+
+  it('shows access code prompt when the share page is password protected', async () => {
+    getMock.mockRejectedValue({ response: { status: 401, data: { reason: 'password_required' } } })
+
+    render(
+      <MemoryRouter initialEntries={['/s/protected-share']} >
+        <Routes>
+          <Route path='/s/:slug' element={<PublicSharePage />} />
+        </Routes>
+      </MemoryRouter>
+    )
+
+    expect(await screen.findByText('该分享页受访问码保护，请输入访问码。')).toBeInTheDocument()
+    expect(screen.getByPlaceholderText('请输入访问码')).toBeInTheDocument()
+  })
 })

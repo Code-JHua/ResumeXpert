@@ -4,13 +4,10 @@ import cors from 'cors'
 import 'dotenv/config'
 import userRoutes from '../routes/userRoutes.js'
 import resumeRoutes from '../routes/resumeRouter.js'
-import jobDescriptionRoutes from '../routes/jobDescriptionRoutes.js'
-import atsRoutes from '../routes/atsRoutes.js'
-import coverLetterRoutes from '../routes/coverLetterRoutes.js'
-import applicationRoutes from '../routes/applicationRoutes.js'
-import resumeImportRoutes from '../routes/resumeImportRoutes.js'
 import templateRoutes from '../routes/templateRoutes.js'
 import publicRoutes from '../routes/publicRoutes.js'
+import adminRoutes from '../routes/adminRoutes.js'
+import User from '../models/userModel.js'
 
 const createTestApp = () => {
   const app = express()
@@ -18,13 +15,9 @@ const createTestApp = () => {
   app.use(express.json())
   app.use('/api/auth', userRoutes)
   app.use('/api/resume', resumeRoutes)
-  app.use('/api/job-descriptions', jobDescriptionRoutes)
-  app.use('/api/ats', atsRoutes)
-  app.use('/api/cover-letters', coverLetterRoutes)
-  app.use('/api/applications', applicationRoutes)
-  app.use('/api/imports', resumeImportRoutes)
   app.use('/api/templates', templateRoutes)
   app.use('/api/public', publicRoutes)
+  app.use('/api/admin', adminRoutes)
 
   return app
 }
@@ -32,11 +25,9 @@ const createTestApp = () => {
 describe('Career Tools API Tests', () => {
   let app
   let authToken
+  let adminToken
   let resumeId
-  let jobDescriptionId
   let versionId
-  let coverLetterId
-  let applicationId
 
   beforeAll(async () => {
     app = createTestApp()
@@ -53,6 +44,27 @@ describe('Career Tools API Tests', () => {
 
     authToken = registerResponse.body.token
 
+    const adminRegisterResponse = await request(app)
+      .post('/api/auth/register')
+      .send({
+        name: 'Career Tool Admin',
+        email: `admin${Date.now()}@example.com`,
+        password: 'password123',
+      })
+
+    await User.findByIdAndUpdate(adminRegisterResponse.body._id, {
+      role: 'admin',
+    })
+
+    const adminLoginResponse = await request(app)
+      .post('/api/auth/login')
+      .send({
+        email: adminRegisterResponse.body.email,
+        password: 'password123',
+      })
+
+    adminToken = adminLoginResponse.body.token
+
     const resumeResponse = await request(app)
       .post('/api/resume')
       .set('Authorization', `Bearer ${authToken}`)
@@ -68,73 +80,6 @@ describe('Career Tools API Tests', () => {
       })
 
     resumeId = resumeResponse.body._id
-  })
-
-  it('should manage job descriptions and run ATS analysis', async () => {
-    const createResponse = await request(app)
-      .post('/api/job-descriptions')
-      .set('Authorization', `Bearer ${authToken}`)
-      .send({
-        title: 'Frontend Engineer',
-        company: 'Example Inc',
-        sourceText: 'Looking for a React engineer with Node.js, testing and communication skills.',
-      })
-
-    expect(createResponse.status).toBe(201)
-    expect(createResponse.body.keywords.length).toBeGreaterThan(0)
-    jobDescriptionId = createResponse.body._id
-
-    const analysisResponse = await request(app)
-      .post('/api/ats/analyze')
-      .set('Authorization', `Bearer ${authToken}`)
-      .send({
-        resumeId,
-        jobDescriptionId,
-      })
-
-    expect(analysisResponse.status).toBe(200)
-    expect(analysisResponse.body.analysisRecordId).toBeDefined()
-    expect(analysisResponse.body).toHaveProperty('overallScore')
-    expect(Array.isArray(analysisResponse.body.recommendations)).toBe(true)
-  })
-
-  it('should derive a job-specific resume from an ATS analysis record', async () => {
-    const createJobResponse = await request(app)
-      .post('/api/job-descriptions')
-      .set('Authorization', `Bearer ${authToken}`)
-      .send({
-        title: 'Senior Frontend Engineer',
-        company: 'Career Labs',
-        sourceText: 'Need React, Node.js, TypeScript and communication for cross-functional product work.',
-      })
-
-    jobDescriptionId = createJobResponse.body._id
-
-    const analyzeResponse = await request(app)
-      .post('/api/ats/analyze')
-      .set('Authorization', `Bearer ${authToken}`)
-      .send({
-        resumeId,
-        jobDescriptionId,
-      })
-
-    expect(analyzeResponse.status).toBe(200)
-    expect(analyzeResponse.body.analysisRecordId).toBeDefined()
-
-    const deriveResponse = await request(app)
-      .post('/api/ats/derive-resume')
-      .set('Authorization', `Bearer ${authToken}`)
-      .send({
-        resumeId,
-        jobDescriptionId,
-        analysisRecordId: analyzeResponse.body.analysisRecordId,
-      })
-
-    expect(deriveResponse.status).toBe(201)
-    expect(deriveResponse.body.resume.derivedFromResumeId.toString()).toBe(resumeId)
-    expect(deriveResponse.body.resume.targetJobDescriptionId.toString()).toBe(jobDescriptionId)
-    expect(deriveResponse.body.version.sourceType).toBe('derived')
-    expect(deriveResponse.body.analysisRecordId).toBe(analyzeResponse.body.analysisRecordId)
   })
 
   it('should create, list, restore and delete resume versions', async () => {
@@ -392,235 +337,214 @@ describe('Career Tools API Tests', () => {
     )
   })
 
-  it('should manage imports and expose template metadata', async () => {
-    const createImportResponse = await request(app)
-      .post('/api/imports')
-      .set('Authorization', `Bearer ${authToken}`)
-      .send({
-        sourceType: 'markdown',
-        originalFileName: 'resume.md',
-        rawText: '# Resume',
-        status: 'needs_confirmation',
-      })
-
-    expect(createImportResponse.status).toBe(201)
-
-    const importId = createImportResponse.body._id
-
-    const updateImportResponse = await request(app)
-      .put(`/api/imports/${importId}`)
-      .set('Authorization', `Bearer ${authToken}`)
-      .send({
-        status: 'confirmed',
-        manualCorrections: [{ field: 'profileInfo.fullName', value: 'Career User' }],
-      })
-
-    expect(updateImportResponse.status).toBe(200)
-    expect(updateImportResponse.body.status).toBe('confirmed')
-
-    const getImportResponse = await request(app)
-      .get(`/api/imports/${importId}`)
-      .set('Authorization', `Bearer ${authToken}`)
-
-    expect(getImportResponse.status).toBe(200)
-    expect(getImportResponse.body.manualCorrections.length).toBe(1)
-
+  it('should expose template metadata and apply a template to a resume', async () => {
     const templatesResponse = await request(app).get('/api/templates')
     expect(templatesResponse.status).toBe(200)
     expect(templatesResponse.body.length).toBeGreaterThan(0)
+    expect(templatesResponse.body.some((template) => template.id === 'official-classic-professional')).toBe(true)
+    expect(templatesResponse.body.find((template) => template.id === 'official-classic-professional').authorName).toBe('ResumeXpert')
 
-    const templatePreviewResponse = await request(app).get('/api/templates/01/preview')
+    const templatePreviewResponse = await request(app).get('/api/templates/official-classic-professional/preview')
     expect(templatePreviewResponse.status).toBe(200)
-    expect(templatePreviewResponse.body.id).toBe('01')
-  })
+    expect(templatePreviewResponse.body.id).toBe('official-classic-professional')
 
-  it('should import markdown and confirm it into a resume', async () => {
-    const createImportResponse = await request(app)
-      .post('/api/imports/markdown')
+    const legacyTemplatePreviewResponse = await request(app).get('/api/templates/01/preview')
+    expect(legacyTemplatePreviewResponse.status).toBe(200)
+    expect(legacyTemplatePreviewResponse.body.id).toBe('official-classic-professional')
+
+    const createTemplateResponse = await request(app)
+      .post('/api/templates')
       .set('Authorization', `Bearer ${authToken}`)
       .send({
-        originalFileName: 'candidate.md',
-        rawText: [
-          '# Jane Import',
-          'Frontend Engineer',
-          '',
-          '## Summary',
-          'React developer with product thinking.',
-          '',
-          '## Skills',
-          '- React',
-          '- Node.js',
-          '',
-          'jane@example.com',
-        ].join('\n'),
+        name: 'Private Custom Template',
+        rendererKey: 'flex',
+        sourceType: 'custom',
+        category: 'general',
       })
 
-    expect(createImportResponse.status).toBe(201)
-    expect(createImportResponse.body.status).toBe('needs_confirmation')
-    expect(createImportResponse.body.mappedResumeDraft.profileInfo.fullName).toBe('Jane Import')
+    expect(createTemplateResponse.status).toBe(201)
 
-    const confirmResponse = await request(app)
-      .put(`/api/imports/${createImportResponse.body._id}/confirm`)
+    const customTemplateId = createTemplateResponse.body.id
+
+    const anonymousCustomPreviewResponse = await request(app).get(`/api/templates/${customTemplateId}/preview`)
+    expect(anonymousCustomPreviewResponse.status).toBe(404)
+
+    const authenticatedCustomPreviewResponse = await request(app)
+      .get(`/api/templates/${customTemplateId}/preview`)
+      .set('Authorization', `Bearer ${authToken}`)
+
+    expect(authenticatedCustomPreviewResponse.status).toBe(200)
+    expect(authenticatedCustomPreviewResponse.body.id).toBe(customTemplateId)
+    expect(authenticatedCustomPreviewResponse.body.authorName).toBe('Career Tool User')
+
+    const mineTemplatesResponse = await request(app)
+      .get('/api/templates?scope=mine')
+      .set('Authorization', `Bearer ${authToken}`)
+
+    expect(mineTemplatesResponse.status).toBe(200)
+    expect(mineTemplatesResponse.body.some((template) => template.id === customTemplateId)).toBe(true)
+
+    const duplicateOfficialResponse = await request(app)
+      .post('/api/templates/official-classic-professional/duplicate')
+      .set('Authorization', `Bearer ${authToken}`)
+      .send({})
+
+    expect(duplicateOfficialResponse.status).toBe(201)
+    expect(duplicateOfficialResponse.body.isOwned).toBe(true)
+
+    const updateProfileResponse = await request(app)
+      .put('/api/auth/profile')
       .set('Authorization', `Bearer ${authToken}`)
       .send({
-        mappedResumeDraft: {
-          ...createImportResponse.body.mappedResumeDraft,
-          profileInfo: {
-            ...createImportResponse.body.mappedResumeDraft.profileInfo,
-            designation: 'Senior Frontend Engineer',
-          },
-        },
-        manualCorrections: [{ field: 'profileInfo.designation', value: 'Senior Frontend Engineer' }],
+        name: 'Career Tool User Updated',
       })
 
-    expect(confirmResponse.status).toBe(200)
-    expect(confirmResponse.body.status).toBe('confirmed')
-    expect(confirmResponse.body.resumeId).toBeDefined()
-    expect(confirmResponse.body.markdownDocumentId).toBeDefined()
+    expect(updateProfileResponse.status).toBe(200)
 
-    const resumeResponse = await request(app)
-      .get(`/api/resume/${confirmResponse.body.resumeId}`)
+    const refreshedCustomTemplateResponse = await request(app)
+      .get(`/api/templates/${customTemplateId}`)
       .set('Authorization', `Bearer ${authToken}`)
 
-    expect(resumeResponse.status).toBe(200)
-    expect(resumeResponse.body.contentSource).toBe('markdown')
-    expect(resumeResponse.body.sourceImportId).toBe(createImportResponse.body._id)
-  })
+    expect(refreshedCustomTemplateResponse.status).toBe(200)
+    expect(refreshedCustomTemplateResponse.body.authorName).toBe('Career Tool User Updated')
 
-  it('should preserve original nested fields when confirm overrides only part of the draft', async () => {
-    const createImportResponse = await request(app)
-      .post('/api/imports/markdown')
-      .set('Authorization', `Bearer ${authToken}`)
-      .send({
-        originalFileName: 'partial.md',
-        rawText: [
-          '# Alex Import',
-          'Product Engineer',
-          '',
-          'alex@example.com',
-        ].join('\n'),
-      })
-
-    expect(createImportResponse.status).toBe(201)
-
-    const confirmResponse = await request(app)
-      .put(`/api/imports/${createImportResponse.body._id}/confirm`)
-      .set('Authorization', `Bearer ${authToken}`)
-      .send({
-        mappedResumeDraft: {
-          profileInfo: {
-            designation: 'Senior Product Engineer',
-          },
-        },
-        manualCorrections: [{ field: 'profileInfo.designation', value: 'Senior Product Engineer' }],
-      })
-
-    expect(confirmResponse.status).toBe(200)
-
-    const resumeResponse = await request(app)
-      .get(`/api/resume/${confirmResponse.body.resumeId}`)
-      .set('Authorization', `Bearer ${authToken}`)
-
-    expect(resumeResponse.status).toBe(200)
-    expect(resumeResponse.body.profileInfo.fullName).toBe('Alex Import')
-    expect(resumeResponse.body.profileInfo.designation).toBe('Senior Product Engineer')
-  })
-
-  it('should reject invalid pdf imports with a failed import record', async () => {
-    const pdfImportResponse = await request(app)
-      .post('/api/imports/pdf')
-      .set('Authorization', `Bearer ${authToken}`)
-      .send({
-        originalFileName: 'broken.pdf',
-        base64Content: 'not-a-real-pdf',
-      })
-
-    expect(pdfImportResponse.status).toBe(422)
-    expect(pdfImportResponse.body.importId).toBeDefined()
-
-    const failedImportResponse = await request(app)
-      .get(`/api/imports/${pdfImportResponse.body.importId}`)
-      .set('Authorization', `Bearer ${authToken}`)
-
-    expect(failedImportResponse.status).toBe(200)
-    expect(failedImportResponse.body.status).toBe('failed')
-    expect(failedImportResponse.body.failureReason).toBeTruthy()
-  })
-
-  it('should generate cover letters and manage applications', async () => {
-    const jobResponse = await request(app)
-      .post('/api/job-descriptions')
-      .set('Authorization', `Bearer ${authToken}`)
-      .send({
-        title: 'Full Stack Engineer',
-        company: 'Hiring Co',
-        sourceText: 'Need React, Node.js and team communication experience for product development.',
-      })
-    jobDescriptionId = jobResponse.body._id
-
-    const versionResponse = await request(app)
-      .post(`/api/resume/${resumeId}/versions`)
-      .set('Authorization', `Bearer ${authToken}`)
-      .send({ versionName: '全栈投递版' })
-    versionId = versionResponse.body._id
-
-    const coverLetterResponse = await request(app)
-      .post('/api/cover-letters/generate')
+    const applyTemplateResponse = await request(app)
+      .post(`/api/templates/${customTemplateId}/apply`)
       .set('Authorization', `Bearer ${authToken}`)
       .send({
         resumeId,
-        resumeVersionId: versionId,
-        jobDescriptionId,
-        sourceAnalysisId: '6805a2d5d4f8b9c4a1234567',
-        title: 'Hiring Co 求职信',
+        themeSettings: {
+          accentColor: '#111827',
+        },
+        layoutMode: 'two-column',
+        blockConfig: [],
       })
 
-    expect(coverLetterResponse.status).toBe(201)
-    expect(coverLetterResponse.body.content).toContain('尊敬的招聘团队')
-    expect(coverLetterResponse.body.resumeVersionId._id || coverLetterResponse.body.resumeVersionId).toBeDefined()
-    coverLetterId = coverLetterResponse.body._id
+    expect(applyTemplateResponse.status).toBe(200)
+    expect(applyTemplateResponse.body.resume.template.templateId).toBe(customTemplateId)
+  })
 
-    const applicationResponse = await request(app)
-      .post('/api/applications')
+  it('should restrict review queue to admins and let admins review community templates', async () => {
+    const templateResponse = await request(app)
+      .post('/api/templates')
       .set('Authorization', `Bearer ${authToken}`)
       .send({
-        company: 'Hiring Co',
-        position: 'Full Stack Engineer',
-        resumeId,
-        resumeVersionId: versionId,
-        jobDescriptionId,
-        coverLetterId,
-        sourceAnalysisId: '6805a2d5d4f8b9c4a1234567',
-        status: 'applied',
-        appliedAt: '2026-04-21T10:00:00.000Z',
-        nextActionAt: '2026-04-25T10:00:00.000Z',
-        notes: '等待一面通知',
+        name: 'Community Candidate',
+        rendererKey: 'flex',
+        sourceType: 'custom',
+        category: 'general',
       })
 
-    expect(applicationResponse.status).toBe(201)
-    expect(applicationResponse.body.timeline.length).toBeGreaterThan(1)
-    applicationId = applicationResponse.body._id
-
-    const timelineResponse = await request(app)
-      .post(`/api/applications/${applicationId}/timeline`)
+    const submitResponse = await request(app)
+      .post(`/api/templates/${templateResponse.body.id}/submit-community`)
       .set('Authorization', `Bearer ${authToken}`)
       .send({
-        type: 'first_interview',
-        title: '一面',
-        time: '2026-04-26T09:00:00.000Z',
-        description: '技术面试',
-        status: 'first_interview',
+        submitterNote: 'Please review this template',
       })
 
-    expect(timelineResponse.status).toBe(200)
-    expect(timelineResponse.body.timeline.length).toBeGreaterThan(1)
+    expect(submitResponse.status).toBe(200)
+    expect(submitResponse.body.communityMeta.reviewStatus).toBe('pending')
 
-    const statsResponse = await request(app)
-      .get('/api/applications/stats/summary')
+    const forbiddenQueueResponse = await request(app)
+      .get('/api/templates/review-queue')
       .set('Authorization', `Bearer ${authToken}`)
 
-    expect(statsResponse.status).toBe(200)
-    expect(statsResponse.body.total).toBe(1)
-    expect(statsResponse.body.calendarItems.length).toBeGreaterThan(0)
+    expect(forbiddenQueueResponse.status).toBe(403)
+
+    const reviewQueueResponse = await request(app)
+      .get('/api/templates/review-queue')
+      .set('Authorization', `Bearer ${adminToken}`)
+
+    expect(reviewQueueResponse.status).toBe(200)
+    expect(reviewQueueResponse.body.some((item) => item.id === templateResponse.body.id)).toBe(true)
+
+    const reviewResponse = await request(app)
+      .post(`/api/templates/${templateResponse.body.id}/review`)
+      .set('Authorization', `Bearer ${adminToken}`)
+      .send({
+        decision: 'approved',
+        reviewNotes: 'Looks good',
+      })
+
+    expect(reviewResponse.status).toBe(200)
+    expect(reviewResponse.body.communityMeta.reviewStatus).toBe('approved')
+    expect(reviewResponse.body.communityMeta.reviewerName).toBe('Career Tool Admin')
+  })
+
+  it('should let admins manage users', async () => {
+    const listResponse = await request(app)
+      .get('/api/admin/users')
+      .set('Authorization', `Bearer ${adminToken}`)
+
+    expect(listResponse.status).toBe(200)
+    expect(Array.isArray(listResponse.body)).toBe(true)
+    expect(listResponse.body.length).toBeGreaterThan(0)
+
+    const targetUser = listResponse.body.find((item) => item.email !== undefined && item.role === 'user')
+    expect(targetUser).toBeDefined()
+
+    const detailResponse = await request(app)
+      .get(`/api/admin/users/${targetUser._id}`)
+      .set('Authorization', `Bearer ${adminToken}`)
+
+    expect(detailResponse.status).toBe(200)
+    expect(detailResponse.body.email).toBe(targetUser.email)
+
+    const statusResponse = await request(app)
+      .put(`/api/admin/users/${targetUser._id}/status`)
+      .set('Authorization', `Bearer ${adminToken}`)
+      .send({ status: 'disabled' })
+
+    expect(statusResponse.status).toBe(200)
+    expect(statusResponse.body.status).toBe('disabled')
+
+    const passwordResetResponse = await request(app)
+      .post(`/api/admin/users/${targetUser._id}/password-reset`)
+      .set('Authorization', `Bearer ${adminToken}`)
+      .send({ newPassword: 'newpass123' })
+
+    expect(passwordResetResponse.status).toBe(200)
+    expect(passwordResetResponse.body.message).toBe('Password reset successfully')
+  })
+
+  it('should enforce password protected share governance and expose export summary', async () => {
+    const shareCreateResponse = await request(app)
+      .post(`/api/resume/${resumeId}/share`)
+      .set('Authorization', `Bearer ${authToken}`)
+      .send({
+        title: 'Governed Share',
+        visibility: 'password',
+        accessCode: 'secret-123',
+        maxViewLimit: 1,
+        triggerSource: 'test',
+      })
+
+    expect(shareCreateResponse.status).toBe(201)
+    expect(shareCreateResponse.body.visibility).toBe('password')
+
+    const unauthorizedPublicResponse = await request(app)
+      .get(`/api/public/share/${shareCreateResponse.body.slug}`)
+
+    expect(unauthorizedPublicResponse.status).toBe(401)
+
+    const authorizedPublicResponse = await request(app)
+      .get(`/api/public/share/${shareCreateResponse.body.slug}`)
+      .set('x-share-access-code', 'secret-123')
+
+    expect(authorizedPublicResponse.status).toBe(200)
+
+    const limitedPublicResponse = await request(app)
+      .get(`/api/public/share/${shareCreateResponse.body.slug}`)
+      .set('x-share-access-code', 'secret-123')
+
+    expect(limitedPublicResponse.status).toBe(410)
+
+    const exportSummaryResponse = await request(app)
+      .get(`/api/resume/${resumeId}/exports/summary`)
+      .set('Authorization', `Bearer ${authToken}`)
+
+    expect(exportSummaryResponse.status).toBe(200)
+    expect(exportSummaryResponse.body.shareGovernance.visibility).toBe('password')
+    expect(exportSummaryResponse.body.shareGovernance.statusReason).toBe('view_limit_reached')
   })
 })

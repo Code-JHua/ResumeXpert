@@ -38,6 +38,10 @@ const buildShareResponse = (req, sharePage) => ({
   status: sharePage.status,
   isEnabled: sharePage.isEnabled,
   visibility: sharePage.visibility,
+  expiresAt: sharePage.expiresAt,
+  maxViewLimit: sharePage.maxViewLimit,
+  deniedAccessCount: sharePage.deniedAccessCount,
+  governanceNotes: sharePage.governanceNotes,
   lastPublishedAt: sharePage.lastPublishedAt,
   lastViewedAt: sharePage.lastViewedAt,
   viewCount: sharePage.viewCount,
@@ -45,6 +49,22 @@ const buildShareResponse = (req, sharePage) => ({
   createdAt: sharePage.createdAt,
   updatedAt: sharePage.updatedAt,
 })
+
+const resolveShareStatusReason = (sharePage) => {
+  if (!sharePage.isEnabled || sharePage.status !== 'published') {
+    return 'disabled'
+  }
+  if (sharePage.visibility === 'private') {
+    return 'private'
+  }
+  if (sharePage.expiresAt && new Date(sharePage.expiresAt).getTime() < Date.now()) {
+    return 'expired'
+  }
+  if (sharePage.maxViewLimit && sharePage.viewCount >= sharePage.maxViewLimit) {
+    return 'view_limit_reached'
+  }
+  return 'active'
+}
 
 const generateShareSlug = async (title) => {
   const baseTitle = String(title || 'resume')
@@ -110,6 +130,41 @@ export const getResumeExportLogs = async (req, res) => {
     res.json(exportLogs)
   } catch (error) {
     res.status(500).json({ message: 'Failed to fetch export logs', error: error.message })
+  }
+}
+
+export const getResumeExportGovernanceSummary = async (req, res) => {
+  try {
+    const resume = await ensureResumeOwnership(req.params.id, req.user._id)
+    if (!resume) {
+      return res.status(404).json({ message: 'Resume not found' })
+    }
+
+    const [logs, sharePage] = await Promise.all([
+      ExportLog.find({ resumeId: resume._id, userId: req.user._id }).sort({ createdAt: -1 }),
+      SharedResumePage.findOne({ resumeId: resume._id, userId: req.user._id }),
+    ])
+
+    const exportsByFormat = logs.reduce((acc, log) => {
+      acc[log.format] = (acc[log.format] || 0) + 1
+      return acc
+    }, {})
+
+    res.json({
+      totalExports: logs.length,
+      successfulExports: logs.filter((log) => log.status === 'success').length,
+      failedExports: logs.filter((log) => log.status === 'failed').length,
+      exportsByFormat,
+      shareGovernance: sharePage ? {
+        visibility: sharePage.visibility,
+        expiresAt: sharePage.expiresAt,
+        maxViewLimit: sharePage.maxViewLimit,
+        deniedAccessCount: sharePage.deniedAccessCount,
+        statusReason: resolveShareStatusReason(sharePage),
+      } : null,
+    })
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to build export governance summary', error: error.message })
   }
 }
 
@@ -211,7 +266,11 @@ export const createResumeSharePage = async (req, res) => {
       title: req.body.title || resume.title,
       status: 'published',
       isEnabled: true,
-      visibility: 'public',
+      visibility: req.body.visibility || 'public',
+      accessCode: req.body.accessCode || '',
+      expiresAt: req.body.expiresAt || null,
+      maxViewLimit: req.body.maxViewLimit || null,
+      governanceNotes: req.body.governanceNotes || '',
       lastPublishedAt: new Date(),
       lastSnapshot: snapshot,
       themeSnapshot: resume.template || { theme: '01', colorPalette: [] },
@@ -253,6 +312,11 @@ export const updateResumeSharePage = async (req, res) => {
     sharePage.resumeVersionId = req.body.resumeVersionId || sharePage.resumeVersionId
     sharePage.status = 'published'
     sharePage.isEnabled = true
+    sharePage.visibility = req.body.visibility || sharePage.visibility || 'public'
+    sharePage.accessCode = req.body.accessCode !== undefined ? req.body.accessCode : sharePage.accessCode
+    sharePage.expiresAt = req.body.expiresAt !== undefined ? req.body.expiresAt || null : sharePage.expiresAt
+    sharePage.maxViewLimit = req.body.maxViewLimit !== undefined ? req.body.maxViewLimit || null : sharePage.maxViewLimit
+    sharePage.governanceNotes = req.body.governanceNotes !== undefined ? req.body.governanceNotes : sharePage.governanceNotes
     sharePage.lastPublishedAt = new Date()
     sharePage.lastSnapshot = buildShareSnapshot(resume)
     sharePage.themeSnapshot = resume.template || { theme: '01', colorPalette: [] }
@@ -294,6 +358,9 @@ export const toggleResumeSharePage = async (req, res) => {
     const nextEnabled = typeof req.body.isEnabled === 'boolean' ? req.body.isEnabled : !sharePage.isEnabled
     sharePage.isEnabled = nextEnabled
     sharePage.status = nextEnabled ? 'published' : 'disabled'
+    if (req.body.visibility) {
+      sharePage.visibility = req.body.visibility
+    }
 
     if (nextEnabled) {
       sharePage.lastPublishedAt = new Date()
@@ -325,9 +392,37 @@ export const toggleResumeSharePage = async (req, res) => {
 
 export const getPublicSharePage = async (req, res) => {
   try {
-    const sharePage = await SharedResumePage.findOne({ slug: req.params.slug }).select('+visitorHashes')
-    if (!sharePage || !sharePage.isEnabled || sharePage.status !== 'published') {
+    const sharePage = await SharedResumePage.findOne({ slug: req.params.slug }).select('+visitorHashes +accessCode')
+    if (!sharePage) {
       return res.status(404).json({ message: 'Shared resume not found' })
+    }
+
+    const statusReason = resolveShareStatusReason(sharePage)
+    if (statusReason === 'disabled') {
+      return res.status(404).json({ message: 'Shared resume not found' })
+    }
+    if (statusReason === 'private') {
+      sharePage.deniedAccessCount += 1
+      await sharePage.save()
+      return res.status(403).json({ message: 'This shared resume is private', reason: 'private' })
+    }
+    if (statusReason === 'expired') {
+      sharePage.deniedAccessCount += 1
+      await sharePage.save()
+      return res.status(410).json({ message: 'This shared resume has expired', reason: 'expired' })
+    }
+    if (statusReason === 'view_limit_reached') {
+      sharePage.deniedAccessCount += 1
+      await sharePage.save()
+      return res.status(410).json({ message: 'This shared resume has reached its view limit', reason: 'view_limit_reached' })
+    }
+    if (sharePage.visibility === 'password') {
+      const accessCode = req.get('x-share-access-code') || req.query.accessCode || ''
+      if (!accessCode || accessCode !== sharePage.accessCode) {
+        sharePage.deniedAccessCount += 1
+        await sharePage.save()
+        return res.status(401).json({ message: 'Access code required', reason: 'password_required' })
+      }
     }
 
     const visitorHash = buildVisitorHash(req)
@@ -347,6 +442,8 @@ export const getPublicSharePage = async (req, res) => {
       slug: sharePage.slug,
       title: sharePage.title,
       status: sharePage.status,
+      visibility: sharePage.visibility,
+      statusReason,
       lastPublishedAt: sharePage.lastPublishedAt,
       viewCount: sharePage.viewCount,
       uniqueVisitorCount: sharePage.uniqueVisitorCount,

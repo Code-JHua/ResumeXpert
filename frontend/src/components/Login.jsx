@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom'
 import { UserContext } from '../context/UserContext.jsx'
 import axiosInstance from '../utils/axiosInstance.js';
 import { API_PATHS } from '../utils/apiPaths.js';
-import { validateEmail } from '../utils/helper.js';
 import { authStyles as styles } from '../assets/dummystyle';
 import { Input } from '../components/Inputs.jsx';
 import { useTranslation } from 'react-i18next';
@@ -20,7 +19,8 @@ const Login = ({ setCurrentPage }) => {
   const handleLogin = async (e) => {
     e.preventDefault();
 
-    if (!validateEmail(email)) {
+    const account = email.trim()
+    if (!account) {
       setError(t('auth.login.errors.invalidEmail'));
       return;
     }
@@ -31,7 +31,7 @@ const Login = ({ setCurrentPage }) => {
     setError('');
     try {
       const response = await axiosInstance.post(API_PATHS.AUTH.LOGIN, {
-        email,
+        email: account,
         password,
       })
       const { token } = response.data
@@ -59,9 +59,9 @@ const Login = ({ setCurrentPage }) => {
         <Input
           value={email}
           onChange={({ target }) => setEmail(target.value)}
-          label={t('auth.login.email')}
-          placeholder={t('auth.login.emailPlaceholder')}
-          type="email" />
+          label="账号或邮箱"
+          placeholder="请输入账号或邮箱"
+          type="text" />
         <Input
           value={password}
           onChange={({ target }) => setPassword(target.value)}

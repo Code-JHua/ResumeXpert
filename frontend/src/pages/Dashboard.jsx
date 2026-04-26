@@ -11,14 +11,14 @@ import moment from 'moment'
 import Modal from '../components/Modal'
 import CreateResumeForm from '../components/CreateResumeForm'
 import { useTranslation } from 'react-i18next'
-import { Link } from 'react-router-dom'
-
+import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { fetchResumes } from '../services/queryService'
+import { queryKeys } from '../lib/queryKeys'
 const Dashboard = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const queryClient = useQueryClient();
   const [openCreateModal, setOpenCreateModal] = useState(false);
-  const [allResumes, setAllResumes] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [resumeToDelete, setResumeToDelete] = useState(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
@@ -95,34 +95,28 @@ const Dashboard = () => {
     return Math.round((completedFields / totalFields) * 100);
   }
 
-  const fetchAllResumes = async () => {
-    try {
-      setLoading(true);
-      const response = await axiosInstance.get(API_PATHS.RESUME.GET_ALL)
-      // add completion percentage to each resumes
-      const resumesWithCompletion = response.data.map(resume => ({
-        ...resume,
-        completion: calculateCompletion(resume)
-      }))
-      setAllResumes(resumesWithCompletion);
-    } catch (error) {
-      console.error('Error fetching resumes:', error);
-    }
-    finally {
-      setLoading(false);
-    }
-  }
-  
-  useEffect(() => {
-    fetchAllResumes();
-  }, []);
+  const resumesQuery = useQuery({
+    queryKey: queryKeys.resumes,
+    queryFn: fetchResumes,
+    placeholderData: (previous) => previous,
+  })
+
+  const allResumes = React.useMemo(
+    () => (resumesQuery.data || []).map((resume) => ({
+      ...resume,
+      completion: calculateCompletion(resume),
+    })),
+    [resumesQuery.data]
+  )
+
+  const loading = resumesQuery.status === 'pending' && !resumesQuery.data
 
   const handleDeleteResume = async () => {
     if (!resumeToDelete) return;
 
     try {
       await axiosInstance.delete(API_PATHS.RESUME.DELETE(resumeToDelete))
-      setAllResumes((prev) => prev.filter((resume) => resume._id !== resumeToDelete))
+      queryClient.setQueryData(queryKeys.resumes, (prev = []) => prev.filter((resume) => resume._id !== resumeToDelete))
       toast.success(t('dashboard.toast.deleted'))
     } catch (error) {
       console.error('Error deleting resume:', error);
@@ -131,7 +125,7 @@ const Dashboard = () => {
     finally {
       setShowDeleteConfirm(false)
       setResumeToDelete(null)
-      fetchAllResumes()
+      queryClient.invalidateQueries({ queryKey: queryKeys.resumes })
     }
   }
 
@@ -143,22 +137,6 @@ const Dashboard = () => {
   return (
     <DashboardLayout>
       <div className={styles.container}>
-        <div className='grid grid-cols-1 md:grid-cols-3 gap-4 mb-8'>
-          {[
-            { to: '/imports', title: '导入中心', desc: '从 Markdown 或后续 PDF 材料开始创建简历' },
-            { to: '/share', title: '输出 / 分享', desc: '统一导出 PDF、Markdown，并管理公开分享链接' },
-            { to: '/templates', title: '模板中心', desc: '浏览官方模板、收藏复制模板，并管理模板元数据与主题参数' },
-            { to: '/jobs', title: '岗位 / ATS', desc: '录入 JD、分析匹配度、生成优化建议' },
-            { to: '/cover-letters', title: '求职信', desc: '基于简历和岗位生成求职信' },
-            { to: '/applications', title: '投递管理', desc: '管理投递状态、面试节点和日历安排' },
-          ].map((item) => (
-            <Link key={item.to} to={item.to} className='rounded-3xl bg-white border border-slate-200 shadow-sm p-5 hover:border-violet-300 transition-colors'>
-              <div className='text-lg font-bold text-slate-800'>{item.title}</div>
-              <p className='mt-2 text-sm text-slate-600'>{item.desc}</p>
-            </Link>
-          ))}
-        </div>
-
         <div className={styles.headerWrapper}>
           <div>
             <div className={styles.headerTitle}>{t('dashboard.title')}</div>
@@ -230,7 +208,7 @@ const Dashboard = () => {
                   onDelete={() => handleDeleteClick(resume._id)}
                   completion={resume.completion || 0}
                   contentSource={resume.contentSource}
-                  isDerived={Boolean(resume.derivedFromResumeId || resume.targetJobDescriptionId)}
+                  isDerived={false}
                   isPremium={resume.isPremium}
                   isNew={moment().diff(moment(resume.createdAt), 'day') < 7}
                 />
@@ -252,7 +230,7 @@ const Dashboard = () => {
           </div>
           <CreateResumeForm onSuccess={() => {
             setOpenCreateModal(false)
-            fetchAllResumes()
+            queryClient.invalidateQueries({ queryKey: queryKeys.resumes })
           }} />
         </div>
       </Modal>

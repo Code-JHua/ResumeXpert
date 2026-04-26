@@ -22,7 +22,6 @@ export const createResumeVersion = async (req, res) => {
       sourceResumeUpdatedAt: resume.updatedAt,
       sourceType: req.body.sourceType || resume.contentSource || 'manual',
       derivedFromVersionId: req.body.derivedFromVersionId || resume.derivedFromVersionId || null,
-      targetJobDescriptionId: req.body.targetJobDescriptionId || resume.targetJobDescriptionId || null,
       snapshotMeta: req.body.snapshotMeta || {
         contentSource: resume.contentSource || 'structured',
         templateId: resume.template?.theme || '',
@@ -30,6 +29,10 @@ export const createResumeVersion = async (req, res) => {
       },
       snapshot: buildSnapshot(resume),
     })
+
+    resume.canonicalContentVersion = version._id
+    resume.canonicalContentUpdatedAt = new Date()
+    await resume.save()
 
     res.status(201).json(version)
   } catch (error) {
@@ -84,6 +87,8 @@ export const restoreResumeVersion = async (req, res) => {
     }
 
     Object.assign(resume, version.snapshot)
+    resume.canonicalContentVersion = version._id
+    resume.canonicalContentUpdatedAt = new Date()
     const saved = await resume.save()
     res.json(saved)
   } catch (error) {

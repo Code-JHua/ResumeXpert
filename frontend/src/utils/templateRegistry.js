@@ -1,50 +1,67 @@
-import Resume1 from '../assets/Resume1.png'
-import Resume2 from '../assets/Resume2.png'
-import Resume3 from '../assets/Resume3.png'
-import TemplateOne from '../components/TemplateOne.jsx'
-import TemplateTwo from '../components/TemplateTwo.jsx'
-import TemplateThree from '../components/TemplateThree.jsx'
-import FlexibleTemplate from '../components/FlexibleTemplate.jsx'
+const rendererLoaders = {
+  '01': () => import('../components/TemplateOne.jsx'),
+  '02': () => import('../components/TemplateTwo.jsx'),
+  '03': () => import('../components/TemplateThree.jsx'),
+  flex: () => import('../components/FlexibleTemplate.jsx'),
+}
+
+const thumbnailMap = {
+  '01': new URL('../assets/Resume1.png', import.meta.url).href,
+  '02': new URL('../assets/Resume2.png', import.meta.url).href,
+  '03': new URL('../assets/Resume3.png', import.meta.url).href,
+  flex: new URL('../assets/Resume1.png', import.meta.url).href,
+}
 
 const RENDERER_REGISTRY = [
   {
     rendererKey: '01',
     name: 'Classic Professional',
-    renderer: TemplateOne,
-    thumbnail: Resume1,
+    thumbnail: thumbnailMap['01'],
   },
   {
     rendererKey: '02',
     name: 'Modern Sidebar',
-    renderer: TemplateTwo,
-    thumbnail: Resume2,
+    thumbnail: thumbnailMap['02'],
   },
   {
     rendererKey: '03',
     name: 'Compact ATS',
-    renderer: TemplateThree,
-    thumbnail: Resume3,
+    thumbnail: thumbnailMap['03'],
   },
   {
     rendererKey: 'flex',
     name: 'Flexible Studio',
-    renderer: FlexibleTemplate,
-    thumbnail: Resume1,
+    thumbnail: thumbnailMap.flex,
   },
 ]
 
 const registryMap = new Map(RENDERER_REGISTRY.map((template) => [template.rendererKey, template]))
+const rendererCache = new Map()
 
 export const getRegisteredTemplates = () => RENDERER_REGISTRY
 
-export const getTemplateRenderer = (rendererKey) => {
+export const getTemplateRendererMeta = (rendererKey) => {
   return registryMap.get(rendererKey) || RENDERER_REGISTRY[0]
+}
+
+export const loadTemplateRenderer = async (rendererKey) => {
+  const resolvedMeta = getTemplateRendererMeta(rendererKey)
+  const cacheKey = resolvedMeta.rendererKey
+
+  if (rendererCache.has(cacheKey)) {
+    return rendererCache.get(cacheKey)
+  }
+
+  const module = await (rendererLoaders[cacheKey] || rendererLoaders[RENDERER_REGISTRY[0].rendererKey])()
+  const renderer = module.default
+  rendererCache.set(cacheKey, renderer)
+  return renderer
 }
 
 export const getTemplateMetadata = (template) => {
   if (!template) return null
 
-  const registryTemplate = getTemplateRenderer(template.rendererKey || template.theme || template.id)
+  const registryTemplate = getTemplateRendererMeta(template.rendererKey || template.theme || template.id)
   return {
     ...registryTemplate,
     ...template,

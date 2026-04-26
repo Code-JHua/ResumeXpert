@@ -13,7 +13,7 @@ const ExportLogSchema = new mongoose.Schema({
   },
   format: {
     type: String,
-    enum: ['pdf', 'markdown', 'share'],
+    enum: ['pdf', 'markdown', 'share', 'docx'],
     required: true,
   },
   templateId: {

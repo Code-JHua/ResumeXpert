@@ -35,11 +35,6 @@ const ResumeVersionSchema = new mongoose.Schema({
     ref: 'ResumeVersion',
     default: null,
   },
-  targetJobDescriptionId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'JobDescription',
-    default: null,
-  },
   snapshotMeta: {
     type: mongoose.Schema.Types.Mixed,
     default: {},

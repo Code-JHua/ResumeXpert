@@ -1,0 +1,8 @@
+export const loadDashboardPage = () => import('../pages/Dashboard.jsx')
+export const loadTemplatesPage = () => import('../pages/TemplatesPage.jsx')
+export const loadShareManagementPage = () => import('../pages/ShareManagementPage.jsx')
+export const loadSettingsPage = () => import('../pages/SettingsPage.jsx')
+export const loadAdminPage = () => import('../pages/AdminPage.jsx')
+export const loadResumeMarkdownPage = () => import('../pages/ResumeMarkdownPage.jsx')
+export const loadEditResume = () => import('../components/EditResume.jsx')
+export const loadPublicSharePage = () => import('../pages/PublicSharePage.jsx')

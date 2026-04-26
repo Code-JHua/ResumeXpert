@@ -217,4 +217,8 @@ const TemplateSchema = new mongoose.Schema({
   },
 }, { timestamps: true })
 
+TemplateSchema.index({ sourceType: 1, sortOrder: 1, createdAt: -1 })
+TemplateSchema.index({ ownerId: 1, createdAt: -1 })
+TemplateSchema.index({ sourceType: 1, 'communityMeta.reviewStatus': 1, updatedAt: -1 })
+
 export default mongoose.model('Template', TemplateSchema)

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react'
-import { getTemplateMetadata, getTemplateRenderer } from '../utils/templateRegistry.js'
+import { getTemplateMetadata, loadTemplateRenderer } from '../utils/templateRegistry.js'
 import { getDensityClassName, resolveTemplateTheme } from '../utils/templateTheme.js'
 
 // 逐字母动画组件 - 支持输入淡入和删除淡出
@@ -93,12 +93,44 @@ const RenderResume = ({
   resumeData,
   containerWidth
 }) => {
-  const template = getTemplateMetadata(templateMeta) || getTemplateRenderer(templateId)
-  const Renderer = template?.renderer
+  const [Renderer, setRenderer] = useState(null)
+  const template = getTemplateMetadata(templateMeta || { rendererKey: templateId || '01' })
   const theme = resolveTemplateTheme(template, resumeData?.template)
 
+  useEffect(() => {
+    let cancelled = false
+
+    loadTemplateRenderer(template?.rendererKey || templateId)
+      .then((nextRenderer) => {
+        if (!cancelled) {
+          setRenderer(() => nextRenderer)
+        }
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setRenderer(null)
+        }
+      })
+
+    return () => {
+      cancelled = true
+    }
+  }, [template?.rendererKey, templateId])
+
   if (!Renderer) {
-    return null
+    return (
+      <div className='rounded-[28px] border border-slate-200 bg-[linear-gradient(180deg,#f8fafc_0%,#ffffff_100%)] p-6'>
+        <div className='space-y-4 animate-pulse'>
+          <div className='h-6 w-1/3 rounded-full bg-slate-200' />
+          <div className='h-4 w-2/3 rounded-full bg-slate-200' />
+          <div className='grid gap-3'>
+            <div className='h-24 rounded-[24px] bg-slate-100' />
+            <div className='h-24 rounded-[24px] bg-slate-100' />
+            <div className='h-40 rounded-[24px] bg-slate-100' />
+          </div>
+        </div>
+      </div>
+    )
   }
 
   return (

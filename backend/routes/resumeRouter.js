@@ -24,12 +24,12 @@ import {
   createResumeSharePage,
   exportResumeDocx,
   exportResumeMarkdown,
+  getResumeExportGovernanceSummary,
   getResumeExportLogs,
   getResumeSharePage,
   toggleResumeSharePage,
   updateResumeSharePage,
 } from '../controllers/exportController.js'
-
 
 const resumeRouter = express.Router()
 resumeRouter.post('/', protect, createResume)
@@ -46,6 +46,7 @@ resumeRouter.get('/:id/export/markdown', protect, exportResumeMarkdown)
 resumeRouter.get('/:id/export/docx', protect, exportResumeDocx)
 resumeRouter.post('/:id/exports/log', protect, createExportLog)
 resumeRouter.get('/:id/exports', protect, getResumeExportLogs)
+resumeRouter.get('/:id/exports/summary', protect, getResumeExportGovernanceSummary)
 resumeRouter.post('/:id/share', protect, createResumeSharePage)
 resumeRouter.get('/:id/share', protect, getResumeSharePage)
 resumeRouter.put('/:id/share', protect, updateResumeSharePage)

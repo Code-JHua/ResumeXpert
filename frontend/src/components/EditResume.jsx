@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react'
+import React, { Suspense, lazy, useState, useRef, useEffect, useCallback } from 'react'
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom'
 import toast from 'react-hot-toast'
 import DashboardLayout from './DashboardLayout'
@@ -19,7 +19,6 @@ import { API_PATHS } from '../utils/apiPaths'
 import { Loader2, Check, Download } from 'lucide-react'
 import html2canvas from 'html2canvas'
 import { fixTailwindColors, dataURLtoFile } from '../utils/helper'
-import ThemeSelector from './ThemeSelector'
 import RenderResume from './RenderResume'
 import Modal from './Modal'
 import { useTranslation } from 'react-i18next'
@@ -29,6 +28,7 @@ import ResumePreviewPanel from './resume-editor/ResumePreviewPanel.jsx'
 import ResumeEditorActions from './resume-editor/ResumeEditorActions.jsx'
 import { exportResumeAsPdf } from '../services/resumeExportService.js'
 
+const ThemeSelector = lazy(() => import('./ThemeSelector'))
 
 
 // resize obserber hook
@@ -777,41 +777,6 @@ const EditResume = () => {
             </div>
           )}
 
-          {searchParams.get('derivedFromJob') === '1' && (
-            <div className='mb-6 rounded-3xl border border-sky-200 bg-sky-50 px-5 py-4 text-sm text-sky-900'>
-              <div className='font-semibold'>岗位定制版简历</div>
-              <div className='mt-1'>当前简历来自岗位闭环派生，建议优先围绕目标岗位关键词、项目成果和工作经历进行定向优化。</div>
-              <div className='mt-3 flex flex-wrap gap-3'>
-                {searchParams.get('jobDescriptionId') && (
-                  <button
-                    onClick={() => navigate(`/jobs?resumeId=${resumeId}&jobId=${searchParams.get('jobDescriptionId')}`)}
-                    className='rounded-2xl border border-sky-300 bg-white px-4 py-2 font-semibold text-sky-800'
-                  >
-                    返回岗位分析页
-                  </button>
-                )}
-                {searchParams.get('versionId') && (
-                  <button
-                    onClick={() => setOpenVersionModal(true)}
-                    className='rounded-2xl border border-sky-300 bg-white px-4 py-2 font-semibold text-sky-800'
-                  >
-                    查看关联版本
-                  </button>
-                )}
-                <button
-                  onClick={() => {
-                    const next = new URLSearchParams(searchParams)
-                    next.delete('derivedFromJob')
-                    setSearchParams(next)
-                  }}
-                  className='rounded-2xl border border-slate-300 bg-white px-4 py-2 font-semibold text-slate-700'
-                >
-                  关闭提示
-                </button>
-              </div>
-            </div>
-          )}
-
           <div className={containerStyles.grid}>
             <div className={containerStyles.formContainer}>
               <StepProgress progress={progress} />
@@ -840,9 +805,11 @@ const EditResume = () => {
 
         <Modal isOpen={openThemeSelector} onClose={() => setOpenThemeSelector(false)} title={t('editResume.modal.changeTheme')}>
           <div className={containerStyles.modalContent}>
-            <ThemeSelector selectedTheme={resumeData?.template?.theme}
-              setSelectedTheme={updateTheme} resumeData={resumeData} onClose={() => setOpenThemeSelector(false)}
-            />
+            <Suspense fallback={<div className='rounded-3xl border border-slate-200 bg-white p-6 text-sm text-slate-500'>正在加载模板预览...</div>}>
+              <ThemeSelector selectedTheme={resumeData?.template?.theme}
+                setSelectedTheme={updateTheme} resumeData={resumeData} onClose={() => setOpenThemeSelector(false)}
+              />
+            </Suspense>
           </div>
         </Modal>
 

@@ -1,8 +1,9 @@
 import express from 'express'
-import { protect } from '../middleware/authMiddleware.js'
+import { optionalProtect, protect, requireAdmin } from '../middleware/authMiddleware.js'
 import {
   applyTemplateToResume,
   createTemplate,
+  deleteTemplate,
   duplicateTemplate,
   getTemplateById,
   getTemplateReviewQueue,
@@ -15,16 +16,17 @@ import {
 
 const templateRoutes = express.Router()
 
-templateRoutes.get('/', protect, getTemplates)
-templateRoutes.get('/review-queue', protect, getTemplateReviewQueue)
-templateRoutes.get('/:id', protect, getTemplateById)
-templateRoutes.get('/:id/preview', protect, getTemplateById)
+templateRoutes.get('/', optionalProtect, getTemplates)
+templateRoutes.get('/review-queue', protect, requireAdmin, getTemplateReviewQueue)
+templateRoutes.get('/:id', optionalProtect, getTemplateById)
+templateRoutes.get('/:id/preview', optionalProtect, getTemplateById)
 templateRoutes.post('/', protect, createTemplate)
 templateRoutes.put('/:id', protect, updateTemplate)
+templateRoutes.delete('/:id', protect, deleteTemplate)
 templateRoutes.post('/:id/favorite', protect, toggleFavoriteTemplate)
 templateRoutes.post('/:id/duplicate', protect, duplicateTemplate)
 templateRoutes.post('/:id/apply', protect, applyTemplateToResume)
 templateRoutes.post('/:id/submit-community', protect, submitTemplateToCommunity)
-templateRoutes.post('/:id/review', protect, reviewTemplateSubmission)
+templateRoutes.post('/:id/review', protect, requireAdmin, reviewTemplateSubmission)
 
 export default templateRoutes
